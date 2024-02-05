@@ -10,15 +10,15 @@ Getting started
 Install
 -------
 
-To use GWDA, we strongly recommend using the release of `GWDA container <https://hub.docker.com/layers/zzhopezhou/astropre/gwda/images/sha256-38d1ce5842c31632cb96da1e542d0e10ab1732fb29696e9798a984af0fb2cdd8?context=repo>`_ with GPU nodes.
+To use GWAI, we strongly recommend using the release of `GWAI container <https://hub.docker.com/layers/zzhopezhou/astropre/gwda/images/sha256-38d1ce5842c31632cb96da1e542d0e10ab1732fb29696e9798a984af0fb2cdd8?context=repo>`_ with GPU nodes.
 
 You can launch an instance of the `astropre container <https://hub.docker.com/layers/zzhopezhou/astropre/gwda/images/sha256-38d1ce5842c31632cb96da1e542d0e10ab1732fb29696e9798a984af0fb2cdd8?context=repo>`_ and 
-mount `GWDA <https://github.com/YueZhou-oh/GWDA_lib>`_ as well as your dataset with the following Docker commands.
+mount `GWAI <https://github.com/AI-HPC-Research-Team/GWAI/tree/main>`_ as well as your dataset with the following Docker commands.
 
 .. code-block:: console
 
    $ docker pull zzhopezhou/astropre:gwda
-   $ docker run --gpus all -itd -v /path/to/GWDA_lib:/workspace/GWDA_lib -v /path/to/dataset:/workspace/dataset zzhopezhou/astropre:gwda
+   $ docker run --gpus all -itd -v /path/to/GWAI:/workspace/GWAI -v /path/to/dataset:/workspace/dataset zzhopezhou/astropre:gwda
 
 In the container, two environments of different python version are provided.
 Specifically, the ``base`` environment is mainly used for model training and the ``waveform`` environment is for data generation.

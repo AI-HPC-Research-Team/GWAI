@@ -6,7 +6,7 @@ Tutorials
 .. _tutorials:
 
 
-We have tutorials and examples of using the GWDA_lib below.
+We have tutorials and examples of using the GWAI below.
 
 .. note::
 

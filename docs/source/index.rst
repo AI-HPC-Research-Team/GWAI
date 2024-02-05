@@ -1,8 +1,8 @@
 ================================
-Welcome to GWDA's documentation!
+Welcome to GWAI's documentation!
 ================================
 
-**GWDA** (Gravitational Wave Data Analysis) is a Python library for astronomy community
+**GWAI** (Gravitational Wave data analysis with Artificial Intelligence) is a Python library for astronomy community
 to provide easy-using GW data processing and model training package.
 
 Check out the :doc:`getting_started` section for further information, including
@@ -18,7 +18,7 @@ Contents
 .. toctree::
    :maxdepth: 3
 
-   about_gwda
+   about_gwai
    getting_started
    tutorials
    citations

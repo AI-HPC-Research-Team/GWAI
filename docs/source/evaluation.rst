@@ -13,7 +13,7 @@ Firstly, activating ``waveform`` environment.
     :linenos:
 
     $ conda activate waveform
-    $ cd /workspace/GWDA_lib/docs/source
+    $ cd /workspace/GWAI/docs/source
 
 Then, loading demo data of waveforms: ``w1.npy, w2.npy, noise.npy``, and plotting waveforms and noise.
 

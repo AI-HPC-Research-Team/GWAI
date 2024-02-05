@@ -11,14 +11,14 @@ Signal Classification
 ===========================================
 
 Firstly, activating ``waveform`` environment.
-Then, by running `train_classify.py <https://github.com/YueZhou-oh/GWDA_lib/blob/main/demos/train_classify.py>`_ script, your own signal classification model can be trained. 
-You can modify `classify.yaml <https://github.com/YueZhou-oh/GWDA_lib/blob/main/configs/classify.yaml>`_ to define your own training dataset as well as model configurations.
+Then, by running `train_classify.py <https://github.com/AI-HPC-Research-Team/GWAI/tree/main/demos/train_classify.py>`_ script, your own signal classification model can be trained. 
+You can modify `classify.yaml <https://github.com/AI-HPC-Research-Team/GWAI/tree/main/configs/classify.yaml>`_ to define your own training dataset as well as model configurations.
 
 .. code-block:: console
     :linenos:
 
     $ conda activate waveform
-    $ cd cd /workspace/GWDA_lib/src/demos
+    $ cd cd /workspace/GWAI/src/demos
     $ python train_classify.py
 
 The output log can be seen as follows.
@@ -42,16 +42,16 @@ Data Denoising
 ==============================================
 
 Firstly, downloading demo dataset (``train_data, valid_data, test_data``) from `this repository <https://github.com/AI-HPC-Research-Team/LIGO_noise_suppression>`_.
-and put it under `datasets/denoise <https://github.com/YueZhou-oh/GWDA_lib/tree/main/datasets/denoise>`_ folder.
-By running `denoise_demo.sh <https://github.com/YueZhou-oh/GWDA_lib/blob/main/demo/denoise_demo.sh>`_ script, your own denoising model can be trained. 
+and put it under `datasets/denoise <https://github.com/AI-HPC-Research-Team/GWAI/tree/main/datasets/denoise>`_ folder.
+By running `denoise_demo.sh <https://github.com/AI-HPC-Research-Team/GWAI/tree/main/demo/denoise_demo.sh>`_ script, your own denoising model can be trained. 
 
-You can modify configurations in `denoise_demo.sh <https://github.com/YueZhou-oh/GWDA_lib/blob/main/demo/denoise_demo.sh>`_ to build your own model with different model size.
+You can modify configurations in `denoise_demo.sh <https://github.com/AI-HPC-Research-Team/GWAI/tree/main/demo/denoise_demo.sh>`_ to build your own model with different model size.
 
 .. code-block:: console
     :linenos:
 
     $ conda activate base
-    $ cd /workspace/GWDA_lib/demos
+    $ cd /workspace/GWAI/demos
     $ bash denoise_demo.sh
 
 The output log can be seen as follows.
@@ -75,19 +75,19 @@ The output log can be seen as follows.
       > initializing model parallel cuda seeds on global rank 0, model parallel rank 0, and data parallel rank 0 with model parallel seed: 3952 and data parallel seed: 1234
       > compiling and loading fused kernels ...
       Detected CUDA files, patching ldflags
-      Emitting ninja build file /workspace/zhouy/GWDA_lib/demo/../src/model/denoising/fused_kernels/build/build.ninja...
+      Emitting ninja build file /workspace/GWAI/demo/../src/model/denoising/fused_kernels/build/build.ninja...
       Building extension module scaled_upper_triang_masked_softmax_cuda...
       Allowing ninja to set a default number of workers... (overridable by setting the environment variable MAX_JOBS=N)
       ninja: no work to do.
       Loading extension module scaled_upper_triang_masked_softmax_cuda...
       Detected CUDA files, patching ldflags
-      Emitting ninja build file /workspace/zhouy/GWDA_lib/demo/../src/model/denoising/fused_kernels/build/build.ninja...
+      Emitting ninja build file /workspace/GWAI/demo/../src/model/denoising/fused_kernels/build/build.ninja...
       Building extension module scaled_masked_softmax_cuda...
       Allowing ninja to set a default number of workers... (overridable by setting the environment variable MAX_JOBS=N)
       ninja: no work to do.
       Loading extension module scaled_masked_softmax_cuda...
       Detected CUDA files, patching ldflags
-      Emitting ninja build file /workspace/zhouy/GWDA_lib/demo/../src/model/denoising/fused_kernels/build/build.ninja...
+      Emitting ninja build file /workspace/GWAI/demo/../src/model/denoising/fused_kernels/build/build.ninja...
       Building extension module fused_mix_prec_layer_norm_cuda...
       Allowing ninja to set a default number of workers... (overridable by setting the environment variable MAX_JOBS=N)
       ninja: no work to do.
@@ -127,13 +127,13 @@ Signal Detection
 ==============================================
 
 Firstly, activating ``waveform`` environment.
-Then, by running `train_detection.py <https://github.com/YueZhou-oh/GWDA_lib/blob/main/demos/train_detection.py>`_ script, your own detection model can be trained. 
+Then, by running `train_detection.py <https://github.com/AI-HPC-Research-Team/GWAI/tree/main/demos/train_detection.py>`_ script, your own detection model can be trained. 
 
 .. code-block:: console
     :linenos:
 
     $ conda activate waveform
-    $ cd cd /workspace/GWDA_lib/demos/
+    $ cd cd /workspace/GWAI/demos/
     $ python train_detection.py ../configs/detection.yaml
 
 The output log can be seen as follows.

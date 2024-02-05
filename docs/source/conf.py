@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "GWDA"
+project = "GWAI"
 copyright = "2024, Yue Zhou, Tianyu Zhao"
 author = "Yue Zhou, Tianyu Zhao"
 
