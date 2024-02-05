@@ -8,7 +8,7 @@ import torch
 # import h5py
 from torch.utils.data import DataLoader, Dataset
 
-from utils.io.hdf5_wfd import load_waveform, save_waveform
+from ...utils.io.hdf5_wfd import load_waveform, save_waveform
 
 log = logging.getLogger(__name__)
 # import torch.multiprocessing
