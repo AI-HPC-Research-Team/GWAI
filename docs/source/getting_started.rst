@@ -33,7 +33,7 @@ Specifically, the ``base`` environment is mainly used for model training and the
 
 
 If you can't use this for some reason, use the latest pytorch, cuda, nccl, NVIDIA `APEX <https://github.com/NVIDIA/apex#quick-start>`_ and
-make sure that the following required `python packages <https://github.com/YueZhou-oh/GWDA_lib/blob/main/requirements.txt>`_ are successfully installed.
+make sure that the following required `python packages <https://github.com/AI-HPC-Research-Team/GWAI/tree/main/requirements.txt>`_ are successfully installed.
 
 .. code-block:: console
    :linenos:
