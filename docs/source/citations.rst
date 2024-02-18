@@ -7,7 +7,7 @@ Citations
 
 If you use any code from GWAI in a scientific publication, please citing the relevent publications as described below.
 
-- GWAI <TBA>
+- `GWAI <https://arxiv.org/abs/2402.02825>`_
 - `WaveFormer: transformer-based denoising method for gravitational-wave data <https://arxiv.org/abs/2212.14283>`_
 - `Megatron-LM paper series <https://github.com/NVIDIA/Megatron-LM>`_
 - `Space-based gravitational wave signal detection and extraction with deep neural network <https://www.nature.com/articles/s42005-023-01334-6>`_
