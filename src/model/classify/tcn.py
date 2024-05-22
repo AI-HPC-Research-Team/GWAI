@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 from torch.nn.utils import weight_norm
 
@@ -6,7 +5,9 @@ from torch.nn.utils import weight_norm
 class TCN(nn.Module):
     def __init__(self, input_size, output_size, num_channels, kernel_size, dropout):
         super(TCN, self).__init__()
-        self.tcn = TemporalConvNet(input_size, num_channels, kernel_size=kernel_size, dropout=dropout)
+        self.tcn = TemporalConvNet(
+            input_size, num_channels, kernel_size=kernel_size, dropout=dropout
+        )
         self.linear = nn.Linear(num_channels[-1], output_size)
 
     def forward(self, inputs):
@@ -84,7 +85,9 @@ class TemporalBlock(nn.Module):
             self.relu2,
             self.dropout2,
         )
-        self.downsample = nn.Conv1d(n_inputs, n_outputs, 1) if n_inputs != n_outputs else None
+        self.downsample = (
+            nn.Conv1d(n_inputs, n_outputs, 1) if n_inputs != n_outputs else None
+        )
         self.relu = nn.ReLU()
         self.init_weights()
 

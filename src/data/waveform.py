@@ -58,7 +58,10 @@ class GB:
         fddot = 11.0 / 3.0 * fdot**2 / f
 
         # phi0 is phi(t = 0) not phi(t = t0)
-        phase = 2 * np.pi * (f * t + 1.0 / 2.0 * fdot * t**2 + 1.0 / 6.0 * fddot * t**3) - phi0
+        phase = (
+            2 * np.pi * (f * t + 1.0 / 2.0 * fdot * t**2 + 1.0 / 6.0 * fddot * t**3)
+            - phi0
+        )
 
         hSp = -self.xp.cos(phase) * A * (1.0 + cosiota * cosiota)
         hSc = -self.xp.sin(phase) * 2.0 * A * cosiota
@@ -94,14 +97,18 @@ class AAK(object):
         # keyword arguments for inspiral generator (RunKerrGenericPn5Inspiral)
         inspiral_kwargs = {
             "DENSE_STEPPING": 0,  # we want a sparsely sampled trajectory
-            "max_init_len": int(1e4),  # all of the trajectories will be well under len = 1000
+            "max_init_len": int(
+                1e4
+            ),  # all of the trajectories will be well under len = 1000
         }
         # keyword arguments for summation generator (AAKSummation)
         sum_kwargs = {
             "use_gpu": use_gpu,  # GPU is availabel for this type of summation
             "pad_output": False,
         }
-        self.Pn5AAK = Pn5AAKWaveform(inspiral_kwargs=inspiral_kwargs, sum_kwargs=sum_kwargs, use_gpu=use_gpu)
+        self.Pn5AAK = Pn5AAKWaveform(
+            inspiral_kwargs=inspiral_kwargs, sum_kwargs=sum_kwargs, use_gpu=use_gpu
+        )
 
     def __call__(
         self,
@@ -185,7 +192,9 @@ class MBHB(object):
         self.T_buffer = T_buffer
         self.buffer_ind = buffer_ind
 
-    def __call__(self, M, q, spin1z, spin2z, coa_phase, distance, iota, psi, t_c, T=1, dt=10):
+    def __call__(
+        self, M, q, spin1z, spin2z, coa_phase, distance, iota, psi, t_c, T=1, dt=10
+    ):
         ratio = M / 100
         m1, m2 = MBHB.m1_m2_from_M_q(100, q)
         # print(ratio*self.f_min)
@@ -239,7 +248,9 @@ class MBHB(object):
 
         # remove first cycle to avoid tdi bugs
         est_T = ratio / f_lower
-        zero_idx = (np.abs(hp[bgn_idx_signal : bgn_idx_signal + int(est_T / dt / 2)])).argmin()
+        zero_idx = (
+            np.abs(hp[bgn_idx_signal : bgn_idx_signal + int(est_T / dt / 2)])
+        ).argmin()
         # ensure same +- sign
         if hp[bgn_idx_signal + zero_idx] * hp[bgn_idx_signal + zero_idx + 1] < 0:
             zero_idx += 1

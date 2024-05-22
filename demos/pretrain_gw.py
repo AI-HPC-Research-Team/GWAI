@@ -18,11 +18,11 @@
 # with some modifications.
 
 """Pretrain WaveFormer"""
+
 import sys
 from functools import partial
 
 import torch
-import torch.nn.functional as F
 
 sys.path.append("..")
 from src.model.denoising import get_args, get_timers, mpu, print_rank_0
@@ -40,7 +40,13 @@ def model_provider(pre_process=True, post_process=True):
     args = get_args()
     num_tokentypes = 2 if args.binary_head else 0
 
-    model = WaveFormerModel(num_tokentypes=num_tokentypes, add_binary_head=args.binary_head, parallel_output=False, pre_process=pre_process, post_process=post_process)
+    model = WaveFormerModel(
+        num_tokentypes=num_tokentypes,
+        add_binary_head=args.binary_head,
+        parallel_output=False,
+        pre_process=pre_process,
+        post_process=post_process,
+    )
 
     return model
 
@@ -71,7 +77,10 @@ def loss_func(loss_mask, clean_signal, output_tensor):
     denoised_signal, sop_logits = output_tensor
 
     loss_fn = torch.nn.MSELoss()
-    lm_loss = loss_fn(denoised_signal.to(torch.float32) * loss_mask.to(torch.float32), clean_signal.to(torch.float32) * loss_mask.to(torch.float32))
+    lm_loss = loss_fn(
+        denoised_signal.to(torch.float32) * loss_mask.to(torch.float32),
+        clean_signal.to(torch.float32) * loss_mask.to(torch.float32),
+    )
 
     loss = lm_loss  # + lm_loss_add
     averaged_losses = average_losses_across_data_parallel_group([loss])
@@ -88,7 +97,9 @@ def forward_step(data_iterator, model):
     noisy_signal, clean_signal, loss_mask, params = get_batch(data_iterator)
 
     # loss_mask is used to calculate loss
-    padding_mask = torch.ones(noisy_signal.shape[:2], device=noisy_signal.device)  # device='cuda:0'
+    padding_mask = torch.ones(
+        noisy_signal.shape[:2], device=noisy_signal.device
+    )  # device='cuda:0'
     gw_labels = torch.ones(noisy_signal.shape[:2], device=noisy_signal.device) * -1
     types = torch.zeros(noisy_signal.shape[:2], device=noisy_signal.device)
 
@@ -98,7 +109,9 @@ def forward_step(data_iterator, model):
         types = None
 
     # Forward pass through the model.
-    output_tensor = model(noisy_signal, padding_mask, tokentype_ids=types, gw_labels=gw_labels)
+    output_tensor = model(
+        noisy_signal, padding_mask, tokentype_ids=types, gw_labels=gw_labels
+    )
 
     return output_tensor, partial(loss_func, loss_mask, clean_signal)
 
@@ -108,7 +121,11 @@ def train_valid_test_datasets_provider():
     args = get_args()
 
     print_rank_0("> building train, validation, and test datasets " "for BERT ...")
-    train_ds, valid_ds, test_ds = build_train_valid_test_datasets(data_prefix=args.data_path, seq_length=args.seq_length, segment_length=args.segment_length)
+    train_ds, valid_ds, test_ds = build_train_valid_test_datasets(
+        data_prefix=args.data_path,
+        seq_length=args.seq_length,
+        segment_length=args.segment_length,
+    )
 
     print_rank_0("> finished creating BERT datasets ...")
 

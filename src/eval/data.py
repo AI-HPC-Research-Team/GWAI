@@ -1,5 +1,5 @@
-"""data evaluation and visualization functions
-"""
+"""data evaluation and visualization functions"""
+
 import sys
 
 sys.path.append("..")

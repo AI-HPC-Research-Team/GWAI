@@ -20,7 +20,12 @@ from src.model.denoising.data.gw_dataset import GwDataset
 
 def build_train_valid_test_datasets(data_prefix, seq_length, segment_length):
     def build_dataset(name, folder):
-        dataset = GwDataset(name=name, data_prefix=folder, seq_length=seq_length, segment_length=segment_length)
+        dataset = GwDataset(
+            name=name,
+            data_prefix=folder,
+            seq_length=seq_length,
+            segment_length=segment_length,
+        )
         return dataset
 
     train_dataset = build_dataset("train", os.path.join(data_prefix[0], "train_data"))

@@ -23,7 +23,17 @@ from src.model.denoising import print_rank_0
 class AnnealingLR(object):
     """Anneals the learning rate."""
 
-    def __init__(self, optimizer, max_lr, min_lr, warmup_steps, decay_steps, decay_style, use_checkpoint_lr_scheduler=True, override_lr_scheduler=False):
+    def __init__(
+        self,
+        optimizer,
+        max_lr,
+        min_lr,
+        warmup_steps,
+        decay_steps,
+        decay_style,
+        use_checkpoint_lr_scheduler=True,
+        override_lr_scheduler=False,
+    ):
         # Class values.
         self.optimizer = optimizer
 
@@ -43,7 +53,9 @@ class AnnealingLR(object):
         self.override_lr_scheduler = override_lr_scheduler
         self.use_checkpoint_lr_scheduler = use_checkpoint_lr_scheduler
         if self.override_lr_scheduler:
-            assert not self.use_checkpoint_lr_scheduler, "both override and " "use-checkpoint are set."
+            assert not self.use_checkpoint_lr_scheduler, (
+                "both override and " "use-checkpoint are set."
+            )
 
         # Set the learning rate
         self.step(0)
@@ -91,7 +103,14 @@ class AnnealingLR(object):
             group["lr"] = new_lr
 
     def state_dict(self):
-        state_dict = {"max_lr": self.max_lr, "warmup_steps": self.warmup_steps, "num_steps": self.num_steps, "decay_style": self.decay_style, "decay_steps": self.decay_steps, "min_lr": self.min_lr}
+        state_dict = {
+            "max_lr": self.max_lr,
+            "warmup_steps": self.warmup_steps,
+            "num_steps": self.num_steps,
+            "decay_style": self.decay_style,
+            "decay_steps": self.decay_steps,
+            "min_lr": self.min_lr,
+        }
         return state_dict
 
     def _check_and_set(self, cls_value, sd_value, name):
@@ -102,7 +121,10 @@ class AnnealingLR(object):
             return cls_value
 
         if not self.use_checkpoint_lr_scheduler:
-            assert cls_value == sd_value, f"AnnealingLR: class input value {cls_value} and checkpoint" f"value {sd_value} for {name} do not match"
+            assert cls_value == sd_value, (
+                f"AnnealingLR: class input value {cls_value} and checkpoint"
+                f"value {sd_value} for {name} do not match"
+            )
         print_rank_0(" > using checkpoint value {} for {}".format(sd_value, name))
         return sd_value
 
@@ -113,20 +135,28 @@ class AnnealingLR(object):
             max_lr_ = sd["max_lr"]
         self.max_lr = self._check_and_set(self.max_lr, max_lr_, "learning rate")
 
-        self.min_lr = self._check_and_set(self.min_lr, sd["min_lr"], "minimum learning rate")
+        self.min_lr = self._check_and_set(
+            self.min_lr, sd["min_lr"], "minimum learning rate"
+        )
 
         if "warmup_iter" in sd:
             warmup_steps_ = sd["warmup_iter"]
         else:
             warmup_steps_ = sd["warmup_steps"]
-        self.warmup_steps = self._check_and_set(self.warmup_steps, warmup_steps_, "warmup iterations")
+        self.warmup_steps = self._check_and_set(
+            self.warmup_steps, warmup_steps_, "warmup iterations"
+        )
 
         if "end_iter" in sd:
             decay_steps_ = sd["end_iter"]
         else:
             decay_steps_ = sd["decay_steps"]
-        self.decay_steps = self._check_and_set(self.decay_steps, decay_steps_, "total number of iterations")
-        self.decay_style = self._check_and_set(self.decay_style, sd["decay_style"], "decay style")
+        self.decay_steps = self._check_and_set(
+            self.decay_steps, decay_steps_, "total number of iterations"
+        )
+        self.decay_style = self._check_and_set(
+            self.decay_style, sd["decay_style"], "decay style"
+        )
 
         if "num_iters" in sd:
             num_steps = sd["num_iters"]

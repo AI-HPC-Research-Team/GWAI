@@ -1,21 +1,21 @@
 # mypy: ignore-errors
 """
-    Copyright (C) 2017 Stas Babak, Antoine Petiteau for the LDC team
+Copyright (C) 2017 Stas Babak, Antoine Petiteau for the LDC team
 
-    This file is part of LISA Data Challenge.
+This file is part of LISA Data Challenge.
 
-    LISA Data Challenge is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+LISA Data Challenge is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    Foobar is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+Foobar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 ##################################################
@@ -27,7 +27,6 @@
 #      for the LISA Data Challenge team          #
 #                                                #
 ##################################################
-
 
 import os
 import re
@@ -57,7 +56,7 @@ def run(command, disp=False, NoExit=False):
             sys.exit(1)
         else:
             print("continue anyway ...")
-
+        raise
 
 def makefromtemplate(output, template, keyChar, **kwargs):
     """
@@ -107,7 +106,7 @@ def GetStrCodeGitCmd(filepath, options, args):
     """
     dirCurrent = os.getcwd() + "/"
     dirScript = os.path.dirname(filepath) + "/"
-    nameScript = os.path.basename(filepath)
+    # nameScript = os.path.basename(filepath)
     os.chdir(dirScript)
     tmp = dirCurrent + "/tmp_GetStrCodeGitCmd.txt"
     run(
@@ -138,11 +137,12 @@ def GetStrCodeGitCmd(filepath, options, args):
             run("rm " + tmp)
     except:
         print("WARNING in GetStrCodeGitCmd: cannot recover script informations")
+        raise
     os.chdir(dirCurrent)
     r = f"#{gitHash} ({gitBranch}): python3 {filepath}"
     for i, k in enumerate(options):
         r = r + " --" + str(k) + "="
-        if type(options[k]) == str:
+        if isinstance(options[k], str):
             r = r + options[k]
         else:
             r = r + str(options[k])
@@ -166,9 +166,13 @@ def AziPolAngleL2PsiIncl(bet, lam, theL, phiL):
     # down_psi = np.sin(theL)*np.sin(lam - phiL)
     # psi = np.arctan2(up_psi, down_psi)
 
-    inc = np.arccos(-np.cos(theL) * np.sin(bet) - np.cos(bet) * np.sin(theL) * np.cos(lam - phiL))
+    inc = np.arccos(
+        -np.cos(theL) * np.sin(bet) - np.cos(bet) * np.sin(theL) * np.cos(lam - phiL)
+    )
     down_psi = np.sin(theL) * np.sin(lam - phiL)
-    up_psi = -np.sin(bet) * np.sin(theL) * np.cos(lam - phiL) + np.cos(theL) * np.cos(bet)
+    up_psi = -np.sin(bet) * np.sin(theL) * np.cos(lam - phiL) + np.cos(theL) * np.cos(
+        bet
+    )
     psi = np.arctan2(up_psi, down_psi)
 
     return psi, inc

@@ -24,10 +24,13 @@ import torch
 import torch.nn.functional as F
 
 from src.model.denoising import get_args, mpu
-from src.model.denoising.model import LayerNorm
 from src.model.denoising.model.enums import AttnMaskType, LayerType
 from src.model.denoising.model.transformer import ParallelTransformer
-from src.model.denoising.model.utils import get_linear_layer, init_method_normal, scaled_init_method_normal
+from src.model.denoising.model.utils import (
+    get_linear_layer,
+    init_method_normal,
+    scaled_init_method_normal,
+)
 
 from .module import MegatronModule
 
@@ -49,7 +52,18 @@ def parallel_gw_logits(input_, word_embeddings_weight, parallel_output, bias=Non
     return mpu.reduce_from_tensor_model_parallel_region(logits_parallel)
 
 
-def get_waveform_model(num_tokentypes, add_pooler, encoder_attn_mask_type, init_method=None, scaled_init_method=None, add_decoder=False, decoder_attn_mask_type=AttnMaskType.causal, pre_process=True, post_process=True, get_atten_value=False):
+def get_waveform_model(
+    num_tokentypes,
+    add_pooler,
+    encoder_attn_mask_type,
+    init_method=None,
+    scaled_init_method=None,
+    add_decoder=False,
+    decoder_attn_mask_type=AttnMaskType.causal,
+    pre_process=True,
+    post_process=True,
+    get_atten_value=False,
+):
     """Build language model and return along with the key to save."""
     args = get_args()
 
@@ -57,7 +71,9 @@ def get_waveform_model(num_tokentypes, add_pooler, encoder_attn_mask_type, init_
         init_method = init_method_normal(args.init_method_std)
 
     if scaled_init_method is None:
-        scaled_init_method = scaled_init_method_normal(args.init_method_std, args.num_layers)
+        scaled_init_method = scaled_init_method_normal(
+            args.init_method_std, args.num_layers
+        )
 
     # GW model.
     gw_model = TransformerWaveformModel(
@@ -117,7 +133,15 @@ class Embedding(MegatronModule):
                         will ignore this embedding
     """
 
-    def __init__(self, hidden_size, vocab_size, max_sequence_length, embedding_dropout_prob, init_method, num_tokentypes=0):
+    def __init__(
+        self,
+        hidden_size,
+        vocab_size,
+        max_sequence_length,
+        embedding_dropout_prob,
+        init_method,
+        num_tokentypes=0,
+    ):
         super(Embedding, self).__init__()
 
         self.hidden_size = hidden_size
@@ -127,34 +151,57 @@ class Embedding(MegatronModule):
 
         args = get_args()
         self.dets = len(args.dets.split(","))
-        assert max_sequence_length % self.dets == 0, "Error in data composition of multiple detectors."
+        assert (
+            max_sequence_length % self.dets == 0
+        ), "Error in data composition of multiple detectors."
         self.segs_per_det = max_sequence_length // self.dets
 
         # Token/Word Embedding (TE/WE).
-        self.word_embeddings = mpu.VocabParallelEmbedding(vocab_size, self.hidden_size, init_method=self.init_method)
+        self.word_embeddings = mpu.VocabParallelEmbedding(
+            vocab_size, self.hidden_size, init_method=self.init_method
+        )
         self._word_embeddings_key = "word_embeddings"
 
         # Position embedding (PE).
-        self.position_embeddings = torch.nn.Embedding(max_sequence_length, self.hidden_size)
+        self.position_embeddings = torch.nn.Embedding(
+            max_sequence_length, self.hidden_size
+        )
         # self.segs_per_det, self.hidden_size)
         self._position_embeddings_key = "position_embeddings"
         # Initialize the position embeddings.
         self.init_method(self.position_embeddings.weight)
 
         # Conv1D embedding (CE), for local feature extraction
-        self.conv_embeddings = torch.nn.Conv1d(max_sequence_length, max_sequence_length, self.kernel_size, padding="same", bias=False, dtype=args.params_dtype)
+        self.conv_embeddings = torch.nn.Conv1d(
+            max_sequence_length,
+            max_sequence_length,
+            self.kernel_size,
+            padding="same",
+            bias=False,
+            dtype=args.params_dtype,
+        )
 
         self._conv_embeddings_key = "conv_embeddings"
         # Initialize the position embeddings.
         self.init_method(self.conv_embeddings.weight)
 
-        self.conv_proj = torch.nn.Linear(args.segment_length, self.hidden_size, bias=False, dtype=args.params_dtype)
+        self.conv_proj = torch.nn.Linear(
+            args.segment_length, self.hidden_size, bias=False, dtype=args.params_dtype
+        )
         self._conv_proj_key = "conv_proj"
         # Initialize the position embeddings.
         self.init_method(self.conv_proj.weight)
 
         # Conv2d layer (serial), for 2D feature extraction/residual module
-        self.conv_layer = torch.nn.Conv2d(self.dets, self.dets, 7, stride=1, padding=3, bias=False, dtype=args.params_dtype)
+        self.conv_layer = torch.nn.Conv2d(
+            self.dets,
+            self.dets,
+            7,
+            stride=1,
+            padding=3,
+            bias=False,
+            dtype=args.params_dtype,
+        )
         self._conv_layer_key = "conv_layer"
         # Initialize the position embeddings.
         self.init_method(self.conv_layer.weight)
@@ -168,7 +215,9 @@ class Embedding(MegatronModule):
         # Embeddings.
         words_embeddings = self.word_embeddings(input_ids)
         position_embeddings = self.position_embeddings(position_ids)
-        conv_embeddings = self.conv_embeddings(input_ids.to(self.conv_embeddings.weight.dtype))
+        conv_embeddings = self.conv_embeddings(
+            input_ids.to(self.conv_embeddings.weight.dtype)
+        )
 
         conv_embeddings = self.embedding_activation(conv_embeddings)
 
@@ -176,7 +225,9 @@ class Embedding(MegatronModule):
 
         embeddings = words_embeddings + position_embeddings + conv_embeddings
 
-        conv_output = self.conv_layer(embeddings.reshape(-1, self.dets, self.segs_per_det, self.hidden_size)).reshape(embeddings.shape)
+        conv_output = self.conv_layer(
+            embeddings.reshape(-1, self.dets, self.segs_per_det, self.hidden_size)
+        ).reshape(embeddings.shape)
         conv_output = self.embedding_activation(conv_output)
 
         # residual block
@@ -187,15 +238,27 @@ class Embedding(MegatronModule):
 
         return embeddings_output
 
-    def state_dict_for_save_checkpoint(self, destination=None, prefix="", keep_vars=False):
+    def state_dict_for_save_checkpoint(
+        self, destination=None, prefix="", keep_vars=False
+    ):
         """For easy load."""
 
         state_dict_ = {}
-        state_dict_[self._word_embeddings_key] = self.word_embeddings.state_dict(destination, prefix, keep_vars)
-        state_dict_[self._position_embeddings_key] = self.position_embeddings.state_dict(destination, prefix, keep_vars)
-        state_dict_[self._conv_embeddings_key] = self.conv_embeddings.state_dict(destination, prefix, keep_vars)
-        state_dict_[self._conv_proj_key] = self.conv_proj.state_dict(destination, prefix, keep_vars)
-        state_dict_[self._conv_layer_key] = self.conv_layer.state_dict(destination, prefix, keep_vars)
+        state_dict_[self._word_embeddings_key] = self.word_embeddings.state_dict(
+            destination, prefix, keep_vars
+        )
+        state_dict_[self._position_embeddings_key] = (
+            self.position_embeddings.state_dict(destination, prefix, keep_vars)
+        )
+        state_dict_[self._conv_embeddings_key] = self.conv_embeddings.state_dict(
+            destination, prefix, keep_vars
+        )
+        state_dict_[self._conv_proj_key] = self.conv_proj.state_dict(
+            destination, prefix, keep_vars
+        )
+        state_dict_[self._conv_layer_key] = self.conv_layer.state_dict(
+            destination, prefix, keep_vars
+        )
 
         return state_dict_
 
@@ -270,7 +333,19 @@ class TransformerWaveformModel(MegatronModule):
                         will ignore this embedding
     """
 
-    def __init__(self, init_method, output_layer_init_method, encoder_attn_mask_type, num_tokentypes=0, add_decoder=False, decoder_attn_mask_type=AttnMaskType.causal, add_pooler=False, pre_process=True, post_process=True, get_atten_value=False):
+    def __init__(
+        self,
+        init_method,
+        output_layer_init_method,
+        encoder_attn_mask_type,
+        num_tokentypes=0,
+        add_decoder=False,
+        decoder_attn_mask_type=AttnMaskType.causal,
+        add_pooler=False,
+        pre_process=True,
+        post_process=True,
+        get_atten_value=False,
+    ):
         super(TransformerWaveformModel, self).__init__()
         args = get_args()
 
@@ -287,17 +362,38 @@ class TransformerWaveformModel(MegatronModule):
 
         # Embeddings.
         if self.pre_process:
-            self.embedding = Embedding(self.hidden_size, args.padded_vocab_size, args.max_position_embeddings, args.hidden_dropout, self.init_method, self.num_tokentypes)
+            self.embedding = Embedding(
+                self.hidden_size,
+                args.padded_vocab_size,
+                args.max_position_embeddings,
+                args.hidden_dropout,
+                self.init_method,
+                self.num_tokentypes,
+            )
             self._embedding_key = "embedding"
 
         # Transformer.
-        self.encoder = ParallelTransformer(self.init_method, output_layer_init_method, self_attn_mask_type=self.encoder_attn_mask_type, pre_process=self.pre_process, post_process=self.post_process, get_atten_value=self.get_atten_value)
+        self.encoder = ParallelTransformer(
+            self.init_method,
+            output_layer_init_method,
+            self_attn_mask_type=self.encoder_attn_mask_type,
+            pre_process=self.pre_process,
+            post_process=self.post_process,
+            get_atten_value=self.get_atten_value,
+        )
         self._encoder_key = "encoder"
 
         # Decoder
         if self.add_decoder:
-            assert args.pipeline_model_parallel_size == 1, "pipeline parallelism is not supported in the presence of decoder"
-            self.decoder = ParallelTransformer(self.init_method, output_layer_init_method, layer_type=LayerType.decoder, self_attn_mask_type=self.decoder_attn_mask_type)
+            assert (
+                args.pipeline_model_parallel_size == 1
+            ), "pipeline parallelism is not supported in the presence of decoder"
+            self.decoder = ParallelTransformer(
+                self.init_method,
+                output_layer_init_method,
+                layer_type=LayerType.decoder,
+                self_attn_mask_type=self.decoder_attn_mask_type,
+            )
             self._decoder_key = "decoder"
 
         if self.post_process:
@@ -328,14 +424,21 @@ class TransformerWaveformModel(MegatronModule):
     ):
         # Embeddings.
         if self.pre_process:
-            embedding_output = self.embedding(enc_input_ids, enc_position_ids, tokentype_ids=tokentype_ids)
+            embedding_output = self.embedding(
+                enc_input_ids, enc_position_ids, tokentype_ids=tokentype_ids
+            )
             encoder_input = embedding_output
         else:
             encoder_input = None
 
         # encoder.
         if enc_hidden_states is None:
-            encoder_output = self.encoder(encoder_input, enc_attn_mask, layer_past=layer_past, get_key_value=get_key_value)
+            encoder_output = self.encoder(
+                encoder_input,
+                enc_attn_mask,
+                layer_past=layer_past,
+                get_key_value=get_key_value,
+            )
             # encoder_output = encoder_output + encoder_input
         else:
             encoder_output = enc_hidden_states.to(encoder_input.dtype)
@@ -353,18 +456,34 @@ class TransformerWaveformModel(MegatronModule):
             else:
                 return encoder_output
 
-    def state_dict_for_save_checkpoint(self, destination=None, prefix="", keep_vars=False):
+    def state_dict_for_save_checkpoint(
+        self, destination=None, prefix="", keep_vars=False
+    ):
         """For easy load."""
 
         state_dict_ = {}
         if self.pre_process:
-            state_dict_[self._embedding_key] = self.embedding.state_dict_for_save_checkpoint(destination, prefix, keep_vars)
-        state_dict_[self._encoder_key] = self.encoder.state_dict_for_save_checkpoint(destination, prefix, keep_vars)
+            state_dict_[self._embedding_key] = (
+                self.embedding.state_dict_for_save_checkpoint(
+                    destination, prefix, keep_vars
+                )
+            )
+        state_dict_[self._encoder_key] = self.encoder.state_dict_for_save_checkpoint(
+            destination, prefix, keep_vars
+        )
         if self.post_process:
             if self.add_pooler:
-                state_dict_[self._pooler_key] = self.pooler.state_dict_for_save_checkpoint(destination, prefix, keep_vars)
+                state_dict_[self._pooler_key] = (
+                    self.pooler.state_dict_for_save_checkpoint(
+                        destination, prefix, keep_vars
+                    )
+                )
         if self.add_decoder:
-            state_dict_[self._decoder_key] = self.decoder.state_dict_for_save_checkpoint(destination, prefix, keep_vars)
+            state_dict_[self._decoder_key] = (
+                self.decoder.state_dict_for_save_checkpoint(
+                    destination, prefix, keep_vars
+                )
+            )
 
         return state_dict_
 
@@ -400,7 +519,9 @@ class TransformerWaveformModel(MegatronModule):
         state_dict_self_attention = {}
         for key in state_dict_.keys():
             if ".attention." in key:
-                state_dict_self_attention[key.replace(".attention.", ".self_attention.")] = state_dict_[key]
+                state_dict_self_attention[
+                    key.replace(".attention.", ".self_attention.")
+                ] = state_dict_[key]
             else:
                 state_dict_self_attention[key] = state_dict_[key]
         state_dict_ = state_dict_self_attention
@@ -410,9 +531,13 @@ class TransformerWaveformModel(MegatronModule):
         if self.post_process:
             # pooler
             if self.add_pooler:
-                assert "pooler" in state_dict, "could not find data for pooler in the checkpoint"
+                assert (
+                    "pooler" in state_dict
+                ), "could not find data for pooler in the checkpoint"
                 self.pooler.load_state_dict(state_dict[self._pooler_key], strict=strict)
         # decoder
         if self.add_decoder:
-            assert "decoder" in state_dict, "could not find data for pooler in the checkpoint"
+            assert (
+                "decoder" in state_dict
+            ), "could not find data for pooler in the checkpoint"
             self.decoder.load_state_dict(state_dict[self._decoder_key], strict=strict)

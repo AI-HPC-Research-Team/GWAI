@@ -8,7 +8,6 @@ from pathlib import Path
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import wandb
 from torch.optim import SGD, Adadelta, Adagrad, Adam, AdamW, RMSprop
 from torch.optim.lr_scheduler import (
@@ -18,7 +17,6 @@ from torch.optim.lr_scheduler import (
     ReduceLROnPlateau,
     StepLR,
 )
-from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 log = logging.getLogger(__name__)
@@ -45,8 +43,12 @@ class Trainer:
         self.model = model
         self.train_loader = train_loader
         self.test_loader = test_loader
-        self.optimizer = self.get_optimizer(optimizer_type, self.model, **optimizer_kwargs)
-        self.scheduler = self.get_lr_scheduler(scheduler_type, self.optimizer, **scheduler_kwargs)
+        self.optimizer = self.get_optimizer(
+            optimizer_type, self.model, **optimizer_kwargs
+        )
+        self.scheduler = self.get_lr_scheduler(
+            scheduler_type, self.optimizer, **scheduler_kwargs
+        )
         self.loss_fn = self.get_loss_fn(loss_fn)
         self.device = device
 
@@ -155,11 +157,15 @@ class Trainer:
             self.optimizer.step()
             acc = self.accuracy(outputs, targets)
             # acc = self.calculate_accuracy(outputs, targets)
-            self.avg_train_loss = self.update_average(loss.detach().cpu(), self.avg_train_loss)
+            self.avg_train_loss = self.update_average(
+                loss.detach().cpu(), self.avg_train_loss
+            )
             avg_acc = self.update_average(torch.tensor(acc), avg_acc)
 
             pbar.update(inputs.shape[0])
-            pbar.set_postfix({"loss": f"{self.avg_train_loss:.2e}", "acc": f"{avg_acc:.2f}"})
+            pbar.set_postfix(
+                {"loss": f"{self.avg_train_loss:.2e}", "acc": f"{avg_acc:.2f}"}
+            )
         pbar.close()
 
         # if self.use_wandb:
@@ -198,7 +204,10 @@ class Trainer:
                 if save:
                     inf_map = self.model.get_activation_maps()  # just one sample
                     print("Saving inf maps...")
-                    np.save(f"inf_map_AK.npy", [inf_map[i].cpu().numpy() for i in range(len(inf_map))])
+                    np.save(
+                        "inf_map_AK.npy",
+                        [inf_map[i].cpu().numpy() for i in range(len(inf_map))],
+                    )
                     # self.model.clear_activation_maps()
                     for i, ind in enumerate(idx):
                         line = torch.cat((latent_vec, outputs), dim=1)
@@ -212,7 +221,9 @@ class Trainer:
 
                 acc = self.accuracy(outputs, targets)
                 # acc = self.calculate_accuracy(outputs, targets)
-                self.avg_test_loss = self.update_average(loss.detach(), self.avg_test_loss)
+                self.avg_test_loss = self.update_average(
+                    loss.detach(), self.avg_test_loss
+                )
                 avg_acc = self.update_average(torch.tensor(acc), avg_acc)
                 pbar.update(inputs.shape[0])
                 pbar.set_postfix(
@@ -236,7 +247,9 @@ class Trainer:
         for epoch in range(n_epochs):
             train_loss, train_acc = self.train_epoch(self.train_loader, epoch)
             val_loss, valid_acc = self.evaluate(self.test_loader)
-            log.info(f"EPOCH {epoch+1}\t: lr={self.optimizer.param_groups[0]['lr']:.2e},\t train_loss={train_loss:.2e}, \t train_acc={train_acc:.4f}, \t val_loss={val_loss:.2e} \t valid_acc={valid_acc:.4f}")
+            log.info(
+                f"EPOCH {epoch+1}\t: lr={self.optimizer.param_groups[0]['lr']:.2e},\t train_loss={train_loss:.2e}, \t train_acc={train_acc:.4f}, \t val_loss={val_loss:.2e} \t valid_acc={valid_acc:.4f}"
+            )
             if val_loss < self.best_loss:
                 self.best_loss = val_loss
                 torch.save(
@@ -284,7 +297,11 @@ class Trainer:
 
     def get_optimizer(self, optimizer_choice, model, **kwargs):
         if optimizer_choice == "adam":
-            print("Using Adam optimizer, lr={}, weight_decay={}".format(kwargs.get("lr"), kwargs.get("weight_decay")))
+            print(
+                "Using Adam optimizer, lr={}, weight_decay={}".format(
+                    kwargs.get("lr"), kwargs.get("weight_decay")
+                )
+            )
             return Adam(
                 model.parameters(),
                 lr=kwargs.get("lr", 1e-3),
@@ -358,7 +375,9 @@ class Trainer:
 
         print("\nGPU tensors sorted by size:")
         for tensor, size in gpu_tensors:
-            print(f"Size (MB): {size/1e6}, Tensor Shape: {tensor.shape}, Tensor dtype: {tensor.dtype}")
+            print(
+                f"Size (MB): {size/1e6}, Tensor Shape: {tensor.shape}, Tensor dtype: {tensor.dtype}"
+            )
 
     def format_number_with_unit(self, num):
         if num >= 1_000_000_000:
@@ -372,11 +391,15 @@ class Trainer:
 
     def count_parameters(self, model):
         total_params = sum(param.numel() for param in model.parameters())
-        trainable_params = sum(param.numel() for param in model.parameters() if param.requires_grad)
+        trainable_params = sum(
+            param.numel() for param in model.parameters() if param.requires_grad
+        )
 
         formatted_total_params = self.format_number_with_unit(total_params)
         formatted_trainable_params = self.format_number_with_unit(trainable_params)
-        formatted_non_trainable_params = self.format_number_with_unit(total_params - trainable_params)
+        formatted_non_trainable_params = self.format_number_with_unit(
+            total_params - trainable_params
+        )
 
         print(f"Total parameters: {formatted_total_params}")
         print(f"Trainable parameters: {formatted_trainable_params}")

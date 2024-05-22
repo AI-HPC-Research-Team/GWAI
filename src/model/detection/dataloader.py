@@ -7,7 +7,10 @@ import torch
 
 class GWSEDataset(object):
     def __init__(self):
-        self.waveform_dataset = {"train": {"noisy": [], "clean": []}, "test": {"noisy": [], "clean": []}}
+        self.waveform_dataset = {
+            "train": {"noisy": [], "clean": []},
+            "test": {"noisy": [], "clean": []},
+        }
 
     def save_waveform(self, DIR=".", data_fn="waveform_dataset.hdf5"):
         p = Path(DIR)
@@ -19,7 +22,12 @@ class GWSEDataset(object):
         for i in self.waveform_dataset.keys():
             for j in self.waveform_dataset[i].keys():
                 data_name = i + "_" + j
-                f_data.create_dataset(data_name, data=self.waveform_dataset[i][j], compression="gzip", compression_opts=9)
+                f_data.create_dataset(
+                    data_name,
+                    data=self.waveform_dataset[i][j],
+                    compression="gzip",
+                    compression_opts=9,
+                )
         f_data.close()
 
     def load_waveform(self, DIR=".", data_fn="waveform_dataset.hdf5"):
@@ -47,11 +55,28 @@ class WaveformDatasetTorch(torch.utils.data.Dataset):
     def merge_dataset(
         self,
     ):
-        self.num = self.wfd.waveform_dataset[self.type_str]["clean"].shape[0] + self.noise.waveform_dataset[self.type_str]["clean"].shape[0]
-        self.waveform_dataset = {"train": {"noisy": np.zeros([self.num, self.length]), "clean": np.zeros([self.num, self.length])}, "test": {"noisy": np.zeros([self.num, self.length]), "clean": np.zeros([self.num, self.length])}}
+        self.num = (
+            self.wfd.waveform_dataset[self.type_str]["clean"].shape[0]
+            + self.noise.waveform_dataset[self.type_str]["clean"].shape[0]
+        )
+        self.waveform_dataset = {
+            "train": {
+                "noisy": np.zeros([self.num, self.length]),
+                "clean": np.zeros([self.num, self.length]),
+            },
+            "test": {
+                "noisy": np.zeros([self.num, self.length]),
+                "clean": np.zeros([self.num, self.length]),
+            },
+        }
         for i in self.waveform_dataset.keys():
             for j in self.waveform_dataset[i].keys():
-                self.waveform_dataset[i][j] = np.vstack([self.wfd.waveform_dataset[i][j][:, -self.length :], self.noise.waveform_dataset[i][j][:, -self.length :]])
+                self.waveform_dataset[i][j] = np.vstack(
+                    [
+                        self.wfd.waveform_dataset[i][j][:, -self.length :],
+                        self.noise.waveform_dataset[i][j][:, -self.length :],
+                    ]
+                )
 
     def __len__(self):
         return self.waveform_dataset[self.type_str]["clean"].shape[0]
@@ -62,4 +87,9 @@ class WaveformDatasetTorch(torch.utils.data.Dataset):
         clean = self.waveform_dataset[self.type_str]["clean"][idx][-self.length :]
         label = 0 if np.allclose(clean, np.zeros(self.length)) else 1
 
-        return torch.from_numpy(noisy).float(), torch.from_numpy(seq_len), torch.from_numpy(clean).float(), torch.from_numpy(np.array([label]))
+        return (
+            torch.from_numpy(noisy).float(),
+            torch.from_numpy(seq_len),
+            torch.from_numpy(clean).float(),
+            torch.from_numpy(np.array([label])),
+        )

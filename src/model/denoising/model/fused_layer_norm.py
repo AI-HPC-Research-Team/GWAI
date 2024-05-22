@@ -14,8 +14,8 @@
 # limitations under the License.
 
 """This code is copied fron NVIDIA apex:
-      https://github.com/NVIDIA/apex
-   with some changes. """
+   https://github.com/NVIDIA/apex
+with some changes."""
 
 import importlib
 import numbers
@@ -36,7 +36,9 @@ class FusedLayerNormAffineFunction(torch.autograd.Function):
         input_ = input.contiguous()
         weight_ = weight.contiguous()
         bias_ = bias.contiguous()
-        output, mean, invvar = fused_mix_prec_layer_norm_cuda.forward_affine(input_, ctx.normalized_shape, weight_, bias_, ctx.eps)
+        output, mean, invvar = fused_mix_prec_layer_norm_cuda.forward_affine(
+            input_, ctx.normalized_shape, weight_, bias_, ctx.eps
+        )
         ctx.save_for_backward(input_, weight_, bias_, mean, invvar)
 
         return output
@@ -45,7 +47,18 @@ class FusedLayerNormAffineFunction(torch.autograd.Function):
     def backward(ctx, grad_output):
         input_, weight_, bias_, mean, invvar = ctx.saved_tensors
         grad_input = grad_weight = grad_bias = None
-        grad_input, grad_weight, grad_bias = fused_mix_prec_layer_norm_cuda.backward_affine(grad_output.contiguous(), mean, invvar, input_, ctx.normalized_shape, weight_, bias_, ctx.eps)
+        grad_input, grad_weight, grad_bias = (
+            fused_mix_prec_layer_norm_cuda.backward_affine(
+                grad_output.contiguous(),
+                mean,
+                invvar,
+                input_,
+                ctx.normalized_shape,
+                weight_,
+                bias_,
+                ctx.eps,
+            )
+        )
 
         return grad_input, grad_weight, grad_bias, None, None
 
@@ -55,7 +68,9 @@ class MixedFusedLayerNorm(torch.nn.Module):
         super(MixedFusedLayerNorm, self).__init__()
 
         global fused_mix_prec_layer_norm_cuda
-        fused_mix_prec_layer_norm_cuda = importlib.import_module("fused_mix_prec_layer_norm_cuda")
+        fused_mix_prec_layer_norm_cuda = importlib.import_module(
+            "fused_mix_prec_layer_norm_cuda"
+        )
 
         if isinstance(normalized_shape, numbers.Integral):
             normalized_shape = (normalized_shape,)
@@ -70,4 +85,6 @@ class MixedFusedLayerNorm(torch.nn.Module):
         init.zeros_(self.bias)
 
     def forward(self, input):
-        return FusedLayerNormAffineFunction.apply(input, self.weight, self.bias, self.normalized_shape, self.eps)
+        return FusedLayerNormAffineFunction.apply(
+            input, self.weight, self.bias, self.normalized_shape, self.eps
+        )

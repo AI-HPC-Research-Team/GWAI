@@ -15,14 +15,13 @@ import speechbrain.nnet.schedulers as schedulers
 import torch
 import torch.nn.functional as F
 from hyperpyyaml import load_hyperpyyaml
-from matplotlib.pyplot import clabel
 from speechbrain.dataio.dataloader import LoopedLoader
 from speechbrain.utils.distributed import run_on_main
 from torch.cuda.amp import autocast
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from src.model.detection.dataloader import GWSEDataset, WaveformDatasetTorch
+from src.model.detection.dataloader import WaveformDatasetTorch
 
 
 # os.environ["CUDA_VISIBLE_DEVICES"]="7"
@@ -62,7 +61,10 @@ class Separation(sb.Brain):
 
         # Decoding
         est_source = torch.cat(
-            [self.hparams.Decoder(sep_h[i]).unsqueeze(-1) for i in range(self.hparams.num_spks)],
+            [
+                self.hparams.Decoder(sep_h[i]).unsqueeze(-1)
+                for i in range(self.hparams.num_spks)
+            ],
             dim=-1,
         )
 
@@ -142,9 +144,15 @@ class Separation(sb.Brain):
             Whether to display the progress of each epoch in a progressbar.
         """
 
-        if not (isinstance(train_set, DataLoader) or isinstance(train_set, LoopedLoader)):
-            train_set = self.make_dataloader(train_set, stage=sb.Stage.TRAIN, **train_loader_kwargs)
-        if valid_set is not None and not (isinstance(valid_set, DataLoader) or isinstance(valid_set, LoopedLoader)):
+        if not (
+            isinstance(train_set, DataLoader) or isinstance(train_set, LoopedLoader)
+        ):
+            train_set = self.make_dataloader(
+                train_set, stage=sb.Stage.TRAIN, **train_loader_kwargs
+            )
+        if valid_set is not None and not (
+            isinstance(valid_set, DataLoader) or isinstance(valid_set, LoopedLoader)
+        ):
             valid_set = self.make_dataloader(
                 valid_set,
                 stage=sb.Stage.VALID,
@@ -168,7 +176,9 @@ class Separation(sb.Brain):
             # Reset nonfinite count to 0 each epoch
             self.nonfinite_count = 0
 
-            if self.train_sampler is not None and hasattr(self.train_sampler, "set_epoch"):
+            if self.train_sampler is not None and hasattr(
+                self.train_sampler, "set_epoch"
+            ):
                 self.train_sampler.set_epoch(epoch)
 
             # Time since last intra-epoch checkpoint
@@ -187,8 +197,12 @@ class Separation(sb.Brain):
                     loss, loss1, loss2 = self.fit_batch(batch)
 
                     self.avg_train_loss = self.update_average(loss, self.avg_train_loss)
-                    self.avg_train_loss1 = self.update_average(loss1, self.avg_train_loss1)
-                    self.avg_train_loss2 = self.update_average(loss2, self.avg_train_loss2)
+                    self.avg_train_loss1 = self.update_average(
+                        loss1, self.avg_train_loss1
+                    )
+                    self.avg_train_loss2 = self.update_average(
+                        loss2, self.avg_train_loss2
+                    )
                     t.set_postfix(
                         train_loss=self.avg_train_loss,
                         loss1=self.avg_train_loss1,
@@ -199,7 +213,12 @@ class Separation(sb.Brain):
                     if self.debug and self.step == self.debug_batches:
                         break
 
-                    if self.checkpointer is not None and self.ckpt_interval_minutes > 0 and time.time() - last_ckpt_time >= self.ckpt_interval_minutes * 60.0:
+                    if (
+                        self.checkpointer is not None
+                        and self.ckpt_interval_minutes > 0
+                        and time.time() - last_ckpt_time
+                        >= self.ckpt_interval_minutes * 60.0
+                    ):
                         # This should not use run_on_main, because that
                         # includes a DDP barrier. That eventually leads to a
                         # crash when the processes'
@@ -231,9 +250,13 @@ class Separation(sb.Brain):
                 avg_valid_loss1 = 0.0
                 avg_valid_loss2 = 0.0
                 with torch.no_grad():
-                    for batch in tqdm(valid_set, dynamic_ncols=True, disable=not enable):
+                    for batch in tqdm(
+                        valid_set, dynamic_ncols=True, disable=not enable
+                    ):
                         self.step += 1
-                        loss, loss1, loss2 = self.evaluate_batch(batch, stage=sb.Stage.VALID)
+                        loss, loss1, loss2 = self.evaluate_batch(
+                            batch, stage=sb.Stage.VALID
+                        )
 
                         avg_valid_loss = self.update_average(loss, avg_valid_loss)
                         avg_valid_loss1 = self.update_average(loss1, avg_valid_loss1)
@@ -275,7 +298,9 @@ class Separation(sb.Brain):
 
         if self.auto_mix_prec:  # false
             with autocast():
-                predictions, targets, clabel = self.compute_forward(mixture, targets, sb.Stage.TRAIN)
+                predictions, targets, clabel = self.compute_forward(
+                    mixture, targets, sb.Stage.TRAIN
+                )
                 loss = self.compute_sisdr(predictions, targets)
                 loss2 = self.compute_cross_entropy(clabel, label)
                 # print(predictions.shape)
@@ -290,7 +315,9 @@ class Separation(sb.Brain):
                 else:
                     loss = loss.mean()
 
-            if loss < self.hparams.loss_upper_lim and loss.nelement() > 0:  # the fix for computational problems
+            if (
+                loss < self.hparams.loss_upper_lim and loss.nelement() > 0
+            ):  # the fix for computational problems
                 self.scaler.scale(loss).backward()
                 if self.hparams.clip_grad_norm >= 0:
                     self.scaler.unscale_(self.optimizer)
@@ -302,14 +329,20 @@ class Separation(sb.Brain):
                 self.scaler.update()
             else:
                 self.nonfinite_count += 1
-                logger.info("infinite loss or empty loss! it happened {} times so far - skipping this batch".format(self.nonfinite_count))
+                logger.info(
+                    "infinite loss or empty loss! it happened {} times so far - skipping this batch".format(
+                        self.nonfinite_count
+                    )
+                )
                 loss.data = torch.tensor(0).to(self.device)
         else:
             label = label.to(self.device)
             # print(label.shape)
             label = label.squeeze(1).float()
 
-            predictions, targets, est_label = self.compute_forward(mixture, targets, sb.Stage.TRAIN)
+            predictions, targets, est_label = self.compute_forward(
+                mixture, targets, sb.Stage.TRAIN
+            )
             loss1 = self.compute_sisdr(predictions, targets)
             loss1 = loss1 * label
             loss2 = self.compute_cross_entropy(est_label, label)
@@ -319,14 +352,22 @@ class Separation(sb.Brain):
             loss1 = loss1.mean()
             loss2 = loss2.mean()
 
-            if loss < self.hparams.loss_upper_lim and loss.nelement() > 0:  # the fix for computational problems
+            if (
+                loss < self.hparams.loss_upper_lim and loss.nelement() > 0
+            ):  # the fix for computational problems
                 loss.backward()
                 if self.hparams.clip_grad_norm >= 0:
-                    torch.nn.utils.clip_grad_norm_(self.modules.parameters(), self.hparams.clip_grad_norm)
+                    torch.nn.utils.clip_grad_norm_(
+                        self.modules.parameters(), self.hparams.clip_grad_norm
+                    )
                 self.optimizer.step()
             else:
                 self.nonfinite_count += 1
-                logger.info("infinite loss or empty loss! it happened {} times so far - skipping this batch".format(self.nonfinite_count))
+                logger.info(
+                    "infinite loss or empty loss! it happened {} times so far - skipping this batch".format(
+                        self.nonfinite_count
+                    )
+                )
                 loss.data = torch.tensor(0).to(self.device)
         self.optimizer.zero_grad()
 
@@ -371,7 +412,9 @@ class Separation(sb.Brain):
 
         if not (isinstance(test_set, DataLoader) or isinstance(test_set, LoopedLoader)):
             test_loader_kwargs["ckpt_prefix"] = None
-            test_set = self.make_dataloader(test_set, sb.Stage.TEST, **test_loader_kwargs)
+            test_set = self.make_dataloader(
+                test_set, sb.Stage.TEST, **test_loader_kwargs
+            )
         self.on_evaluate_start(max_key=max_key, min_key=min_key)
         self.on_stage_start(sb.Stage.TEST, epoch=None)
         self.modules.eval()
@@ -392,7 +435,9 @@ class Separation(sb.Brain):
         with torch.no_grad():
             for batch in tqdm(test_set, dynamic_ncols=True, disable=not progressbar):
                 self.step += 1
-                loss, loss1, loss2 = self.evaluate_batch(batch, stage=sb.Stage.TEST, epoch=self.step)
+                loss, loss1, loss2 = self.evaluate_batch(
+                    batch, stage=sb.Stage.TEST, epoch=self.step
+                )
                 avg_test_loss = self.update_average(loss, avg_test_loss)
                 avg_test_loss1 = self.update_average(loss1, avg_test_loss1)
                 avg_test_loss2 = self.update_average(loss2, avg_test_loss2)
@@ -431,7 +476,9 @@ class Separation(sb.Brain):
             targets.append(batch.s3_sig)
 
         with torch.no_grad():
-            predictions, targets, est_label = self.compute_forward(mixture, targets, stage)
+            predictions, targets, est_label = self.compute_forward(
+                mixture, targets, stage
+            )
 
             loss1 = self.compute_sisdr(predictions, targets)
             loss2 = self.compute_cross_entropy(est_label, label)
@@ -462,6 +509,7 @@ class Separation(sb.Brain):
                 )
 
             # ______________________________________________
+            '''
             if self.hparams.save_attention_weights:
                 # save att weight in hdf5
                 att_data = {
@@ -495,18 +543,22 @@ class Separation(sb.Brain):
                         chunks=True,
                         maxshape=(2, None, 25, 162, 162),
                     )
-                    self.inf_data_stream.create_dataset("label", data=label.cpu().numpy(), chunks=True, maxshape=(None,))
+                    self.inf_data_stream.create_dataset(
+                        "label", data=label.cpu().numpy(), chunks=True, maxshape=(None,)
+                    )
                 else:
                     for i in att_data.keys():
                         n = self.inf_data_stream[i].shape[1]
                         self.inf_data_stream[i].resize(n + att_data[i].shape[1], axis=1)
-                        self.inf_data_stream[i][:, -att_data[i].shape[1] :, :, :, :] = att_data[i]
+                        self.inf_data_stream[i][:, -att_data[i].shape[1] :, :, :, :] = (
+                            att_data[i]
+                        )
 
                     lab = label.cpu().numpy()
-                    l = self.inf_data_stream["label"].shape[0]
-                    self.inf_data_stream["label"].resize(l + lab.shape[0], axis=0)
+                    lb = self.inf_data_stream["label"].shape[0]
+                    self.inf_data_stream["label"].resize(lb + lab.shape[0], axis=0)
                     self.inf_data_stream["label"][-lab.shape[0] :] = lab
-
+            '''
         return loss.detach().cpu(), loss1.detach().cpu(), loss2.detach().cpu()
 
     def on_stage_end(self, stage, stage_loss, loss1, loss2, epoch):
@@ -520,7 +572,9 @@ class Separation(sb.Brain):
         if stage == sb.Stage.VALID:
             # Learning rate annealing
             if isinstance(self.hparams.lr_scheduler, schedulers.ReduceLROnPlateau):
-                current_lr, next_lr = self.hparams.lr_scheduler([self.optimizer], epoch, stage_loss)
+                current_lr, next_lr = self.hparams.lr_scheduler(
+                    [self.optimizer], epoch, stage_loss
+                )
                 schedulers.update_learning_rate(self.optimizer, next_lr)
             else:
                 # if we do not use the reducelronplateau, we do not change the lr
@@ -559,7 +613,9 @@ class Separation(sb.Brain):
         all_sisnrs_i = []
         csv_columns = ["snt_id", "sdr", "sdr_i", "si-snr", "si-snr_i"]
 
-        test_loader = sb.dataio.dataloader.make_dataloader(test_data, **self.hparams.dataloader_opts)
+        test_loader = sb.dataio.dataloader.make_dataloader(
+            test_data, **self.hparams.dataloader_opts
+        )
 
         with open(save_file, "w") as results_csv:
             writer = csv.DictWriter(results_csv, fieldnames=csv_columns)
@@ -576,13 +632,17 @@ class Separation(sb.Brain):
                         targets.append(batch.s3_sig)
 
                     with torch.no_grad():
-                        predictions, targets = self.compute_forward(batch.mix_sig, targets, sb.Stage.TEST)
+                        predictions, targets = self.compute_forward(
+                            batch.mix_sig, targets, sb.Stage.TEST
+                        )
 
                     # Compute SI-SNR
                     sisnr = self.compute_objectives(predictions, targets)
 
                     # Compute SI-SNR improvement
-                    mixture_signal = torch.stack([mixture] * self.hparams.num_spks, dim=-1)
+                    mixture_signal = torch.stack(
+                        [mixture] * self.hparams.num_spks, dim=-1
+                    )
                     mixture_signal = mixture_signal.to(targets.device)
                     sisnr_baseline = self.compute_objectives(mixture_signal, targets)
                     sisnr_i = sisnr - sisnr_baseline
@@ -666,8 +726,12 @@ if __name__ == "__main__":
     wfd.load_waveform(DIR=hparams["data_folder"], data_fn=hparams["data_hdf5"])
     noise.load_waveform(DIR=hparams["data_folder"], data_fn=hparams["noise_hdf5"])
 
-    wfdt_train = WaveformDatasetTorch(wfd, noise, train=True, length=hparams["training_signal_len"])
-    wfdt_test = WaveformDatasetTorch(wfd, noise, train=False, length=hparams["training_signal_len"])
+    wfdt_train = WaveformDatasetTorch(
+        wfd, noise, train=True, length=hparams["training_signal_len"]
+    )
+    wfdt_test = WaveformDatasetTorch(
+        wfd, noise, train=False, length=hparams["training_signal_len"]
+    )
 
     train_loader = DataLoader(
         wfdt_train,
@@ -675,7 +739,9 @@ if __name__ == "__main__":
         shuffle=True,
         pin_memory=True,
         num_workers=8,
-        worker_init_fn=lambda _: np.random.seed(int(torch.initial_seed()) % (2**32 - 1)),
+        worker_init_fn=lambda _: np.random.seed(
+            int(torch.initial_seed()) % (2**32 - 1)
+        ),
     )
 
     test_loader = DataLoader(
@@ -684,7 +750,9 @@ if __name__ == "__main__":
         shuffle=False,
         pin_memory=True,
         num_workers=8,
-        worker_init_fn=lambda _: np.random.seed(int(torch.initial_seed()) % (2**32 - 1)),
+        worker_init_fn=lambda _: np.random.seed(
+            int(torch.initial_seed()) % (2**32 - 1)
+        ),
     )
 
     # Load pretrained model if pretrained_separator is present in the yaml

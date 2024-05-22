@@ -48,11 +48,22 @@ class MemoryBuffer:
     def __init__(self, name, numel, dtype, track_usage):
         if torch.distributed.get_rank() == 0:
             element_size = torch.tensor([], dtype=dtype).element_size()
-            print("> building the {} memory buffer with {} num elements " "and {} dtype ({:.1f} MB)...".format(name, numel, dtype, numel * element_size / 1024 / 1024), flush=True)
+            print(
+                "> building the {} memory buffer with {} num elements "
+                "and {} dtype ({:.1f} MB)...".format(
+                    name, numel, dtype, numel * element_size / 1024 / 1024
+                ),
+                flush=True,
+            )
         self.name = name
         self.numel = numel
         self.dtype = dtype
-        self.data = torch.empty(self.numel, dtype=self.dtype, device=torch.cuda.current_device(), requires_grad=False)
+        self.data = torch.empty(
+            self.numel,
+            dtype=self.dtype,
+            device=torch.cuda.current_device(),
+            requires_grad=False,
+        )
 
         # Index tracking the start of the free memory.
         self._start = 0
@@ -78,11 +89,19 @@ class MemoryBuffer:
     def add(self, tensor):
         """Allocate a chunk of memory from the buffer to tensor and copy
         the values."""
-        assert tensor.dtype == self.dtype, "Input tensor type {} different from buffer type {}".format(tensor.dtype, self.dtype)
+        assert (
+            tensor.dtype == self.dtype
+        ), "Input tensor type {} different from buffer type {}".format(
+            tensor.dtype, self.dtype
+        )
         # Number of elements of the input tensor.
         tensor_numel = torch.numel(tensor)
         new_start = self._start + tensor_numel
-        assert new_start <= self.numel, "Not enough memory left in the buffer ({} > {})".format(tensor_numel, self.numel - self._start)
+        assert (
+            new_start <= self.numel
+        ), "Not enough memory left in the buffer ({} > {})".format(
+            tensor_numel, self.numel - self._start
+        )
         # New tensor is a view into the memory.
         new_tensor = self.data[self._start : new_start]
         self._start = new_start
@@ -103,7 +122,12 @@ class MemoryBuffer:
         to be as high as possible."""
         assert self.track_usage, "You need to enable track usage."
         if torch.distributed.get_rank() == 0:
-            print(" > usage of {} memory buffer: {:.2f} %".format(self.name, self.in_use_value * 100.0 / self.total_value), flush=True)
+            print(
+                " > usage of {} memory buffer: {:.2f} %".format(
+                    self.name, self.in_use_value * 100.0 / self.total_value
+                ),
+                flush=True,
+            )
 
 
 class RingMemBuffer:
@@ -111,7 +135,10 @@ class RingMemBuffer:
 
     def __init__(self, name, num_buffers, numel, dtype, track_usage):
         self.num_buffers = num_buffers
-        self.buffers = [allocate_mem_buff(name + " {}".format(i), numel, dtype, track_usage) for i in range(num_buffers)]
+        self.buffers = [
+            allocate_mem_buff(name + " {}".format(i), numel, dtype, track_usage)
+            for i in range(num_buffers)
+        ]
         self._index = -1
 
     def get_next_buffer(self):

@@ -36,7 +36,7 @@ def main():
     p = Path.cwd().parent
     VGB_cat = p / "src/data/catalog/VGB-catalog.txt"
     orbit_file = p / "src/data/orbit/taiji-orbit.hdf5"
-    
+
     tdi_wg = TDIWaveformGen(T=2.0, use_gpu=False, det="Taiji", orbit_file=orbit_file)
     tdi_wg.init_GB(VGB=True)
     gen_vgb_data(tdi_wg, VGB_cat, "test_VGB.hdf5")

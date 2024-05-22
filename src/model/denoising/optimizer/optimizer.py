@@ -56,7 +56,9 @@ def _multi_tensor_copy_this_to_that(this, that, overflow_buf=None):
 
 
 class MegatronOptimizer(ABC):
-    def __init__(self, optimizer, clip_grad, log_num_zeros_in_grad, params_have_main_grad):
+    def __init__(
+        self, optimizer, clip_grad, log_num_zeros_in_grad, params_have_main_grad
+    ):
         """Input optimizer is the base optimizer for example Adam."""
         self.optimizer = optimizer
         assert self.optimizer, "no optimizer is provided."
@@ -161,8 +163,18 @@ class Float16OptimizerWithFloat16Params(MegatronOptimizer):
             always require a grad scaler.
     """
 
-    def __init__(self, optimizer, clip_grad, log_num_zeros_in_grad, params_have_main_grad, bf16, grad_scaler):
-        super(Float16OptimizerWithFloat16Params, self).__init__(optimizer, clip_grad, log_num_zeros_in_grad, params_have_main_grad)
+    def __init__(
+        self,
+        optimizer,
+        clip_grad,
+        log_num_zeros_in_grad,
+        params_have_main_grad,
+        bf16,
+        grad_scaler,
+    ):
+        super(Float16OptimizerWithFloat16Params, self).__init__(
+            optimizer, clip_grad, log_num_zeros_in_grad, params_have_main_grad
+        )
 
         self.bf16 = bf16
         self.grad_scaler = grad_scaler
@@ -210,7 +222,10 @@ class Float16OptimizerWithFloat16Params(MegatronOptimizer):
             for i, param in enumerate(param_group["params"]):
                 if param.requires_grad:
                     # float16 params:
-                    if param.type() in ["torch.cuda.HalfTensor", "torch.cuda.BFloat16Tensor"]:
+                    if param.type() in [
+                        "torch.cuda.HalfTensor",
+                        "torch.cuda.BFloat16Tensor",
+                    ]:
                         float16_params_this_group.append(param)
                         # Create a copy
                         main_param = param.detach().clone().float()
@@ -223,7 +238,9 @@ class Float16OptimizerWithFloat16Params(MegatronOptimizer):
                         fp32_from_float16_params_this_group.append(main_param)
                         # Reset existing state dict key to the new main param.
                         if param in self.optimizer.state:
-                            self.optimizer.state[main_param] = self.optimizer.state.pop(param)
+                            self.optimizer.state[main_param] = self.optimizer.state.pop(
+                                param
+                            )
 
                     # fp32 params.
                     elif param.type() == "torch.cuda.FloatTensor":
@@ -231,7 +248,13 @@ class Float16OptimizerWithFloat16Params(MegatronOptimizer):
                         param_group["params"][i] = param
 
                     else:
-                        raise TypeError("Wrapped parameters must be one of " "torch.cuda.FloatTensor,  " "torch.cuda.HalfTensor, or " "torch.cuda.BFloat16Tensor. " "Received {}".format(param.type()))
+                        raise TypeError(
+                            "Wrapped parameters must be one of "
+                            "torch.cuda.FloatTensor,  "
+                            "torch.cuda.HalfTensor, or "
+                            "torch.cuda.BFloat16Tensor. "
+                            "Received {}".format(param.type())
+                        )
 
             self.float16_groups.append(float16_params_this_group)
             self.fp32_from_float16_groups.append(fp32_from_float16_params_this_group)
@@ -261,7 +284,9 @@ class Float16OptimizerWithFloat16Params(MegatronOptimizer):
 
     def _copy_model_grads_to_main_grads(self):
         # This only needs to be done for the float16 group.
-        for model_group, main_group in zip(self.float16_groups, self.fp32_from_float16_groups):
+        for model_group, main_group in zip(
+            self.float16_groups, self.fp32_from_float16_groups
+        ):
             for model_param, main_param in zip(model_group, main_group):
                 if self.params_have_main_grad:
                     # print_rank_0("model_param.shape:{}".format(model_param.shape))
@@ -291,9 +316,15 @@ class Float16OptimizerWithFloat16Params(MegatronOptimizer):
         # Reset found inf.
         self.found_inf.fill_(0.0)
         # Unscale and set found inf/nan
-        torch._amp_foreach_non_finite_check_and_unscale_(main_grads, self.found_inf, self.grad_scaler.inv_scale)
+        torch._amp_foreach_non_finite_check_and_unscale_(
+            main_grads, self.found_inf, self.grad_scaler.inv_scale
+        )
         # Update across all model parallel instances.
-        torch.distributed.all_reduce(self.found_inf, op=torch.distributed.ReduceOp.MAX, group=mpu.get_model_parallel_group())
+        torch.distributed.all_reduce(
+            self.found_inf,
+            op=torch.distributed.ReduceOp.MAX,
+            group=mpu.get_model_parallel_group(),
+        )
 
         # Check for nan.
         found_inf_flag = self.found_inf.item() > 0
@@ -302,7 +333,9 @@ class Float16OptimizerWithFloat16Params(MegatronOptimizer):
     def _get_model_and_main_params_data_float16(self):
         model_data = []
         main_data = []
-        for model_group, main_group in zip(self.float16_groups, self.fp32_from_float16_groups):
+        for model_group, main_group in zip(
+            self.float16_groups, self.fp32_from_float16_groups
+        ):
             for model_param, main_param in zip(model_group, main_group):
                 model_data.append(model_param.data)
                 main_data.append(main_param.data)
@@ -311,12 +344,16 @@ class Float16OptimizerWithFloat16Params(MegatronOptimizer):
     def _copy_main_params_to_model_params(self):
         # Only needed for the float16 params.
         model_data, main_data = self._get_model_and_main_params_data_float16()
-        _multi_tensor_copy_this_to_that(this=main_data, that=model_data, overflow_buf=self._dummy_overflow_buf)
+        _multi_tensor_copy_this_to_that(
+            this=main_data, that=model_data, overflow_buf=self._dummy_overflow_buf
+        )
 
     def _copy_model_params_to_main_params(self):
         # Only needed for the float16 params.
         model_data, main_data = self._get_model_and_main_params_data_float16()
-        _multi_tensor_copy_this_to_that(this=model_data, that=main_data, overflow_buf=self._dummy_overflow_buf)
+        _multi_tensor_copy_this_to_that(
+            this=model_data, that=main_data, overflow_buf=self._dummy_overflow_buf
+        )
 
     def reload_model_params(self):
         self._copy_model_params_to_main_params()
@@ -380,30 +417,45 @@ class Float16OptimizerWithFloat16Params(MegatronOptimizer):
         optimizer_key = "optimizer"
         if optimizer_key not in state_dict:
             optimizer_key = "optimizer_state_dict"
-            print_rank_0("***WARNING*** loading optimizer from " "an old checkpoint ...")
+            print_rank_0(
+                "***WARNING*** loading optimizer from " "an old checkpoint ..."
+            )
         self.optimizer.load_state_dict(state_dict[optimizer_key])
 
         # Grad scaler.
         if "grad_scaler" not in state_dict:
-            print_rank_0("***WARNING*** found an old checkpoint, will not " "load grad scaler ...")
+            print_rank_0(
+                "***WARNING*** found an old checkpoint, will not "
+                "load grad scaler ..."
+            )
         else:
             if self.grad_scaler:
                 self.grad_scaler.load_state_dict(state_dict["grad_scaler"])
             else:
-                print_rank_0("***WARNING*** fould the grad scaler in the " "checkpoint but it is None in the class. " "Skipping loading grad scaler ...")
+                print_rank_0(
+                    "***WARNING*** fould the grad scaler in the "
+                    "checkpoint but it is None in the class. "
+                    "Skipping loading grad scaler ..."
+                )
 
         # Copy data for the main params.
         fp32_from_float16_params_key = "fp32_from_fp16_params"
         if fp32_from_float16_params_key not in state_dict:
             fp32_from_float16_params_key = "fp32_from_fp16"
-        for current_group, saved_group in zip(self.fp32_from_float16_groups, state_dict[fp32_from_float16_params_key]):
+        for current_group, saved_group in zip(
+            self.fp32_from_float16_groups, state_dict[fp32_from_float16_params_key]
+        ):
             for current_param, saved_param in zip(current_group, saved_group):
                 current_param.data.copy_(saved_param.data)
 
 
 class FP32Optimizer(MegatronOptimizer):
-    def __init__(self, optimizer, clip_grad, log_num_zeros_in_grad, params_have_main_grad):
-        super(FP32Optimizer, self).__init__(optimizer, clip_grad, log_num_zeros_in_grad, params_have_main_grad)
+    def __init__(
+        self, optimizer, clip_grad, log_num_zeros_in_grad, params_have_main_grad
+    ):
+        super(FP32Optimizer, self).__init__(
+            optimizer, clip_grad, log_num_zeros_in_grad, params_have_main_grad
+        )
 
         self._scale = torch.cuda.FloatTensor([1.0])
 

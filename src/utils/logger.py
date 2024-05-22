@@ -2,13 +2,11 @@
 """
 Logging utilities
 """
+
 import functools
 import logging
 from time import gmtime, strftime, time
 
-import rich.syntax
-import rich.tree
-from omegaconf import DictConfig, ListConfig, OmegaConf
 from rich import print
 
 
@@ -46,7 +44,10 @@ class Timer:
             try:
                 rsp = func(*args, **kwargs)
                 # self.logger.debug(f"Response: {rsp}")
-                print(f"{self.prefix} Used " + strftime("%H:%M:%S", gmtime(time() - start_time)))
+                print(
+                    f"{self.prefix} Used "
+                    + strftime("%H:%M:%S", gmtime(time() - start_time))
+                )
                 return rsp
             except Exception as e:
                 # self.logger.error(repr(e))

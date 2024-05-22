@@ -4,7 +4,7 @@ import sys
 sys.path.append("..")
 try:
     import cupy as xp
-except (ImportError, ModuleNotFoundError) as e:
+except (ImportError, ModuleNotFoundError):
     import numpy as xp
 
 import h5py
@@ -63,7 +63,7 @@ def gen_sgwb(wg, psd):
 
 def main():
     use_gpu = False
-    
+
     p = Path.cwd().parent
     orbit_file = p / "src/data/orbit/taiji-orbit.hdf5"
 

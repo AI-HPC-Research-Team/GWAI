@@ -28,7 +28,12 @@ from torch.utils.checkpoint import detach_variable
 from src.model.denoising import get_args
 from src.model.denoising.memory import allocate_mem_buff
 
-from .initialize import get_data_parallel_rank, get_tensor_model_parallel_group, get_tensor_model_parallel_rank, get_tensor_model_parallel_world_size
+from .initialize import (
+    get_data_parallel_rank,
+    get_tensor_model_parallel_group,
+    get_tensor_model_parallel_rank,
+    get_tensor_model_parallel_world_size,
+)
 
 # Default name for the model parallel rng tracker.
 _MODEL_PARALLEL_RNG_TRACKER_NAME = "model-parallel-rng"
@@ -42,8 +47,15 @@ def init_checkpointed_activations_memory_buffer():
     """Initializ the memory buffer for the checkpointed activations."""
     args = get_args()
 
-    per_layer = args.micro_batch_size * args.max_position_embeddings * args.hidden_size // args.tensor_model_parallel_size
-    assert args.num_layers % args.checkpoint_num_layers == 0, "number of layers is not divisible by checkpoint-num-layers"
+    per_layer = (
+        args.micro_batch_size
+        * args.max_position_embeddings
+        * args.hidden_size
+        // args.tensor_model_parallel_size
+    )
+    assert (
+        args.num_layers % args.checkpoint_num_layers == 0
+    ), "number of layers is not divisible by checkpoint-num-layers"
     num_checkpointer_layers = args.num_layers // args.checkpoint_num_layers
     numel = per_layer * num_checkpointer_layers
     dtype = torch.half
@@ -51,8 +63,12 @@ def init_checkpointed_activations_memory_buffer():
         dtype = torch.float
 
     global _CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER
-    assert _CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER is None, "checkpointed activations memory buffer is already allocated."
-    _CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER = allocate_mem_buff("checkpointed activations", numel, dtype, track_usage=False)
+    assert (
+        _CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER is None
+    ), "checkpointed activations memory buffer is already allocated."
+    _CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER = allocate_mem_buff(
+        "checkpointed activations", numel, dtype, track_usage=False
+    )
 
 
 def reset_checkpointed_activations_memory_buffer():
@@ -109,9 +125,16 @@ def gather_split_1d_tensor(tensor):
     world_size = get_tensor_model_parallel_world_size()
     numel = torch.numel(tensor)
     numel_gathered = world_size * numel
-    gathered = torch.empty(numel_gathered, dtype=tensor.dtype, device=torch.cuda.current_device(), requires_grad=False)
+    gathered = torch.empty(
+        numel_gathered,
+        dtype=tensor.dtype,
+        device=torch.cuda.current_device(),
+        requires_grad=False,
+    )
     chunks = [gathered[i * numel : (i + 1) * numel] for i in range(world_size)]
-    torch.distributed.all_gather(chunks, tensor, group=get_tensor_model_parallel_group())
+    torch.distributed.all_gather(
+        chunks, tensor, group=get_tensor_model_parallel_group()
+    )
     return gathered
 
 
@@ -222,14 +245,22 @@ def model_parallel_cuda_manual_seed(seed):
         print(
             "> initializing model parallel cuda seeds on global rank {}, "
             "model parallel rank {}, and data parallel rank {} with "
-            "model parallel seed: {} and data parallel seed: {}".format(torch.distributed.get_rank(), get_tensor_model_parallel_rank(), get_data_parallel_rank(), tensor_model_parallel_seed, data_parallel_seed),
+            "model parallel seed: {} and data parallel seed: {}".format(
+                torch.distributed.get_rank(),
+                get_tensor_model_parallel_rank(),
+                get_data_parallel_rank(),
+                tensor_model_parallel_seed,
+                data_parallel_seed,
+            ),
             flush=True,
         )
     _CUDA_RNG_STATE_TRACKER.reset()
     # Set the default state.
     torch.cuda.manual_seed(data_parallel_seed)
     # and model parallel state.
-    _CUDA_RNG_STATE_TRACKER.add(_MODEL_PARALLEL_RNG_TRACKER_NAME, tensor_model_parallel_seed)
+    _CUDA_RNG_STATE_TRACKER.add(
+        _MODEL_PARALLEL_RNG_TRACKER_NAME, tensor_model_parallel_seed
+    )
 
 
 class CheckpointFunction(torch.autograd.Function):
@@ -267,7 +298,10 @@ class CheckpointFunction(torch.autograd.Function):
     @staticmethod
     def backward(ctx, *args):
         if not torch.autograd._is_checkpoint_valid():
-            raise RuntimeError("Checkpointing is not compatible with .grad(), " "please use .backward() if possible")
+            raise RuntimeError(
+                "Checkpointing is not compatible with .grad(), "
+                "please use .backward() if possible"
+            )
         inputs = ctx.saved_tensors
         if _CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER is not None:
             inputs[0].data = gather_split_1d_tensor(inputs[0].data)
@@ -296,7 +330,10 @@ class CheckpointFunction(torch.autograd.Function):
         if isinstance(outputs, torch.Tensor):
             outputs = (outputs,)
         torch.autograd.backward(outputs, args)
-        grads = tuple(inp.grad if isinstance(inp, torch.Tensor) else inp for inp in detached_inputs)
+        grads = tuple(
+            inp.grad if isinstance(inp, torch.Tensor) else inp
+            for inp in detached_inputs
+        )
         return (None,) + grads
 
 

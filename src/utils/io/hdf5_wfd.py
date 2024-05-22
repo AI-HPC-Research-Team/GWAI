@@ -40,7 +40,9 @@ def save_waveform(data=None, DIR=".", data_fn="waveform_dataset.hdf5"):
 
     for i in wfp.keys():
         data_name = i + "_" "par"
-        f_data.create_dataset(data_name, data=wfp[i], compression="gzip", compression_opts=9)
+        f_data.create_dataset(
+            data_name, data=wfp[i], compression="gzip", compression_opts=9
+        )
     f_data.close()
 
 

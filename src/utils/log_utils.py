@@ -8,7 +8,10 @@ class MyLogger(object):
         self._logger = logging.getLogger(name)
         self._logger.setLevel(logging.INFO)
         self.stream_handler = logging.StreamHandler()
-        formatter = logging.Formatter(fmt="%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s : %(message)s", datefmt="%Y-%m-%d %H:%M")
+        formatter = logging.Formatter(
+            fmt="%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s : %(message)s",
+            datefmt="%Y-%m-%d %H:%M",
+        )
         self.stream_handler.setFormatter(formatter)
         self._logger.addHandler(self.stream_handler)
 
@@ -34,7 +37,10 @@ class TimerLog(object):
             try:
                 rsp = func(*args, **kwargs)
                 self.logger.debug(f"Response: {rsp}")
-                self.logger.info("{} Used ".format(func.__name__) + strftime("%H:%M:%S", gmtime(time() - start_time)))
+                self.logger.info(
+                    "{} Used ".format(func.__name__)
+                    + strftime("%H:%M:%S", gmtime(time() - start_time))
+                )
                 return rsp
             except Exception as e:
                 self.logger.error(repr(e))

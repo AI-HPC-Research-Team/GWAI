@@ -22,11 +22,20 @@
 
 import torch
 
-from src.model.denoising import get_args, mpu
+from src.model.denoising import get_args
 from src.model.denoising.model import LayerNorm
 from src.model.denoising.model.enums import AttnMaskType
-from src.model.denoising.model.utils import erf_gelu, get_linear_layer, init_method_normal, openai_gelu, scaled_init_method_normal
-from src.model.denoising.model.waveform_model import get_waveform_model, parallel_gw_logits
+from src.model.denoising.model.utils import (
+    erf_gelu,
+    get_linear_layer,
+    init_method_normal,
+    openai_gelu,
+    scaled_init_method_normal,
+)
+from src.model.denoising.model.waveform_model import (
+    get_waveform_model,
+    parallel_gw_logits,
+)
 
 from .module import MegatronModule
 
@@ -88,11 +97,15 @@ class GWHead(MegatronModule):
         hidden_states = self.dense(hidden_states)
         hidden_states = self.gelu(hidden_states)
         hidden_states = self.layernorm(hidden_states)
-        output = parallel_gw_logits(hidden_states, word_embeddings_weight, self.parallel_output, bias=self.bias)
+        output = parallel_gw_logits(
+            hidden_states, word_embeddings_weight, self.parallel_output, bias=self.bias
+        )
         return output
 
 
-def post_waveform_model_processing(gw_output, pooled_output, gw_head, binary_head, logit_weights, get_atten_value):
+def post_waveform_model_processing(
+    gw_output, pooled_output, gw_head, binary_head, logit_weights, get_atten_value
+):
     # Output.
     if not get_atten_value:
         gw_logits = gw_head(gw_output, logit_weights)
@@ -112,7 +125,15 @@ def post_waveform_model_processing(gw_output, pooled_output, gw_head, binary_hea
 class WaveFormerModel(MegatronModule):
     """Bert Language model."""
 
-    def __init__(self, num_tokentypes=2, add_binary_head=True, parallel_output=True, pre_process=True, post_process=True, get_atten_value=False):
+    def __init__(
+        self,
+        num_tokentypes=2,
+        add_binary_head=True,
+        parallel_output=True,
+        pre_process=True,
+        post_process=True,
+        get_atten_value=False,
+    ):
         super(WaveFormerModel, self).__init__()
         args = get_args()
 
@@ -124,7 +145,9 @@ class WaveFormerModel(MegatronModule):
         self.get_atten_value = get_atten_value
 
         init_method = init_method_normal(args.init_method_std)
-        scaled_init_method = scaled_init_method_normal(args.init_method_std, args.num_layers)
+        scaled_init_method = scaled_init_method_normal(
+            args.init_method_std, args.num_layers
+        )
 
         self.gw_model, self._gw_model_key = get_waveform_model(
             num_tokentypes=num_tokentypes,
@@ -140,7 +163,9 @@ class WaveFormerModel(MegatronModule):
         self.initialize_word_embeddings(init_method_normal)
 
         if self.post_process:
-            self.gw_head = GWHead(args.hidden_size, init_method, args.layernorm_epsilon, parallel_output)
+            self.gw_head = GWHead(
+                args.hidden_size, init_method, args.layernorm_epsilon, parallel_output
+            )
             self._gw_head_key = "gw_head"
             self.binary_head = None
             if self.add_binary_head:
@@ -151,12 +176,19 @@ class WaveFormerModel(MegatronModule):
         """See megatron.model.transformer.set_input_tensor()"""
         self.gw_model.set_input_tensor(input_tensor)
 
-    def forward(self, bert_model_input, attention_mask, tokentype_ids=None, gw_labels=None):
+    def forward(
+        self, bert_model_input, attention_mask, tokentype_ids=None, gw_labels=None
+    ):
         extended_attention_mask = gw_extended_attention_mask(attention_mask)
         input_ids = bert_model_input
         position_ids = bert_position_ids(input_ids, self.dets)
 
-        gw_output = self.gw_model(input_ids, position_ids, extended_attention_mask, tokentype_ids=tokentype_ids)
+        gw_output = self.gw_model(
+            input_ids,
+            position_ids,
+            extended_attention_mask,
+            tokentype_ids=tokentype_ids,
+        )
 
         if self.post_process and self.add_binary_head:
             gw_output, pooled_output = gw_output
@@ -164,23 +196,42 @@ class WaveFormerModel(MegatronModule):
             pooled_output = None
 
         if self.post_process:
-            return post_waveform_model_processing(gw_output, pooled_output, self.gw_head, self.binary_head, self.word_embeddings_weight(), self.get_atten_value)
+            return post_waveform_model_processing(
+                gw_output,
+                pooled_output,
+                self.gw_head,
+                self.binary_head,
+                self.word_embeddings_weight(),
+                self.get_atten_value,
+            )
         else:
             return gw_output
 
-    def state_dict_for_save_checkpoint(self, destination=None, prefix="", keep_vars=False):
+    def state_dict_for_save_checkpoint(
+        self, destination=None, prefix="", keep_vars=False
+    ):
         """For easy load when model is combined with other heads,
         add an extra key."""
 
         state_dict_ = {}
-        state_dict_[self._gw_model_key] = self.gw_model.state_dict_for_save_checkpoint(destination, prefix, keep_vars)
+        state_dict_[self._gw_model_key] = self.gw_model.state_dict_for_save_checkpoint(
+            destination, prefix, keep_vars
+        )
         if self.post_process:
-            state_dict_[self._gw_head_key] = self.gw_head.state_dict_for_save_checkpoint(destination, prefix, keep_vars)
+            state_dict_[self._gw_head_key] = (
+                self.gw_head.state_dict_for_save_checkpoint(
+                    destination, prefix, keep_vars
+                )
+            )
         if self.post_process and self.add_binary_head:
-            state_dict_[self._binary_head_key] = self.binary_head.state_dict(destination, prefix, keep_vars)
+            state_dict_[self._binary_head_key] = self.binary_head.state_dict(
+                destination, prefix, keep_vars
+            )
         # Save word_embeddings.
         if self.post_process and not self.pre_process:
-            state_dict_[self._word_embeddings_for_head_key] = self.word_embeddings.state_dict(destination, prefix, keep_vars)
+            state_dict_[self._word_embeddings_for_head_key] = (
+                self.word_embeddings.state_dict(destination, prefix, keep_vars)
+            )
         return state_dict_
 
     def load_state_dict(self, state_dict, strict=True):
@@ -190,7 +241,11 @@ class WaveFormerModel(MegatronModule):
         if self.post_process:
             self.gw_head.load_state_dict(state_dict[self._gw_head_key], strict=strict)
         if self.post_process and self.add_binary_head:
-            self.binary_head.load_state_dict(state_dict[self._binary_head_key], strict=strict)
+            self.binary_head.load_state_dict(
+                state_dict[self._binary_head_key], strict=strict
+            )
         # Load word_embeddings.
         if self.post_process and not self.pre_process:
-            self.word_embeddings.load_state_dict(state_dict[self._word_embeddings_for_head_key], strict=strict)
+            self.word_embeddings.load_state_dict(
+                state_dict[self._word_embeddings_for_head_key], strict=strict
+            )

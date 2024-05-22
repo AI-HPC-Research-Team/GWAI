@@ -14,6 +14,7 @@
 # limitations under the License.
 
 """Model parallel utility interface."""
+# ruff: noqa: F401
 
 from .data import broadcast_data
 from .initialize import (
@@ -46,7 +47,27 @@ from .initialize import (
     set_tensor_model_parallel_world_size,
     set_virtual_pipeline_model_parallel_rank,
 )
-from .layers import ColumnParallelLinear, RowParallelLinear, VocabParallelEmbedding, copy_tensor_model_parallel_attributes, set_defaults_if_not_set_tensor_model_parallel_attributes, set_tensor_model_parallel_attributes
-from .mappings import copy_to_tensor_model_parallel_region, gather_from_tensor_model_parallel_region, reduce_from_tensor_model_parallel_region, scatter_to_tensor_model_parallel_region
-from .random import checkpoint, gather_split_1d_tensor, get_cuda_rng_tracker, init_checkpointed_activations_memory_buffer, model_parallel_cuda_manual_seed, reset_checkpointed_activations_memory_buffer, split_tensor_into_1d_equal_chunks
+from .layers import (
+    ColumnParallelLinear,
+    RowParallelLinear,
+    VocabParallelEmbedding,
+    copy_tensor_model_parallel_attributes,
+    set_defaults_if_not_set_tensor_model_parallel_attributes,
+    set_tensor_model_parallel_attributes,
+)
+from .mappings import (
+    copy_to_tensor_model_parallel_region,
+    gather_from_tensor_model_parallel_region,
+    reduce_from_tensor_model_parallel_region,
+    scatter_to_tensor_model_parallel_region,
+)
+from .random import (
+    checkpoint,
+    gather_split_1d_tensor,
+    get_cuda_rng_tracker,
+    init_checkpointed_activations_memory_buffer,
+    model_parallel_cuda_manual_seed,
+    reset_checkpointed_activations_memory_buffer,
+    split_tensor_into_1d_equal_chunks,
+)
 from .utils import divide, split_tensor_along_last_dim

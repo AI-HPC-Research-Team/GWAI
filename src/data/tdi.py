@@ -1,4 +1,3 @@
-
 try:
     import cupy as xp
 except (ImportError, ModuleNotFoundError):
@@ -6,7 +5,6 @@ except (ImportError, ModuleNotFoundError):
 
 import functools
 
-import numpy as np
 from fastlisaresponse import ResponseWrapper
 
 from ..utils.lisa.constant import Constant
@@ -52,7 +50,10 @@ class TDIWaveformGen(object):
         self.sampling_rate = sample_rate
         self.t0 = t0
         self.T = T  # [yr]
-        self.time_duration = (int((T * Constant.YRSID_SI) / self.delta_t) + int((T * Constant.YRSID_SI) / self.delta_t) % 2) * self.delta_t  # [s]
+        self.time_duration = (
+            int((T * Constant.YRSID_SI) / self.delta_t)
+            + int((T * Constant.YRSID_SI) / self.delta_t) % 2
+        ) * self.delta_t  # [s]
         self.T_buffer = (self.time_duration + 2 * self.t0) / Constant.YRSID_SI  # [yr]
         self.buffer_ind = int(t0 / self.delta_t)
         self.n_signal = int(self.T_buffer * Constant.YRSID_SI / self.delta_t)
@@ -99,12 +100,16 @@ class TDIWaveformGen(object):
     @functools.lru_cache()
     def sample_times(self):
         """Array of times at which waveforms are sampled."""
-        return xp.linspace(0.0, self.time_duration, num=self.Nt, endpoint=False, dtype=xp.float32)
+        return xp.linspace(
+            0.0, self.time_duration, num=self.Nt, endpoint=False, dtype=xp.float32
+        )
 
     @property
     @functools.lru_cache()
     def sample_frequencies(self):
-        return xp.linspace(0.0, self.f_max, num=self.Nf, endpoint=True, dtype=xp.float32)
+        return xp.linspace(
+            0.0, self.f_max, num=self.Nf, endpoint=True, dtype=xp.float32
+        )
 
     def TDI(
         self,
@@ -184,7 +189,12 @@ class TDIWaveformGen(object):
     def PSD_Noise_X20(fr, sqSnoise, L_arm):
         [Sa_nu, Soms_nu] = TDIWaveformGen.PSD_Noise_components(fr, sqSnoise)
         phiL = 2 * xp.pi * fr * L_arm / Constant.C_SI
-        return 64 * (xp.sin(phiL)) ** 2 * (xp.sin(2 * phiL)) ** 2 * (Soms_nu + Sa_nu * (3 + xp.cos(2 * phiL)))
+        return (
+            64
+            * (xp.sin(phiL)) ** 2
+            * (xp.sin(2 * phiL)) ** 2
+            * (Soms_nu + Sa_nu * (3 + xp.cos(2 * phiL)))
+        )
 
     def get_psd(
         self,

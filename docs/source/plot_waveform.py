@@ -1,4 +1,5 @@
 import h5py
+import matplotlib.pyplot as plt
 
 source = "EMRI"
 # source = 'MBHB'
@@ -8,9 +9,6 @@ source = "EMRI"
 f = h5py.File(f"test_{source}.hdf5", "r")
 all_keys = [key for key in f.keys()]
 d = f[all_keys[0]]
-
-import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 fig = plt.figure(figsize=(15, 3), facecolor="white", dpi=100)
 

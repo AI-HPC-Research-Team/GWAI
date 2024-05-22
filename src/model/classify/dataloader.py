@@ -6,7 +6,7 @@ import numpy as np
 import torch
 
 # import h5py
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import Dataset
 
 from ...utils.io.hdf5_wfd import load_waveform, save_waveform
 
@@ -92,7 +92,7 @@ class TinyEMRIDataset(object):
 
         log.info("Loading data from {}/{}".format(DIR, fn))
         load_waveform(data=[self.data, self.params], DIR=DIR, data_fn=fn)
-    
+
     def save(self, DIR, fn):
         save_waveform(data=[self.data, self.params], DIR=DIR, data_fn=fn)
 
@@ -119,8 +119,8 @@ class EMRIDatasetTorch(Dataset):
 
     def __getitem__(self, idx):
         if idx < self.n_signal:
-        # for activation map
-        # if idx == 0:
+            # for activation map
+            # if idx == 0:
             data = (
                 self.wfd.data[self.type_str]["signal"][idx][:, ::4]
                 # + self.wfd.data[self.type_str]["noise"][idx]
@@ -128,9 +128,7 @@ class EMRIDatasetTorch(Dataset):
             label = 1
         else:
             # idx -= self.n_signal
-            data = self.wfd.data[self.type_str]["noise"][
-                idx - self.n_signal
-            ][:, ::4]
+            data = self.wfd.data[self.type_str]["noise"][idx - self.n_signal][:, ::4]
             label = 0
         # data = np.log10(np.abs(data) + 1e-20)
         if np.isnan(data).any():

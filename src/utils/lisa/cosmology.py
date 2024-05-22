@@ -7,7 +7,13 @@ from .constant import Constant
 class Cosmology(object):
     @staticmethod
     def H(zp, w):
-        fn = 1.0 / (Constant.H0 * math.sqrt(Constant.Omegam * math.pow(1.0 + zp, 3.0) + Constant.Omegalam * math.pow(1.0 + zp, 3.0 * w)))
+        fn = 1.0 / (
+            Constant.H0
+            * math.sqrt(
+                Constant.Omegam * math.pow(1.0 + zp, 3.0)
+                + Constant.Omegalam * math.pow(1.0 + zp, 3.0 * w)
+            )
+        )
         return fn
 
     @staticmethod

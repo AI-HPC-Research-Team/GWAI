@@ -2,10 +2,6 @@ from pathlib import Path
 import sys
 
 sys.path.append("..")
-try:
-    import cupy as xp
-except (ImportError, ModuleNotFoundError) as e:
-    import numpy as xp
 
 import h5py
 import numpy as np
@@ -15,7 +11,7 @@ from utils.lisa.cosmology import Cosmology
 
 def main():
     use_gpu = False
-    
+
     p = Path.cwd().parent
     orbit_file = p / "src/data/orbit/taiji-orbit.hdf5"
 
@@ -35,7 +31,9 @@ def main():
     t_c = 1
     # --------
 
-    bbh_xyz = tdiwg.mbhb_TDI(M_tot, q, a1, a2, phi0, distance, iota, psi, t_c, lam, beta)
+    bbh_xyz = tdiwg.mbhb_TDI(
+        M_tot, q, a1, a2, phi0, distance, iota, psi, t_c, lam, beta
+    )
 
     nX = tdiwg.gen_noise()
     nY = tdiwg.gen_noise()

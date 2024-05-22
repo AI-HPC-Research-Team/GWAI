@@ -1,11 +1,12 @@
 import sys
+
 sys.path.append("..")
 
 import os
 import hydra
 import numpy as np
 import torch
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 
 from src.model.classify.dataloader import EMRIDatasetTorch, TinyEMRIDataset
 from src.model.classify.tcn import TCN
@@ -32,7 +33,9 @@ def main(config):
         shuffle=True,
         pin_memory=True,
         num_workers=config.dataloader.num_workers,
-        worker_init_fn=lambda _: np.random.seed(int(torch.initial_seed()) % (2**32 - 1)),
+        worker_init_fn=lambda _: np.random.seed(
+            int(torch.initial_seed()) % (2**32 - 1)
+        ),
     )
     test_loader = DataLoader(
         wfdt_test,
@@ -40,7 +43,9 @@ def main(config):
         shuffle=False,
         pin_memory=True,
         num_workers=config.dataloader.num_workers,
-        worker_init_fn=lambda _: np.random.seed(int(torch.initial_seed()) % (2**32 - 1)),
+        worker_init_fn=lambda _: np.random.seed(
+            int(torch.initial_seed()) % (2**32 - 1)
+        ),
     )
 
     # Create model

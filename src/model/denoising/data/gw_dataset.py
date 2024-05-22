@@ -52,7 +52,13 @@ class GwDataset(torch.utils.data.Dataset):
             clean_input[ind] = clean_np[0, ind * self.step : (ind + 1) * self.step]
 
         mask_input = np.ones(noisy_input.shape, dtype=noisy_input.dtype)
-        train_sample = {"name": self.name, "noisy_signal": noisy_input, "clean_signal": clean_input, "mask": mask_input, "params": param_np}
+        train_sample = {
+            "name": self.name,
+            "noisy_signal": noisy_input,
+            "clean_signal": clean_input,
+            "mask": mask_input,
+            "params": param_np,
+        }
 
         return train_sample
 
@@ -62,7 +68,10 @@ def get_samples(data_prefix, name):
     counts = torch.cuda.LongTensor([1])
     torch.distributed.all_reduce(counts, group=mpu.get_data_parallel_group())
     torch.distributed.all_reduce(counts, group=mpu.get_pipeline_model_parallel_group())
-    assert counts[0].item() == (torch.distributed.get_world_size() // torch.distributed.get_world_size(group=mpu.get_tensor_model_parallel_group()))
+    assert counts[0].item() == (
+        torch.distributed.get_world_size()
+        // torch.distributed.get_world_size(group=mpu.get_tensor_model_parallel_group())
+    )
 
     if name in ["valid", "test"]:
         data_path = os.path.join(data_prefix, name + ".hdf5")
@@ -83,8 +92,12 @@ def get_samples(data_prefix, name):
                 dataset["params"] = f_data["params"][:, :]
             else:
                 for data_name in ["noisy", "clean"]:
-                    dataset[data_name] = np.append(dataset[data_name], f_data[data_name][:, :, :], axis=0)
-                dataset["params"] = np.append(dataset["params"], f_data["params"][:, :], axis=0)
+                    dataset[data_name] = np.append(
+                        dataset[data_name], f_data[data_name][:, :, :], axis=0
+                    )
+                dataset["params"] = np.append(
+                    dataset["params"], f_data["params"][:, :], axis=0
+                )
             f_data.close()
 
     return dataset

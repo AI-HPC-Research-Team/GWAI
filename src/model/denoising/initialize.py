@@ -20,19 +20,32 @@
 
 """Megatron initialization."""
 
-import os
 import random
 import time
 
 import numpy as np
 import torch
 
-from src.model.denoising import fused_kernels, get_adlr_autoresume, get_args, get_tensorboard_writer, mpu
+from src.model.denoising import (
+    fused_kernels,
+    get_adlr_autoresume,
+    get_args,
+    get_tensorboard_writer,
+    mpu,
+)
 from src.model.denoising.global_vars import set_global_variables
-from src.model.denoising.mpu import set_tensor_model_parallel_rank, set_tensor_model_parallel_world_size
+from src.model.denoising.mpu import (
+    set_tensor_model_parallel_rank,
+    set_tensor_model_parallel_world_size,
+)
 
 
-def initialize_megatron(extra_args_provider=None, args_defaults={}, ignore_unknown_args=False, allow_no_cuda=False):
+def initialize_megatron(
+    extra_args_provider=None,
+    args_defaults={},
+    ignore_unknown_args=False,
+    allow_no_cuda=False,
+):
     """Set global variables, initialize distributed, and
     set autoresume and random seeds.
     `allow_no_cuda` should not be set unless using megatron for cpu only
@@ -47,7 +60,11 @@ def initialize_megatron(extra_args_provider=None, args_defaults={}, ignore_unkno
 
     # Parse args, build tokenizer, and set adlr-autoresume,
     # tensorboard-writer, and timers.
-    set_global_variables(extra_args_provider=extra_args_provider, args_defaults=args_defaults, ignore_unknown_args=ignore_unknown_args)
+    set_global_variables(
+        extra_args_provider=extra_args_provider,
+        args_defaults=args_defaults,
+        ignore_unknown_args=ignore_unknown_args,
+    )
 
     # torch.distributed initialization
     def finish_mpu_init():
@@ -108,14 +125,30 @@ def _compile_dependencies():
 
     # Custom kernel constraints check.
     seq_len = args.seq_length
-    attn_batch_size = (args.num_attention_heads / args.tensor_model_parallel_size) * args.micro_batch_size
+    attn_batch_size = (
+        args.num_attention_heads / args.tensor_model_parallel_size
+    ) * args.micro_batch_size
     # Constraints on sequence length and attn_batch_size to enable warp based
     # optimization and upper triangular optimization (for causal mask)
-    custom_kernel_constraint = seq_len > 16 and seq_len <= 2048 and seq_len % 4 == 0 and attn_batch_size % 4 == 0
+    custom_kernel_constraint = (
+        seq_len > 16
+        and seq_len <= 2048
+        and seq_len % 4 == 0
+        and attn_batch_size % 4 == 0
+    )
     # Print a warning.
-    if not ((args.fp16 or args.bf16) and custom_kernel_constraint and args.masked_softmax_fusion):
+    if not (
+        (args.fp16 or args.bf16)
+        and custom_kernel_constraint
+        and args.masked_softmax_fusion
+    ):
         if args.rank == 0:
-            print("WARNING: constraints for invoking optimized" " fused softmax kernel are not met. We default" " back to unfused kernel invocations.", flush=True)
+            print(
+                "WARNING: constraints for invoking optimized"
+                " fused softmax kernel are not met. We default"
+                " back to unfused kernel invocations.",
+                flush=True,
+            )
 
     # Always build on rank zero first.
     if torch.distributed.get_rank() == 0:
@@ -132,7 +165,11 @@ def _compile_dependencies():
     # the lock is released.
     torch.distributed.barrier()
     if torch.distributed.get_rank() == 0:
-        print(">>> done with compiling and loading fused kernels. " "Compilation time: {:.3f} seconds".format(time.time() - start_time), flush=True)
+        print(
+            ">>> done with compiling and loading fused kernels. "
+            "Compilation time: {:.3f} seconds".format(time.time() - start_time),
+            flush=True,
+        )
 
 
 def _initialize_distributed():
@@ -142,7 +179,11 @@ def _initialize_distributed():
     device_count = torch.cuda.device_count()
     if torch.distributed.is_initialized():
         if args.rank == 0:
-            print("torch distributed is already initialized, " "skipping initialization ...", flush=True)
+            print(
+                "torch distributed is already initialized, "
+                "skipping initialization ...",
+                flush=True,
+            )
         args.rank = torch.distributed.get_rank()
         args.world_size = torch.distributed.get_world_size()
 
@@ -153,13 +194,20 @@ def _initialize_distributed():
         if device_count > 0:
             device = args.rank % device_count
             if args.local_rank is not None:
-                assert args.local_rank == device, "expected local-rank to be the same as rank % device-count."
+                assert (
+                    args.local_rank == device
+                ), "expected local-rank to be the same as rank % device-count."
             else:
                 args.local_rank = device
             torch.cuda.set_device(device)
         # Call the init process
         init_method = "env://"
-        torch.distributed.init_process_group(backend=args.distributed_backend, world_size=args.world_size, rank=args.rank, init_method=init_method)
+        torch.distributed.init_process_group(
+            backend=args.distributed_backend,
+            world_size=args.world_size,
+            rank=args.rank,
+            init_method=init_method,
+        )
         # init_method = 'tcp://'
         # master_ip = os.getenv('MASTER_ADDR', 'localhost')
         # master_port = os.getenv('MASTER_PORT', '6066')
@@ -178,7 +226,11 @@ def _initialize_distributed():
         if mpu.model_parallel_is_initialized():
             print("model parallel is already initialized")
         else:
-            mpu.initialize_model_parallel(args.tensor_model_parallel_size, args.pipeline_model_parallel_size, args.virtual_pipeline_model_parallel_size)
+            mpu.initialize_model_parallel(
+                args.tensor_model_parallel_size,
+                args.pipeline_model_parallel_size,
+                args.virtual_pipeline_model_parallel_size,
+            )
 
 
 def _init_autoresume():

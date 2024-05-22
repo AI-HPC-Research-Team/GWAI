@@ -1,17 +1,12 @@
 """model evaluation and visualization functions"""
+
 import sys
 
 sys.path.append("..")
 
 import functools
-import logging
-import math
-from itertools import permutations
 
-import numpy as np
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 
 
 def l1_loss(predictions, targets, length=None, allowed_len_diff=3, reduction="mean"):
@@ -28,7 +23,9 @@ def mse_loss(predictions, targets, length=None, allowed_len_diff=3, reduction="m
     return compute_masked_loss(loss, predictions, targets, length, reduction=reduction)
 
 
-def classification_error(probabilities, targets, length=None, allowed_len_diff=3, reduction="mean"):
+def classification_error(
+    probabilities, targets, length=None, allowed_len_diff=3, reduction="mean"
+):
     """Computes the classification error"""
     if len(probabilities.shape) == 3 and len(targets.shape) == 2:
         probabilities, targets = truncate(probabilities, targets, allowed_len_diff)
@@ -38,7 +35,9 @@ def classification_error(probabilities, targets, length=None, allowed_len_diff=3
         predictions = torch.argmax(probabilities, dim=-1)
         return (predictions != targets).float()
 
-    return compute_masked_loss(error, probabilities, targets.long(), length, reduction=reduction)
+    return compute_masked_loss(
+        error, probabilities, targets.long(), length, reduction=reduction
+    )
 
 
 def nll_loss(
@@ -51,7 +50,9 @@ def nll_loss(
 ):
     """Computes negative log likelihood loss."""
     if len(log_probabilities.shape) == 3:
-        log_probabilities, targets = truncate(log_probabilities, targets, allowed_len_diff)
+        log_probabilities, targets = truncate(
+            log_probabilities, targets, allowed_len_diff
+        )
         log_probabilities = log_probabilities.transpose(1, -1)
 
     # Pass the loss function but apply reduction="none" first
@@ -188,7 +189,9 @@ def kldiv_loss(
             targets = targets.masked_fill(ignore, 0)
             true_distribution.scatter_(1, targets.unsqueeze(1), confidence)
 
-        loss = torch.nn.functional.kl_div(log_probabilities, true_distribution, reduction="none")
+        loss = torch.nn.functional.kl_div(
+            log_probabilities, true_distribution, reduction="none"
+        )
         loss = loss.masked_fill(ignore.unsqueeze(1), 0)
 
         # return loss according to reduction specified
@@ -222,7 +225,10 @@ def truncate(predictions, targets, allowed_len_diff=3):
     if len_diff == 0:
         return predictions, targets
     elif abs(len_diff) > allowed_len_diff:
-        raise ValueError("Predictions and targets should be same length, but got %s and " "%s respectively." % (predictions.shape[1], targets.shape[1]))
+        raise ValueError(
+            "Predictions and targets should be same length, but got %s and "
+            "%s respectively." % (predictions.shape[1], targets.shape[1])
+        )
     elif len_diff < 0:
         return predictions, targets[:, : predictions.shape[1]]
     else:

@@ -74,9 +74,15 @@ def get_timers():
     return _GLOBAL_TIMERS
 
 
-def set_global_variables(extra_args_provider=None, args_defaults={}, ignore_unknown_args=False):
+def set_global_variables(
+    extra_args_provider=None, args_defaults={}, ignore_unknown_args=False
+):
     """Set args, tokenizer, tensorboard-writer, adlr-autoresume, and timers."""
-    args = _parse_args(extra_args_provider=extra_args_provider, defaults=args_defaults, ignore_unknown_args=ignore_unknown_args)
+    args = _parse_args(
+        extra_args_provider=extra_args_provider,
+        defaults=args_defaults,
+        ignore_unknown_args=ignore_unknown_args,
+    )
     _build_num_microbatches_calculator(args)
     args.padded_vocab_size = 256
     _set_tensorboard_writer(args)
@@ -88,13 +94,19 @@ def _parse_args(extra_args_provider=None, defaults={}, ignore_unknown_args=False
     """Parse entire arguments."""
     global _GLOBAL_ARGS
     _ensure_var_is_not_initialized(_GLOBAL_ARGS, "args")
-    _GLOBAL_ARGS = parse_args(extra_args_provider=extra_args_provider, defaults=defaults, ignore_unknown_args=ignore_unknown_args)
+    _GLOBAL_ARGS = parse_args(
+        extra_args_provider=extra_args_provider,
+        defaults=defaults,
+        ignore_unknown_args=ignore_unknown_args,
+    )
     return _GLOBAL_ARGS
 
 
 def _build_num_microbatches_calculator(args):
     global _GLOBAL_NUM_MICROBATCHES_CALCULATOR
-    _ensure_var_is_not_initialized(_GLOBAL_NUM_MICROBATCHES_CALCULATOR, "num microbatches calculator")
+    _ensure_var_is_not_initialized(
+        _GLOBAL_NUM_MICROBATCHES_CALCULATOR, "num microbatches calculator"
+    )
 
     _GLOBAL_NUM_MICROBATCHES_CALCULATOR = build_num_microbatches_calculator(args)
 
@@ -104,14 +116,25 @@ def _set_tensorboard_writer(args):
     global _GLOBAL_TENSORBOARD_WRITER
     _ensure_var_is_not_initialized(_GLOBAL_TENSORBOARD_WRITER, "tensorboard writer")
 
-    if hasattr(args, "tensorboard_dir") and args.tensorboard_dir and args.rank == (args.world_size - 1):
+    if (
+        hasattr(args, "tensorboard_dir")
+        and args.tensorboard_dir
+        and args.rank == (args.world_size - 1)
+    ):
         try:
             from torch.utils.tensorboard import SummaryWriter
 
             print("> setting tensorboard ...")
-            _GLOBAL_TENSORBOARD_WRITER = SummaryWriter(log_dir=args.tensorboard_dir, max_queue=args.tensorboard_queue_size)
+            _GLOBAL_TENSORBOARD_WRITER = SummaryWriter(
+                log_dir=args.tensorboard_dir, max_queue=args.tensorboard_queue_size
+            )
         except ModuleNotFoundError:
-            print("WARNING: TensorBoard writing requested but is not " "available (are you using PyTorch 1.1.0 or later?), " "no TensorBoard logs will be written.", flush=True)
+            print(
+                "WARNING: TensorBoard writing requested but is not "
+                "available (are you using PyTorch 1.1.0 or later?), "
+                "no TensorBoard logs will be written.",
+                flush=True,
+            )
 
 
 def _set_adlr_autoresume(args):

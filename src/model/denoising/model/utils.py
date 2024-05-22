@@ -19,8 +19,6 @@ import math
 
 import torch
 
-from src.model.denoising import get_args
-
 
 def init_method_normal(sigma):
     """Init method based on N(0, sigma)."""
@@ -58,7 +56,9 @@ def get_linear_layer(rows, columns, init_method):
 @torch.jit.script
 def gelu_impl(x):
     """OpenAI's gelu implementation."""
-    return 0.5 * x * (1.0 + torch.tanh(0.7978845608028654 * x * (1.0 + 0.044715 * x * x)))
+    return (
+        0.5 * x * (1.0 + torch.tanh(0.7978845608028654 * x * (1.0 + 0.044715 * x * x)))
+    )
 
 
 def openai_gelu(x):
@@ -68,4 +68,11 @@ def openai_gelu(x):
 # This is actually Python equivalent of torch.nn.functional.gelu(), also with type hints for ONNX exporter
 @torch.jit.script
 def erf_gelu(x):
-    return x * 0.5 * (torch.erf(x / 1.41421).to(dtype=x.dtype) + torch.ones_like(x).to(dtype=x.dtype))
+    return (
+        x
+        * 0.5
+        * (
+            torch.erf(x / 1.41421).to(dtype=x.dtype)
+            + torch.ones_like(x).to(dtype=x.dtype)
+        )
+    )

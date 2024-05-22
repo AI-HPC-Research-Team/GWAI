@@ -2,10 +2,6 @@ from pathlib import Path
 import sys
 
 sys.path.append("..")
-try:
-    import cupy as xp
-except (ImportError, ModuleNotFoundError) as e:
-    import numpy as xp
 
 import h5py
 import numpy as np
@@ -14,7 +10,7 @@ from src.data.tdi import TDIWaveformGen
 
 def main():
     use_gpu = False
-    
+
     p = Path.cwd().parent
     orbit_file = p / "src/data/orbit/taiji-orbit.hdf5"
 
@@ -45,7 +41,23 @@ def main():
     # ...............
     mich = False
 
-    emri_xyz = tdiwg.aak_TDI(M, mu, a, p0, e0, Y0, qS, phiS, qK, phiK, dist, Phi_phi0, Phi_theta0, Phi_r0, mich)
+    emri_xyz = tdiwg.aak_TDI(
+        M,
+        mu,
+        a,
+        p0,
+        e0,
+        Y0,
+        qS,
+        phiS,
+        qK,
+        phiK,
+        dist,
+        Phi_phi0,
+        Phi_theta0,
+        Phi_r0,
+        mich,
+    )
 
     nX = tdiwg.gen_noise()
     nY = tdiwg.gen_noise()
