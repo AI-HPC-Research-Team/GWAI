@@ -18,7 +18,7 @@ You can modify `classify.yaml <https://github.com/AI-HPC-Research-Team/GWAI/tree
     :linenos:
 
     $ conda activate waveform
-    $ cd cd /workspace/GWAI/src/demos
+    $ cd /workspace/GWAI/demos
     $ python train_classify.py
 
 The output log can be seen as follows.
@@ -133,8 +133,8 @@ Then, by running `train_detection.py <https://github.com/AI-HPC-Research-Team/GW
     :linenos:
 
     $ conda activate waveform
-    $ cd cd /workspace/GWAI/demos/
-    $ python train_detection.py ../configs/detection.yaml
+    $ cd /workspace/GWAI/
+    $ python demos/train_detection.py configs/detection.yaml
 
 The output log can be seen as follows.
 
