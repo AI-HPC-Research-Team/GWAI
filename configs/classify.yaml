@@ -1,5 +1,5 @@
 dataset:
-  save_path: "../datasets/detection/"
+  save_path: "../datasets/classify/"
   fn: emri_asd_test.hdf5
 dataloader:
   batch_size: 256

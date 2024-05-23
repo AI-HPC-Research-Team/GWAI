@@ -8,7 +8,7 @@ from pathlib import Path
 
 import h5py
 import numpy as np
-
+sys.path.append(os.getcwd())
 # import torchaudio
 import speechbrain as sb
 import speechbrain.nnet.schedulers as schedulers
@@ -20,8 +20,7 @@ from speechbrain.utils.distributed import run_on_main
 from torch.cuda.amp import autocast
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-
-from src.model.detection.dataloader import WaveformDatasetTorch
+from src.model.detection.dataloader import WaveformDatasetTorch,GWSEDataset
 
 
 # os.environ["CUDA_VISIBLE_DEVICES"]="7"
@@ -721,8 +720,8 @@ if __name__ == "__main__":
     )
 
     # Load dataset
-    wfd = GW_SE_Dataset()
-    noise = GW_SE_Dataset()
+    wfd = GWSEDataset()
+    noise = GWSEDataset()
     wfd.load_waveform(DIR=hparams["data_folder"], data_fn=hparams["data_hdf5"])
     noise.load_waveform(DIR=hparams["data_folder"], data_fn=hparams["noise_hdf5"])
 

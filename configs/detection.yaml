@@ -11,8 +11,8 @@ __set_seed: !apply:torch.manual_seed [!ref <seed>]
 # cuda device num
 cuda: 5
 # Data params
-data_folder: '../datasets'
-data_hdf5: mbhb_test.hdf5
+data_folder: './datasets/detection'
+data_hdf5: smbhb_test.hdf5
 noise_hdf5: noise_test.hdf5
 
 experiment_name: detection_demo

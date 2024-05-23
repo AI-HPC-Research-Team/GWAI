@@ -245,17 +245,17 @@ def compute_masked_loss(
 ):
     """Compute the average loss"""
     mask = torch.ones_like(targets)
-    if length is not None:
-        length_mask = length_to_mask(
-            length * targets.shape[1],
-            max_len=targets.shape[1],
-        )
+    # if length is not None:
+    #     length_mask = length_to_mask(
+    #         length * targets.shape[1],
+    #         max_len=targets.shape[1],
+    #     )
 
-        # Handle any dimensionality of input
-        while len(length_mask.shape) < len(mask.shape):
-            length_mask = length_mask.unsqueeze(-1)
-        length_mask = length_mask.type(mask.dtype)
-        mask *= length_mask
+    #     # Handle any dimensionality of input
+    #     while len(length_mask.shape) < len(mask.shape):
+    #         length_mask = length_mask.unsqueeze(-1)
+    #     length_mask = length_mask.type(mask.dtype)
+    #     mask *= length_mask
 
     # Compute, then reduce loss
     loss = loss_fn(predictions, targets) * mask
