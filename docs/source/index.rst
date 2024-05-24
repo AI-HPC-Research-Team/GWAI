@@ -21,4 +21,5 @@ Contents
    about_gwai
    getting_started
    tutorials
+   modules
    citations

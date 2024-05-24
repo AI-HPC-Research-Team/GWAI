@@ -9,7 +9,10 @@ Main Modules
 .. toctree::
    :maxdepth: 3
 
-   submodule
+   data
+   eval
+   model
+   utils
 
 
 
