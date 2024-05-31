@@ -1,0 +1,25 @@
+name: CI
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  PACKAGE_NAME: GWAI
+  PYTHON_VERSION: "3.8"
+
+jobs:
+  linter-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run `ruff check` stable ecosystem check
+        run: |
+          echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+          pip install ruff
+          ruff check ./ --config pyproject.toml
+          echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+          echo "🍏 This job's status is ${{ job.status }}."
+
+
