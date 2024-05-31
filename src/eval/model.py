@@ -10,14 +10,32 @@ import torch
 
 
 def l1_loss(predictions, targets, length=None, allowed_len_diff=3, reduction="mean"):
-    """Compute the l1 loss"""
+    """
+    Compute the l1 loss
+    
+    Args:
+        predictions (torch.Tensor): The predictions tensor
+        targets (torch.Tensor): The targets tensor
+        length (torch.Tensor): The length tensor
+        allowed_len_diff (int): The allowed length difference
+        reduction (str): The reduction method
+    """
     predictions, targets = truncate(predictions, targets, allowed_len_diff)
     loss = functools.partial(torch.nn.functional.l1_loss, reduction="none")
     return compute_masked_loss(loss, predictions, targets, length, reduction=reduction)
 
 
 def mse_loss(predictions, targets, length=None, allowed_len_diff=3, reduction="mean"):
-    """Compute the mean squared error"""
+    """
+    Compute the mean squared error
+    
+    Args:
+        predictions (torch.Tensor): The predictions tensor
+        targets (torch.Tensor): The targets tensor
+        length (torch.Tensor): The length tensor
+        allowed_len_diff (int): The allowed length difference
+        reduction (str): The reduction method
+    """
     predictions, targets = truncate(predictions, targets, allowed_len_diff)
     loss = functools.partial(torch.nn.functional.mse_loss, reduction="none")
     return compute_masked_loss(loss, predictions, targets, length, reduction=reduction)
@@ -26,7 +44,16 @@ def mse_loss(predictions, targets, length=None, allowed_len_diff=3, reduction="m
 def classification_error(
     probabilities, targets, length=None, allowed_len_diff=3, reduction="mean"
 ):
-    """Computes the classification error"""
+    """
+    Computes the classification error
+    
+    Args:
+        probabilities (torch.Tensor): The posterior probabilities
+        targets (torch.Tensor): The targets
+        length (torch.Tensor): The length tensor
+        allowed_len_diff (int): The allowed length difference
+        reduction (str): The reduction method
+    """
     if len(probabilities.shape) == 3 and len(targets.shape) == 2:
         probabilities, targets = truncate(probabilities, targets, allowed_len_diff)
 
@@ -48,7 +75,17 @@ def nll_loss(
     allowed_len_diff=3,
     reduction="mean",
 ):
-    """Computes negative log likelihood loss."""
+    """
+    Computes negative log likelihood loss.
+    
+    Args:
+        log_probabilities (torch.Tensor): The log probabilities
+        targets (torch.Tensor): The targets
+        length (torch.Tensor): The length tensor
+        label_smoothing (float): The label smoothing value
+        allowed_len_diff (int): The allowed length difference
+        reduction (str): The reduction method
+    """
     if len(log_probabilities.shape) == 3:
         log_probabilities, targets = truncate(
             log_probabilities, targets, allowed_len_diff
@@ -80,8 +117,7 @@ def bce_loss(
     """Computes binary cross-entropy (BCE) loss. It also applies the sigmoid
     function directly (this improves the numerical stability).
 
-    Arguments
-    ---------
+    Args:
     inputs : torch.Tensor
         The output before applying the final softmax
         Format is [batch[, 1]?] or [batch, frames[, 1]?].
@@ -102,13 +138,6 @@ def bce_loss(
         Options are 'mean', 'batch', 'batchmean', 'sum'.
         See pytorch for 'mean', 'sum'. The 'batch' option returns
         one loss per item in the batch, 'batchmean' returns sum / batch size.
-
-    Example
-    -------
-    >>> inputs = torch.tensor([10.0, -6.0])
-    >>> targets = torch.tensor([1, 0])
-    >>> bce_loss(inputs, targets)
-    tensor(0.0013)
     """
     # Squeeze singleton dimension so inputs + targets match
     if len(inputs.shape) == len(targets.shape) + 1:
@@ -149,8 +178,7 @@ def kldiv_loss(
     """Computes the KL-divergence error at the batch level.
     This loss applies label smoothing directly to the targets
 
-    Arguments
-    ---------
+    Args:   
     probabilities : torch.Tensor
         The posterior probabilities of shape
         [batch, prob] or [batch, frames, prob].
@@ -164,12 +192,6 @@ def kldiv_loss(
         Options are 'mean', 'batch', 'batchmean', 'sum'.
         See pytorch for 'mean', 'sum'. The 'batch' option returns
         one loss per item in the batch, 'batchmean' returns sum / batch size.
-
-    Example
-    -------
-    >>> probs = torch.tensor([[0.9, 0.1], [0.1, 0.9]])
-    >>> kldiv_loss(torch.log(probs), torch.tensor([1, 1]))
-    tensor(1.2040)
     """
     if label_smoothing > 0:
         if log_probabilities.dim() == 2:
@@ -212,8 +234,7 @@ def kldiv_loss(
 def truncate(predictions, targets, allowed_len_diff=3):
     """Ensure that predictions and targets are the same length.
 
-    Arguments
-    ---------
+    Args:
     predictions : torch.Tensor
         First tensor for checking length.
     targets : torch.Tensor
@@ -243,7 +264,17 @@ def compute_masked_loss(
     label_smoothing=0.0,
     reduction="mean",
 ):
-    """Compute the average loss"""
+    """
+    Compute the average loss
+    
+    Args:
+        loss_fn: The loss function
+        predictions: The predictions tensor
+        targets: The targets tensor
+        length: The length tensor
+        label_smoothing: The label smoothing value
+        reduction: The reduction method
+    """
     mask = torch.ones_like(targets)
     # if length is not None:
     #     length_mask = length_to_mask(
@@ -282,7 +313,13 @@ def compute_masked_loss(
 
 
 def get_mask(source, source_lengths):
-    """Get the mask for the source tensor"""
+    """
+    Get the mask for the source tensor
+    
+    Args:
+        source: The source tensor
+        source_lengths: The source lengths
+    """
     mask = source.new_ones(source.size()[:-1]).unsqueeze(-1).transpose(1, -2)
     B = source.size(-2)
     for i in range(B):

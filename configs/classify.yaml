@@ -4,11 +4,10 @@ dataset:
 dataloader:
   batch_size: 256
   num_workers: 8
-  # reduce: 2
 
 training:
   test_only: False
-  checkpoint_dir: "./results/2023-07-10/09-46-49/best_model.pth" # 4k
+  checkpoint_dir: 
   gpu: 0
   n_epoch: 50
   # loss_fn: "bce_with_logits"
@@ -24,7 +23,7 @@ training:
     patience: 5
     threshold: 1e-4
   result_dir: "./results//${now:%Y-%m-%d}/${now:%H-%M-%S}"
-  result_fn: "inf_result_100_240_1k.npy"
+  result_fn: "inf_result.npy"
   use_wandb: False
 
 net:

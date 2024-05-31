@@ -8,6 +8,12 @@ from sklearn.metrics import auc, roc_curve
 
 
 def corner_plot(data, true_value=None):
+    """corner contour plot of the data
+    
+    Args:
+        data: shape (n_samples, n_dims)
+        true_value: shape (n_dims)
+    """
     if true_value is None:
         return corner(
             data,
@@ -24,6 +30,13 @@ def corner_plot(data, true_value=None):
 
 
 def roc_plot(label, pred):
+    """
+    ROC plot of the classifier
+
+    Args:
+        label: true label shape (n_events, n_dims)
+        pred: predicted label shape (n_events, n_dims)
+    """
     fpr, tpr, _ = roc_curve(label, pred)
     area = auc(fpr, tpr)
     plt.plot(fpr, tpr, label="ROC")
@@ -36,10 +49,12 @@ def roc_plot(label, pred):
 
 
 def pp_plot(label, pred):
-    """pp plot of the posterior probabilities
-    args:
-    label: true label shape (n_events, n_dims)
-    pred: predicted label shape (n_events, n_samples, n_dims)
+    """
+    pp plot of the posterior probabilities
+    
+    Args:
+        label: true label shape (n_events, n_dims)
+        pred: predicted label shape (n_events, n_samples, n_dims)
     """
     percentiles = np.empty((label.shape[0], label.shape[2]))
     for idx in range(label.shape[0]):

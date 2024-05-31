@@ -15,6 +15,10 @@ from ...src.utils.lisa.constant import Constant
 def tukey(M, alpha=0.5):
     """
     Tukey window code copied from scipy
+
+    Args:
+        M (int): The window length.
+        alpha (float, optional): The alpha parameter. Defaults to 0.5.
     """
     n = np.arange(0, M)
     width = int(np.floor(alpha * (M - 1) / 2.0))
@@ -52,6 +56,13 @@ def get_mf_snr(
 ):
     """
     computes the snr of a signal given a PSD starting from a particular frequency index
+
+    Args:
+        data (array): The data.
+        T_obs (float): The observation time.
+        fs (float): The sampling frequency.
+        fmin (float): The minimum frequency.
+        psd (array): The psd.
     """
     N = int(T_obs * fs)
     df = 1.0 / T_obs
@@ -72,6 +83,9 @@ def get_mf_snr(
 def ADF_test(x):
     """
     Augmented Dickey-Fuller test for stationarity
+
+    Args:
+        x (array): The data.
     """
     result = adfuller(x)
     return result[1]
@@ -80,6 +94,9 @@ def ADF_test(x):
 def shapiro_wilks_test(x):
     """
     Shapiro-Wilks test for normality
+
+    Args:   
+        x (array): The data.
     """
     return shapiro(x)
 
@@ -87,6 +104,10 @@ def shapiro_wilks_test(x):
 def plot_td_data(t, data):
     """
     Plot time domain data
+
+    Args:
+        t (array): The time.
+        data (array): The data.
     """
     plt.plot(t / Constant.YRSID_SI, data)
     plt.xlabel("Time [yr]")
@@ -97,6 +118,11 @@ def plot_td_data(t, data):
 def plot_fd_data(f, data, psd):
     """
     Plot frequency domain data psd
+
+    Args:
+        f (array): The frequency.
+        data (array): The data.
+        psd (array): The psd.
     """
     f, psd_data = signal.welch(data, fs=1.0 / (f[1] - f[0]), nperseg=512 * 512)
     plt.loglog(f, psd_data, label="Data")
@@ -109,6 +135,10 @@ def plot_fd_data(f, data, psd):
 def plot_spectrogram(data, fs):
     """
     Plot spectrogram
+
+    Args:
+        data (array): The data.
+        fs (float): The sampling frequency.
     """
     f, t, Sxx = signal.spectrogram(data, fs, nperseg=512, noverlap=256)
     plt.pcolormesh(t / Constant.YRSID_SI, f, np.log10(Sxx))

@@ -11,76 +11,17 @@ from torch.utils.data import Dataset
 from ...utils.io.hdf5_wfd import load_waveform, save_waveform
 
 log = logging.getLogger(__name__)
-# import torch.multiprocessing
-# from gwdataset import GW_SE_Dataset
-# from matplotlib.pyplot import axis
-# from torch.utils.data import DataLoader
-
-
-# class EMRIDatasetTorch(torch.utils.data.Dataset):
-#     def __init__(self, wfd, train):
-#         self.wfd = wfd
-#         self.train = train
-#         self.type_str = "train" if self.train else "test"
-#         self.merge_dataset()
-
-#     def merge_dataset(
-#         self,
-#     ):
-#         self.length = self.wfd.waveform_dataset[self.type_str]["signal"].shape[
-#             -1
-#         ]
-#         self.n_channel = self.wfd.waveform_dataset[self.type_str][
-#             "signal"
-#         ].shape[-2]
-#         self.num = (
-#             self.wfd.waveform_dataset[self.type_str]["signal"].shape[0]
-#             + self.wfd.waveform_dataset[self.type_str]["noise"].shape[0]
-#         )
-#         self.waveform_dataset = {
-#             "train": {
-#                 "data": np.zeros([self.num, self.n_channel, self.length]),
-#                 "label": np.zeros(self.num),
-#             },
-#             "test": {
-#                 "data": np.zeros([self.num, self.n_channel, self.length]),
-#                 "label": np.zeros(self.num),
-#             },
-#         }
-#         for i in self.waveform_dataset.keys():
-#             self.waveform_dataset[i]["data"] = np.concatenate(
-#                 [
-#                     self.wfd.waveform_dataset[i]["signal"],
-#                     self.wfd.waveform_dataset[i]["noise"],
-#                 ],
-#                 axis=0,
-#             )
-#             self.waveform_dataset[i]["label"] = np.hstack(
-#                 [
-#                     np.ones(self.wfd.waveform_dataset[i]["signal"].shape[0]),
-#                     np.zeros(self.wfd.waveform_dataset[i]["noise"].shape[0]),
-#                 ]
-#             )
-#         # print(self.waveform_dataset[self.type_str]['clean'].shape)
-
-#     def __len__(self):
-#         return self.waveform_dataset[self.type_str]["data"].shape[0]
-
-#     def __getitem__(self, idx):
-#         data = self.waveform_dataset[self.type_str]["data"][idx][
-#             -self.length :
-#         ]
-#         label = self.waveform_dataset[self.type_str]["label"][idx]
-
-#         return (
-#             torch.tensor(idx, dtype=torch.long),
-#             torch.from_numpy(data).float(),
-#             torch.tensor(label, dtype=torch.long),
-#         )
 
 
 class TinyEMRIDataset(object):
     def __init__(self, DIR, fn):
+        """
+        Load the TinyEMRI Dataset
+
+        Args:
+            DIR (str): Directory of the data
+            fn (str): Filename of the data
+        """
         super().__init__()
         # self.train = train
         self.data = {
@@ -99,6 +40,13 @@ class TinyEMRIDataset(object):
 
 class EMRIDatasetTorch(Dataset):
     def __init__(self, wfd, train=True):
+        """
+        Load the EMRI Dataset
+
+        Args:
+            wfd (TinyEMRIDataset): EMRI Dataset
+            train (bool, optional): Train or test. Defaults to True.
+        """
         super().__init__()
         self.wfd = wfd
         self.train = train
@@ -144,6 +92,13 @@ class EMRIDatasetTorch(Dataset):
 
 class NpzDatasetTorch(Dataset):
     def __init__(self, fn, train=False):
+        """
+        Load the EMRI Dataset from .npz file
+
+        Args:
+            fn (str): Filename of the data
+            train (bool, optional): Train or test. Defaults to False.
+        """
         super().__init__()
         self.data = np.load(fn)
         # check the dimension of the data

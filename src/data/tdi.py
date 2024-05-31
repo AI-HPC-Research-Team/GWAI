@@ -15,7 +15,7 @@ from .waveform import AAK, GB, MBHB
 # constants
 EPS = 1e-8
 
-mylogger = MyLogger(__name__)
+# mylogger = MyLogger(__name__)
 
 
 class TDIWaveformGen(object):
@@ -29,6 +29,18 @@ class TDIWaveformGen(object):
         use_gpu=True,
         orbit_file="../orbit/taiji-orbit.hdf5",
     ):
+        """
+        Initialize the TDIWaveformGen class.
+        
+        Args:
+            T (float): The duration of the signal.
+            sample_rate (float): The sampling rate of the signal.
+            tdi_gen (int): The TDI generation.
+            det (str): The detector used.
+            t0 (float): The time at which the to cut the data.
+            use_gpu (bool): Whether to use the GPU.
+            orbit_file (str): The path to the orbit file.
+        """
         self.use_gpu = use_gpu
         self.tdi_gen = tdi_gen
 
@@ -70,30 +82,37 @@ class TDIWaveformGen(object):
 
     @f_max.setter
     def f_max(self, f_max):
+        """f_max (float): The maximum frequency value."""
         self.sampling_rate = 2.0 * f_max
 
     @property
     def delta_t(self):
+        """The time interval between samples."""
         return 1.0 / self.sampling_rate
 
     @delta_t.setter
     def delta_t(self, delta_t):
+        """Set the time interval between samples."""
         self.sampling_rate = 1.0 / delta_t
 
     @property
     def delta_f(self):
+        """The frequency interval between samples."""
         return 1.0 / self.time_duration
 
     @delta_f.setter
     def delta_f(self, delta_f):
+        """Set the frequency interval between samples."""
         self.time_duration = 1.0 / delta_f
 
     @property
     def Nt(self):
+        """The number of samples in the time domain."""
         return int(self.time_duration * self.sampling_rate)
 
     @property
     def Nf(self):
+        """The number of samples in the frequency domain."""
         return int(self.f_max / self.delta_f) + 1
 
     @property
@@ -107,6 +126,7 @@ class TDIWaveformGen(object):
     @property
     @functools.lru_cache()
     def sample_frequencies(self):
+        """Array of frequencies at which waveforms are sampled."""
         return xp.linspace(
             0.0, self.f_max, num=self.Nf, endpoint=True, dtype=xp.float32
         )
@@ -158,16 +178,24 @@ class TDIWaveformGen(object):
 
     @staticmethod
     def PSD_Noise_components(fr, sqSnoise):
-        [sqSacc_level, sqSoms_level] = sqSnoise
-        # sqSacc_level: Amplitude level of acceleration noise [3e-15]
-        # sqSoms_level: Amplitude level of OMS noise [15e-12]
+        """
+        Calculates the power spectral density (PSD) of acceleration noise and optical metrology system (OMS) noise.
 
-        # ## Acceleration noise
+        Args:
+            fr (float): The frequency at which the PSD is calculated.
+            sqSnoise (list): A list containing the amplitude levels of acceleration noise and OMS noise.
+
+        Returns:
+            list: A list containing the PSD of acceleration noise and OMS noise.
+        """
+        [sqSacc_level, sqSoms_level] = sqSnoise
+
+        # Calculate acceleration noise PSD
         Sa_a = sqSacc_level**2 * (1.0 + (0.4e-3 / fr) ** 2) * (1.0 + (fr / 8e-3) ** 4)
         Sa_d = Sa_a * (2.0 * xp.pi * fr) ** (-4.0)
         Sa_nu = Sa_d * (2.0 * xp.pi * fr / Constant.C_SI) ** 2
 
-        # ## Optical Metrology System
+        # Calculate OMS noise PSD
         Soms_d = sqSoms_level**2 * (1.0 + (2.0e-3 / fr) ** 4)
         Soms_nu = Soms_d * (2.0 * xp.pi * fr / Constant.C_SI) ** 2
 
@@ -175,18 +203,51 @@ class TDIWaveformGen(object):
 
     @staticmethod
     def PSD_Noise_X15(fr, sqSnoise, L_arm):
+        """
+        Calculates the X channel PSD of TDI1.0/1.5.
+
+        Args:
+            fr (float): Frequency value.
+            sqSnoise (float): Square root of the noise component.
+            L_arm (float): Length of the arm.
+
+        Returns:
+            float: The calculated PSD value.
+        """
         [Sa_nu, Soms_nu] = TDIWaveformGen.PSD_Noise_components(fr, sqSnoise)
         phiL = 2 * xp.pi * fr * L_arm / Constant.C_SI
         return 16 * (xp.sin(phiL)) ** 2 * (Soms_nu + Sa_nu * (3 + xp.cos(2 * phiL)))
 
     @staticmethod
     def PSD_Noise_XY15(fr, sqSnoise, L_arm):
+        """
+        Calculates the XY coorelation term of TDI1.0/1.5.
+
+        Args:
+            fr (float): Frequency value.
+            sqSnoise (float): Square root of the noise component.
+            L_arm (float): Length of the arm.
+
+        Returns:
+            float: The calculated PSD value.
+        """
         [Sa_nu, Soms_nu] = TDIWaveformGen.PSD_Noise_components(fr, sqSnoise)
         phiL = 2 * xp.pi * fr * L_arm / Constant.C_SI
         return -8 * (xp.sin(phiL)) ** 2 * xp.cos(phiL) * (Soms_nu + 4 * Sa_nu)
 
     @staticmethod
     def PSD_Noise_X20(fr, sqSnoise, L_arm):
+        """
+        Calculates the X channel PSD of TDI2.0.
+
+        Args:
+            fr (float): Frequency value.
+            sqSnoise (float): Square root of the noise component.
+            L_arm (float): Length of the arm.
+
+        Returns:
+            float: The calculated PSD value.
+        """
         [Sa_nu, Soms_nu] = TDIWaveformGen.PSD_Noise_components(fr, sqSnoise)
         phiL = 2 * xp.pi * fr * L_arm / Constant.C_SI
         return (
@@ -199,6 +260,9 @@ class TDIWaveformGen(object):
     def get_psd(
         self,
     ):
+        """
+        Generates the PSD of the noise.
+        """
         fr = xp.linspace(0.0, self.f_max, num=self.Nf, endpoint=True)
         psd = xp.zeros(self.Nf)
         if self.tdi_gen == 1:
@@ -230,9 +294,7 @@ class TDIWaveformGen(object):
         self,
     ):
         """
-        tdi_wave = aak_AET(M, mu, a, p0, e0,
-                            Y0, qS, phiS, qK, phiK, dist,
-                            Phi_phi0, Phi_theta0, Phi_r0, mich)
+        Initialize the EMRI waveform generator.
         """
         mylogger.logger.info("Init AAK")
         self.aak = AAK(self.use_gpu, self.n_signal)
@@ -247,6 +309,9 @@ class TDIWaveformGen(object):
         )
 
     def init_GB(self, VGB=True):
+        """
+        Initialize the GB waveform generator.
+        """
         mylogger.logger.info("Init GB")
         self.gb = GB(self.use_gpu, VGB=VGB)
         self.gb_TDI = self.TDI(
@@ -260,6 +325,9 @@ class TDIWaveformGen(object):
         )
 
     def init_MBHB(self):
+        """
+        Initialize the MBHB waveform generator.
+        """
         mylogger.logger.info("Init MBHB")
         self.mbhb = MBHB(self.f_min, self.T_buffer, self.buffer_ind)
         self.mbhb_TDI = self.TDI(

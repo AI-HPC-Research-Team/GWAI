@@ -39,7 +39,25 @@ class Trainer:
         checkpoint_dir=None,
         use_wandb=False,
     ):
-        """Trainer class for training and evaluating the model."""
+        """
+        Trainer class for training and evaluating the model.
+
+        Args:
+
+            model (torch.nn.Module): The model to train.
+            train_loader (torch.utils.data.DataLoader): The training data loader.
+            test_loader (torch.utils.data.DataLoader): The test data loader.
+            optimizer_type (str): The optimizer to use.
+            optimizer_kwargs (dict): The optimizer keyword arguments.
+            scheduler_type (str): The learning rate scheduler to use.
+            scheduler_kwargs (dict): The scheduler keyword arguments.
+            loss_fn (str): The loss function to use.
+            device (torch.device): The device to use for training.
+            result_dir (str): The directory to save the results.
+            result_fn (str): The filename to save the results.
+            checkpoint_dir (str): The directory to save the model checkpoints.
+            use_wandb (bool): Whether to use wandb for logging.
+        """
         self.model = model
         self.train_loader = train_loader
         self.test_loader = test_loader
@@ -72,15 +90,13 @@ class Trainer:
     def update_average(self, loss, avg_loss):
         """Update running average of the loss.
 
-        Arguments
-        ---------
+        Args:
         loss : torch.tensor
             detached loss, a single float value.
         avg_loss : float
             current running average.
 
-        Returns
-        -------
+        Returns:
         avg_loss : float
             The average loss.
         """
@@ -90,6 +106,15 @@ class Trainer:
         return avg_loss
 
     def accuracy(self, output, target):
+        """Compute the accuracy of the model.
+
+        Args:
+            output (torch.Tensor): The model output.
+            target (torch.Tensor): The target labels.
+
+        Returns:
+            float: The accuracy of the model.
+        """
         with torch.no_grad():
             pred = torch.argmax(output, dim=1)
             assert pred.shape[0] == len(target)
@@ -101,13 +126,15 @@ class Trainer:
         """
         Calculate the classification accuracy for binary classification.
 
-        :param logits: The raw output scores from the model (before sigmoid).
+        Args:
+            logits: The raw output scores from the model (before sigmoid).
                     Expected shape is (batch_size).
-        :param true_labels: The ground truth labels.
+            true_labels: The ground truth labels.
                             Expected shape is (batch_size).
-        :param threshold: The threshold to classify samples as positive or negative.
+            threshold: The threshold to classify samples as positive or negative.
 
-        :return: The accuracy as a floating point number between 0 and 1.
+        Return:
+            float: The accuracy as a floating point number between 0 and 1.
         """
 
         # Apply sigmoid to convert logits to probabilities
@@ -127,6 +154,7 @@ class Trainer:
     def load_checkpoint(
         self,
     ):
+        """Load the model from the checkpoint."""
         print(f"load model from checkpoint {self.checkpoint_dir}")
         self.checkpoint = torch.load(self.checkpoint_dir)
         # print(self.checkpoint)
@@ -134,6 +162,17 @@ class Trainer:
         self.model.load_state_dict(self.checkpoint)
 
     def train_epoch(self, dataloader, epoch):
+        """
+        Train the model for one epoch.
+
+        Args:
+            dataloader : torch.utils.data.DataLoader The training data loader.
+            epoch : int The current epoch number.
+
+        Returns:
+            avg_loss : float The average training loss.
+            avg_acc : float The average training accuracy.
+        """
         self.model.train()
         self.avg_train_loss = 0
         avg_acc = 0
@@ -179,6 +218,17 @@ class Trainer:
         return self.avg_train_loss, avg_acc
 
     def evaluate(self, dataloader, save=False):
+        """
+        Evaluate the model on the test data.
+
+        Args:
+            dataloader : torch.utils.data.DataLoader The test data loader.
+            save : bool Whether to save the inference results.
+
+        Returns:
+            avg_loss : float The average test loss.
+            avg_acc : float The average test accuracy.
+        """
         self.model.eval()
         self.avg_test_loss = 0
         avg_acc = 0
@@ -243,6 +293,12 @@ class Trainer:
         return self.avg_test_loss, avg_acc
 
     def train(self, n_epochs):
+        """
+        Train the model for n_epochs.
+
+        Args:
+            n_epochs : int The number of epochs to train the model.
+        """
         avg_loss = []
         for epoch in range(n_epochs):
             train_loss, train_acc = self.train_epoch(self.train_loader, epoch)
@@ -262,6 +318,17 @@ class Trainer:
             # )
 
     def get_lr_scheduler(self, scheduler_choice, optimizer, **kwargs):
+        """
+        Get the learning rate scheduler.
+
+        Args:
+            scheduler_choice : str The scheduler to use.
+            optimizer : torch.optim.Optimizer The optimizer.
+            **kwargs : dict The scheduler keyword arguments.
+
+        Returns:
+            torch.optim.lr_scheduler._LRScheduler : The learning rate scheduler.
+        """
         if scheduler_choice == "step":
             return StepLR(
                 optimizer,
@@ -296,6 +363,17 @@ class Trainer:
             raise ValueError(f"Invalid scheduler choice: {scheduler_choice}")
 
     def get_optimizer(self, optimizer_choice, model, **kwargs):
+        """
+        Get the optimizer.
+
+        Args:
+            optimizer_choice : str The optimizer to use.
+            model : torch.nn.Module The model to optimize.
+            **kwargs : dict The optimizer keyword arguments.
+
+        Returns:
+            torch.optim.Optimizer : The optimizer.
+        """
         if optimizer_choice == "adam":
             print(
                 "Using Adam optimizer, lr={}, weight_decay={}".format(
@@ -342,6 +420,16 @@ class Trainer:
             raise ValueError(f"Invalid optimizer choice: {optimizer_choice}")
 
     def get_loss_fn(self, loss_choice, **kwargs):
+        """
+        Get the loss function.
+
+        Args:
+            loss_choice : str The loss function to use.
+            **kwargs : dict The loss function keyword arguments.
+
+        Returns:
+            torch.nn.modules.loss._Loss : The loss function.
+        """
         if loss_choice == "cross_entropy":
             return nn.CrossEntropyLoss(**kwargs)
         elif loss_choice == "mse":
@@ -358,6 +446,9 @@ class Trainer:
             raise ValueError(f"Invalid loss choice: {loss_choice}")
 
     def get_gpu_tensors_sorted_by_size(self):
+        """
+        Get the GPU tensors sorted by size.
+        """
         gpu_tensors = []
         for obj in gc.get_objects():
             if torch.is_tensor(obj) and obj.is_cuda:
@@ -367,6 +458,12 @@ class Trainer:
         return gpu_tensors
 
     def print_gpu_tensors(self, top_n=None):
+        """
+        Print the GPU tensors sorted by size.
+
+        Args:
+            top_n : int The number of tensors to display.
+        """
         torch.cuda.empty_cache()
         gpu_tensors = self.get_gpu_tensors_sorted_by_size()
 
@@ -380,6 +477,15 @@ class Trainer:
             )
 
     def format_number_with_unit(self, num):
+        """
+        Format a number with a unit.
+
+        Args:
+            num : int The number to format.
+
+        Returns:
+            str : The formatted number string.
+        """
         if num >= 1_000_000_000:
             return f"{num / 1_000_000_000:.2f}B"
         elif num >= 1_000_000:
@@ -390,6 +496,12 @@ class Trainer:
             return str(num)
 
     def count_parameters(self, model):
+        """
+        Count the number of parameters in the model.
+
+        Args:
+            model : torch.nn.Module The model to count the parameters of.
+        """
         total_params = sum(param.numel() for param in model.parameters())
         trainable_params = sum(
             param.numel() for param in model.parameters() if param.requires_grad
@@ -404,40 +516,3 @@ class Trainer:
         print(f"Total parameters: {formatted_total_params}")
         print(f"Trainable parameters: {formatted_trainable_params}")
         print(f"Non-trainable parameters: {formatted_non_trainable_params}")
-
-
-# def main():
-#     # Import necessary libraries
-#     import torch.optim as optim
-#     import torch.nn as nn
-#     from model import MyModel
-#     from dataset import MyTrainDataset, MyValDataset
-
-#     # Set device
-#     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-#     # Create datasets
-#     train_dataset = MyTrainDataset()
-#     val_dataset = MyValDataset()
-
-#     # Create model
-#     model = MyModel()
-#     model.to(device)
-
-#     # Create optimizer and loss function
-#     optimizer = optim.Adam(model.parameters(), lr=0.001)
-#     loss_fn = nn.CrossEntropyLoss()
-
-#     # Initialize trainer
-#     trainer = Trainer(
-#         model=model,
-#         train_dataset=train_dataset,
-#         val_dataset=val_dataset,
-#         optimizer=optimizer,
-#         loss_fn=loss_fn,
-#         device=device,
-#         use_wandb=False
-#         )
-
-#     # Train the model
-#     trainer.train(n_epochs=10)

@@ -12,7 +12,6 @@ Signal Classification
 
 Firstly, activating ``waveform`` environment.
 Then, by running `train_classify.py <https://github.com/AI-HPC-Research-Team/GWAI/tree/main/demos/train_classify.py>`_ script, your own signal classification model can be trained. 
-You can modify `classify.yaml <https://github.com/AI-HPC-Research-Team/GWAI/tree/main/configs/classify.yaml>`_ to define your own training dataset as well as model configurations.
 
 .. code-block:: console
     :linenos:
@@ -20,6 +19,48 @@ You can modify `classify.yaml <https://github.com/AI-HPC-Research-Team/GWAI/tree
     $ conda activate waveform
     $ cd /workspace/GWAI/demos
     $ python train_classify.py
+
+You can modify `classify.yaml <https://github.com/AI-HPC-Research-Team/GWAI/tree/main/configs/classify.yaml>`_ to define your own training dataset as well as model configurations. For example:
+
+.. code-block:: yaml
+    :linenos:
+
+    dataset:
+    save_path: "../datasets/classify/"
+    fn: emri_asd_test.hdf5
+    dataloader:
+    batch_size: 256
+    num_workers: 8
+
+    training:
+    test_only: False
+    checkpoint_dir: 
+    gpu: 0
+    n_epoch: 50
+    # loss_fn: "bce_with_logits"
+    loss_fn: "cross_entropy"
+    optimizer_type: "adam"
+    optimizer_kwargs:
+        lr: 5e-5
+        weight_decay: 1e-3
+    scheduler_type: "plateau"
+    scheduler_kwargs:
+        mode: "min"
+        factor: 0.5
+        patience: 5
+        threshold: 1e-4
+    result_dir: "./results//${now:%Y-%m-%d}/${now:%H-%M-%S}"
+    result_fn: "inf_result.npy"
+    use_wandb: False
+
+    net:
+    input_channels: 2
+    n_classes: 2
+    n_hidden: 128
+    n_levels: 10
+    kernel_size: 3
+    num_classes: 2
+    dropout: 0
 
 The output log can be seen as follows.
 
@@ -53,6 +94,60 @@ You can modify configurations in `denoise_demo.sh <https://github.com/AI-HPC-Res
     $ conda activate base
     $ cd /workspace/GWAI/demos
     $ bash denoise_demo.sh
+
+The training parameters can be modified in `denoise_demo.sh`, for example:
+
+.. code-block:: shell
+    :linenos:
+
+    #!/bin/bash
+
+    GPUS_PER_NODE=2
+    MASTER_ADDR=localhost
+    MASTER_PORT=6066
+    NNODES=1
+    NODE_RANK=0
+    WORLD_SIZE=$(($GPUS_PER_NODE*$NNODES))
+    DATA_PATH=../dataset/denoise
+
+    DETS=H1
+    CHECKPOINT_PATH=demo
+
+    DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE --nnodes $NNODES --node_rank $NODE_RANK --master_addr $MASTER_ADDR --master_port $MASTER_PORT"
+
+    export CUDA_VISIBLE_DEVICES=6,7
+    python -m torch.distributed.launch $DISTRIBUTED_ARGS \
+        pretrain_gw.py \
+        --tensor-model-parallel-size 1 \
+        --pipeline-model-parallel-size 1 \
+        --num-layers 16 \
+        --hidden-size 1024 \
+        --num-attention-heads 16 \
+        --micro-batch-size 8 \
+        --segment-length 256 \
+        --dets $DETS \
+        --seq-length 128 \
+        --max-position-embeddings 128 \
+        --train-iters 30000 \
+        --save $CHECKPOINT_PATH \
+        --load $CHECKPOINT_PATH \
+        --data-path $DATA_PATH \
+        --data-impl mmap \
+        --split 949,50,1 \
+        --distributed-backend nccl \
+        --lr 0.0001 \
+        --lr-decay-style linear \
+        --min-lr 1.0e-5 \
+        --lr-decay-iters 9900 \
+        --weight-decay 1e-2 \
+        --clip-grad 1.0 \
+        --lr-warmup-fraction .002 \
+        --log-interval 1 \
+        --save-interval 10000 \
+        --eval-interval 1 \
+        --dataloader-type cyclic \
+        --fp16 \
+        --no-binary-head
 
 The output log can be seen as follows.
 
@@ -135,6 +230,161 @@ Then, by running `train_detection.py <https://github.com/AI-HPC-Research-Team/GW
     $ conda activate waveform
     $ cd /workspace/GWAI/
     $ python demos/train_detection.py configs/detection.yaml
+
+You can modify `detection.yaml` to define your own training dataset as well as model configurations. For example:
+
+.. code-block:: yaml
+    :linenos:
+
+    # Basic parameters
+    # Seed needs to be set at top of yaml, before objects with parameters are made
+    #
+    seed: 1607
+    __set_seed: !apply:torch.manual_seed [!ref <seed>]
+
+    # cuda device num
+    cuda: 5
+    # Data params
+    data_folder: './datasets/detection'
+    data_hdf5: smbhb_test.hdf5
+    noise_hdf5: noise_test.hdf5
+
+    experiment_name: detection_demo
+    #----------------------------------------
+
+    output_folder: !ref results/<experiment_name>/<seed>
+    train_log: !ref <output_folder>/train_log.txt
+    save_folder: !ref <output_folder>/save
+
+    # Experiment params
+    auto_mix_prec: False
+    test_only: False
+    num_spks: 1
+    progressbar: True
+    save_inf_data: False
+    save_attention_weights: False
+    # se loss * alpha + clsf loss * (1 - alpha)
+    alpha: 1
+    inf_data: !ref <save_folder>/inf_test/
+    # att_data: !ref <save_folder>/inf_test/
+
+    # Training parameters
+    N_epochs: 100
+    batch_size: 16
+    lr: 0.0005
+    clip_grad_norm: 5
+    loss_upper_lim: 999999  # this is the upper limit for an acceptable loss
+    # if True, the training sequences are cut to a specified length
+    limit_training_signal_len: False
+    # this is the length of sequences if we choose to limit
+    # the signal length of training sequences
+    training_signal_len: 4000
+    dataloader_opts:
+        batch_size: !ref <batch_size>
+        num_workers: 3
+
+    # loss thresholding -- this thresholds the training loss
+    threshold_byloss: True
+    threshold: -50
+
+    # Encoder parameters
+    N_encoder_out: 256
+    out_channels: 256
+    kernel_size: 16
+    kernel_stride: 8
+
+
+    # Specifying the network
+    Encoder: !new:speechbrain.lobes.models.dual_path.Encoder
+        kernel_size: !ref <kernel_size>
+        out_channels: !ref <N_encoder_out>
+
+
+    SBtfintra: !new:speechbrain.lobes.models.dual_path.SBTransformerBlock
+        num_layers: 2
+        d_model: !ref <out_channels>
+        nhead: 4
+        d_ffn: 256
+        dropout: 0
+        use_positional_encoding: True
+        norm_before: True
+
+    SBtfinter: !new:speechbrain.lobes.models.dual_path.SBTransformerBlock
+        num_layers: 2
+        d_model: !ref <out_channels>
+        nhead: 4
+        d_ffn: 256
+        dropout: 0
+        use_positional_encoding: True
+        norm_before: True
+
+    MaskNet: !new:speechbrain.lobes.models.dual_path.Dual_Path_Model
+        num_spks: !ref <num_spks>
+        in_channels: !ref <N_encoder_out>
+        out_channels: !ref <out_channels>
+        num_layers: 2
+        K: 25
+        intra_model: !ref <SBtfintra>
+        inter_model: !ref <SBtfinter>
+        norm: ln
+        linear_layer_after_inter_intra: False
+        skip_around_intra: True
+
+    Decoder: !new:speechbrain.lobes.models.dual_path.Decoder
+        in_channels: !ref <N_encoder_out>
+        out_channels: 1
+        kernel_size: !ref <kernel_size>
+        stride: !ref <kernel_stride>
+        bias: False
+
+    linear_1: !new:speechbrain.nnet.linear.Linear
+        input_size: !ref <training_signal_len>
+        n_neurons: 512
+
+    relu: !new:torch.nn.ReLU
+
+    linear_2: !new:speechbrain.nnet.linear.Linear
+        input_size: 512
+        n_neurons: 1
+
+    optimizer: !name:torch.optim.Adam
+        lr: !ref <lr>
+        weight_decay: 0
+
+
+    loss: !name:speechbrain.nnet.losses.get_si_snr_with_pitwrapper
+    loss2: !name:speechbrain.nnet.losses.bce_loss
+
+    lr_scheduler: !new:speechbrain.nnet.schedulers.ReduceLROnPlateau
+        factor: 0.5
+        patience: 2
+        dont_halve_until_epoch: 35
+
+    epoch_counter: !new:speechbrain.utils.epoch_loop.EpochCounter
+        limit: !ref <N_epochs>
+
+    modules:
+        encoder: !ref <Encoder>
+        decoder: !ref <Decoder>
+        masknet: !ref <MaskNet>
+        linear_1: !ref <linear_1>
+        linear_2: !ref <linear_2>
+
+    checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer
+        checkpoints_dir: !ref <save_folder>
+        recoverables:
+            encoder: !ref <Encoder>
+            decoder: !ref <Decoder>
+            masknet: !ref <MaskNet>
+            linear_1: !ref <linear_1>
+            linear_2: !ref <linear_2>
+            counter: !ref <epoch_counter>
+            lr_scheduler: !ref <lr_scheduler>
+            # mlp: !ref <MLP>
+
+    train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
+        save_file: !ref <train_log>
+
 
 The output log can be seen as follows.
 

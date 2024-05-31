@@ -7,12 +7,22 @@ import torch
 
 class GWSEDataset(object):
     def __init__(self):
+        """
+        Initialize the GWSEDataset object
+        """
         self.waveform_dataset = {
             "train": {"noisy": [], "clean": []},
             "test": {"noisy": [], "clean": []},
         }
 
     def save_waveform(self, DIR=".", data_fn="waveform_dataset.hdf5"):
+        """
+        Save the waveform dataset to a hdf5 file
+
+        Args:
+            DIR (str, optional): Directory to save the data. Defaults to ".".
+            data_fn (str, optional): Filename of the data. Defaults to "waveform_dataset.hdf5".
+        """
         p = Path(DIR)
         p.mkdir(parents=True, exist_ok=True)
 
@@ -31,6 +41,13 @@ class GWSEDataset(object):
         f_data.close()
 
     def load_waveform(self, DIR=".", data_fn="waveform_dataset.hdf5"):
+        """
+        Load the waveform dataset from a hdf5 file
+
+        Args:
+            DIR (str, optional): Directory of the data. Defaults to ".".
+            data_fn (str, optional): Filename of the data. Defaults to "waveform_dataset.hdf5".
+        """
         p = Path(DIR)
 
         f_data = h5py.File(p / data_fn, "r")
@@ -45,6 +62,15 @@ class GWSEDataset(object):
 
 class WaveformDatasetTorch(torch.utils.data.Dataset):
     def __init__(self, wfd, noise, train, length=4000):
+        """
+        Initialize the WaveformDatasetTorch object
+
+        Args:
+            wfd (GWSEDataset): EMRI Dataset
+            noise (GWSEDataset): Noise Dataset
+            train (bool): Train or test
+            length (int, optional): Length of the waveform. Defaults to 4000.
+        """
         self.wfd = wfd
         self.noise = noise
         self.train = train
@@ -55,6 +81,9 @@ class WaveformDatasetTorch(torch.utils.data.Dataset):
     def merge_dataset(
         self,
     ):
+        """
+        Merge the waveform dataset and noise dataset
+        """
         self.num = (
             self.wfd.waveform_dataset[self.type_str]["clean"].shape[0]
             + self.noise.waveform_dataset[self.type_str]["clean"].shape[0]

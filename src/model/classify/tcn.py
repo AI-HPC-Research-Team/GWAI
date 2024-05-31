@@ -4,6 +4,15 @@ from torch.nn.utils import weight_norm
 
 class TCN(nn.Module):
     def __init__(self, input_size, output_size, num_channels, kernel_size, dropout):
+        """
+        Temporal Convolutional Network
+        Args:
+            input_size: Number of input features
+            output_size: Number of output features
+            num_channels: List of number of channels in the network
+            kernel_size: Size of the kernel
+            dropout: Dropout rate
+        """
         super(TCN, self).__init__()
         self.tcn = TemporalConvNet(
             input_size, num_channels, kernel_size=kernel_size, dropout=dropout
@@ -11,7 +20,12 @@ class TCN(nn.Module):
         self.linear = nn.Linear(num_channels[-1], output_size)
 
     def forward(self, inputs):
-        """Inputs have to have dimension (N, C_in, L_in)"""
+        """
+        Forward pass
+        
+        Args:
+            inputs: Input data dimension (N, C_in, L_in)
+        """
         y1 = self.tcn(inputs)  # input should have dimension (N, C, L)
         # print(y1.shape) # torch.Size([B, hidden_dim, L])
         # exit()
@@ -20,18 +34,39 @@ class TCN(nn.Module):
         return o, y1[:, :, -1]
 
     def get_activation_maps(self):
+        """
+        Get the activation maps
+        """
         return self.tcn.activation_maps
 
     def clear_activation_maps(self):
+        """
+        Clear the activation maps
+        """
         self.tcn.activation_maps.clear()
 
 
 class Chomp1d(nn.Module):
     def __init__(self, chomp_size):
+        """
+        Chomp1d
+        
+        Args:
+            chomp_size: Chomp size
+        """
         super(Chomp1d, self).__init__()
         self.chomp_size = chomp_size
 
     def forward(self, x):
+        """
+        Forward pass
+        
+        Args:
+            x: Input data
+
+        Returns:
+            Cropped data
+        """
         return x[:, :, : -self.chomp_size].contiguous()
 
 
@@ -46,6 +81,18 @@ class TemporalBlock(nn.Module):
         padding,
         dropout=0.2,
     ):
+        """
+        Temporal Block
+
+        Args:
+            n_inputs: Number of input features
+            n_outputs: Number of output features
+            kernel_size: Size of the kernel
+            stride: Stride
+            dilation: Dilation
+            padding: Padding
+            dropout: Dropout rate
+        """
         super(TemporalBlock, self).__init__()
         self.conv1 = weight_norm(
             nn.Conv1d(
@@ -92,12 +139,21 @@ class TemporalBlock(nn.Module):
         self.init_weights()
 
     def init_weights(self):
+        """
+        Initialize weights
+        """
         self.conv1.weight.data.normal_(0, 0.01)
         self.conv2.weight.data.normal_(0, 0.01)
         if self.downsample is not None:
             self.downsample.weight.data.normal_(0, 0.01)
 
     def forward(self, x):
+        """
+        Forward pass
+
+        Args:
+            x: Input data
+        """
         out = self.net(x)
         res = x if self.downsample is None else self.downsample(x)
         return self.relu(out + res)
@@ -105,6 +161,14 @@ class TemporalBlock(nn.Module):
 
 class TemporalConvNet(nn.Module):
     def __init__(self, num_inputs, num_channels, kernel_size=2, dropout=0.2):
+        """
+        Main Temporal Convolutional Network
+        Args:
+            num_inputs: Number of input features
+            num_channels: List of number of channels in the network
+            kernel_size: Size of the kernel
+            dropout: Dropout rate
+        """
         super(TemporalConvNet, self).__init__()
         self.activation_maps = []  # Instance variable for activations
         layers = []
@@ -134,13 +198,33 @@ class TemporalConvNet(nn.Module):
         self.network = nn.Sequential(*layers)
 
     def hook_fn(self, module, input, output):
+        """
+        Hook function to store the activation maps
+
+        Args:
+            module: Module
+            input: Input
+            output: Output
+        """
         self.activation_maps.append(output)
 
     def forward(self, x):
+        """
+        Forward pass
+
+        Args:
+            x: Input data
+        """
         return self.network(x)
 
     def get_activation_maps(self):
+        """
+        Get the activation maps
+        """
         return self.activation_maps
 
     def clear_activation_maps(self):
+        """
+        Clear the activation maps
+        """
         self.activation_maps.clear()

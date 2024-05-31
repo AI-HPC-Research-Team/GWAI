@@ -7,6 +7,16 @@ from .constant import Constant
 class Cosmology(object):
     @staticmethod
     def H(zp, w):
+        """
+        Compute the Hubble parameter at redshift zp for a given w
+
+        Args:
+            zp (float): Redshift
+            w (float): Dark energy equation of state parameter
+
+        Returns:
+            float: Hubble parameter
+        """
         fn = 1.0 / (
             Constant.H0
             * math.sqrt(
@@ -19,7 +29,18 @@ class Cosmology(object):
     @staticmethod
     def DL(zup, w):
         """
-        Usage: DL(3,w=0)[0]
+        Compute the luminosity distance at redshift zup for a given w
+
+        Args:
+            zup (float): Redshift
+            w (float): Dark energy equation of state parameter
+
+        Returns:
+            float: Luminosity distance
+            float: Proper distance
+
+        Usage: 
+            DL(3,w=0)[0]
         """
         pd = integrate.quad(Cosmology.H, 0.0, zup, args=(w))[0]
         res = (1.0 + zup) * pd  # in Mpc
@@ -27,13 +48,33 @@ class Cosmology(object):
 
     @staticmethod
     def findz(zm, dlum, ww):
-        """f-n needed for finding z for given DL, w"""
+        """
+        Finding z for given DL, w
+        
+        Args:
+            zm (float): Redshift
+            dlum (float): Luminosity distance
+            ww (float): Dark energy equation of state parameter
+
+        Returns:
+            float: Luminosity distance
+        """
         dofzm = Cosmology.DL(zm, ww)
         return dlum - dofzm[0]
 
     @staticmethod
     def zofDl(DL, w, tolerance):
-        """computes z(DL, w), Assumes DL in Mpc"""
+        """
+        computes z(DL, w), Assumes DL in Mpc
+        
+        Args:
+            DL (float): Luminosity distance
+            w (float): Dark energy equation of state parameter
+            tolerance (float): Tolerance
+
+        Returns:
+            float: Redshift
+        """
         if tolerance > 1.0e-4:
             tolerance = 1.0e-4
         zguess = DL / 6.6e3

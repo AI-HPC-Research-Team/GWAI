@@ -6,7 +6,7 @@ def m1_m2_from_M_q(M, q):
 
     Choose m1 >= m2.
 
-    Arguments:
+    Args:
         M {float} -- total mass
         q {mass ratio} -- mass ratio, 0.0< q <= 1.0
 
@@ -21,6 +21,16 @@ def m1_m2_from_M_q(M, q):
 
 
 def m1_m2_from_M_Chirp_q(M_Chirp, q):
+    """
+    Compute individual masses from chirp mass and mass ratio.
+
+    Args:
+        M_Chirp (float): chirp mass
+        q (float): mass ratio, 0.0< q <= 1.0
+
+    Returns:
+        (float, float) -- (mass_1, mass_2)
+    """
     q = 1 / q
     eta = q / (1 + q) ** 2
     M = M_Chirp * eta ** (-3 / 5)
@@ -28,6 +38,14 @@ def m1_m2_from_M_Chirp_q(M_Chirp, q):
 
 
 def AET(X, Y, Z):
+    """
+    Convert the TDI variables to the AET from XYZ.
+
+    Args:
+        X (float): X variable
+        Y (float): Y variable
+        Z (float): Z variable
+    """
     return [
         (Z - X) / np.sqrt(2.0),
         (X - 2.0 * Y + Z) / np.sqrt(6.0),
@@ -36,6 +54,14 @@ def AET(X, Y, Z):
 
 
 def XYZ(A, E, T):
+    """
+    Convert the AET variables to the XYZ from AET.
+
+    Args:
+        A (float): A variable
+        E (float): E variable
+        T (float): T variable
+    """
     return [
         (-A / np.sqrt(2.0) + T / np.sqrt(2.0)),
         (A / np.sqrt(6.0) - 2 * E / np.sqrt(6.0) + T / np.sqrt(6.0)),

@@ -16,6 +16,13 @@ mylogger = MyLogger(__name__)
 
 class GB:
     def __init__(self, use_gpu=False, VGB=True):
+        """
+        Initialize the GB waveform generator
+
+        Args:
+            use_gpu (bool, optional): Use GPU or not. Defaults to False.
+            VGB (bool, optional): Use VGB catalog or not. Defaults to True.
+        """
         if use_gpu:
             self.xp = xp
         else:
