@@ -12,6 +12,14 @@ data.tdi module
    :undoc-members:
    :show-inheritance:
 
+data.utils module
+-----------------
+
+.. automodule:: data.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data.waveform module
 --------------------
 

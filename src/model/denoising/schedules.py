@@ -23,16 +23,16 @@ from contextlib import contextmanager
 import torch
 from torch.nn.parallel.distributed import DistributedDataParallel as torchDDP
 
-from src.model.denoising import (
+from . import (
     get_args,
     get_num_microbatches,
     get_timers,
     mpu,
     p2p_communication,
 )
-from src.model.denoising.model import DistributedDataParallel as LocalDDP
-from src.model.denoising.model import Float16Module
-from src.model.denoising.utils import unwrap_model
+from .model import DistributedDataParallel as LocalDDP
+from .model import Float16Module
+from .utils import unwrap_model
 
 
 def get_forward_backward_func():

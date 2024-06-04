@@ -7,8 +7,8 @@ import functools
 
 from fastlisaresponse import ResponseWrapper
 
-from ..utils.lisa.constant import Constant
-from ..utils.log_utils import MyLogger
+from .utils import Constant
+# from ..utils.log_utils import MyLogger
 from .waveform import AAK, GB, MBHB
 
 # -------------------------------------
@@ -296,7 +296,7 @@ class TDIWaveformGen(object):
         """
         Initialize the EMRI waveform generator.
         """
-        mylogger.logger.info("Init AAK")
+        # mylogger.logger.info("Init AAK")
         self.aak = AAK(self.use_gpu, self.n_signal)
         self.aak_TDI = self.TDI(
             self.aak,
@@ -312,7 +312,7 @@ class TDIWaveformGen(object):
         """
         Initialize the GB waveform generator.
         """
-        mylogger.logger.info("Init GB")
+        # mylogger.logger.info("Init GB")
         self.gb = GB(self.use_gpu, VGB=VGB)
         self.gb_TDI = self.TDI(
             self.gb,
@@ -328,7 +328,7 @@ class TDIWaveformGen(object):
         """
         Initialize the MBHB waveform generator.
         """
-        mylogger.logger.info("Init MBHB")
+        # mylogger.logger.info("Init MBHB")
         self.mbhb = MBHB(self.f_min, self.T_buffer, self.buffer_ind)
         self.mbhb_TDI = self.TDI(
             self.mbhb,

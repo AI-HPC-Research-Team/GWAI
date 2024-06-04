@@ -1,11 +1,8 @@
 """model evaluation and visualization functions"""
 
 import sys
-
 sys.path.append("..")
-
 import functools
-
 import torch
 
 
@@ -75,7 +72,7 @@ def nll_loss(
     allowed_len_diff=3,
     reduction="mean",
 ):
-    """
+    r"""
     Computes negative log likelihood loss.
     
     Args:
@@ -114,8 +111,8 @@ def bce_loss(
     allowed_len_diff=3,
     label_smoothing=0.0,
 ):
-    """Computes binary cross-entropy (BCE) loss. It also applies the sigmoid
-    function directly (this improves the numerical stability).
+    r"""
+    Computes binary cross-entropy (BCE) loss. It also applies the sigmoid function directly (this improves the numerical stability).
 
     Args:
     inputs : torch.Tensor
@@ -138,6 +135,7 @@ def bce_loss(
         Options are 'mean', 'batch', 'batchmean', 'sum'.
         See pytorch for 'mean', 'sum'. The 'batch' option returns
         one loss per item in the batch, 'batchmean' returns sum / batch size.
+
     """
     # Squeeze singleton dimension so inputs + targets match
     if len(inputs.shape) == len(targets.shape) + 1:
@@ -175,7 +173,7 @@ def kldiv_loss(
     pad_idx=0,
     reduction="mean",
 ):
-    """Computes the KL-divergence error at the batch level.
+    r"""Computes the KL-divergence error at the batch level.
     This loss applies label smoothing directly to the targets
 
     Args:   
@@ -232,7 +230,7 @@ def kldiv_loss(
 
 
 def truncate(predictions, targets, allowed_len_diff=3):
-    """Ensure that predictions and targets are the same length.
+    r"""Ensure that predictions and targets are the same length.
 
     Args:
     predictions : torch.Tensor

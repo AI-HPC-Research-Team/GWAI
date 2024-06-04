@@ -20,15 +20,15 @@
 
 """Pretrain utilities."""
 
-# import math
-# import sys
-# import time
-# from datetime import datetime
+import math
+import sys
+import time
+from datetime import datetime
 
 import torch
 from torch.nn.parallel.distributed import DistributedDataParallel as torchDDP
 
-from src.model.denoising import (
+from . import (
     get_args,
     get_current_global_batch_size,
     get_num_microbatches,
@@ -40,18 +40,18 @@ from src.model.denoising import (
     print_rank_last,
     update_num_microbatches,
 )
-from src.model.denoising.checkpointing import load_checkpoint, save_checkpoint
-from src.model.denoising.data.data_samplers import build_pretraining_data_loader
-from src.model.denoising.initialize import (
+from .checkpointing import load_checkpoint, save_checkpoint
+from .data.data_samplers import build_pretraining_data_loader
+from .initialize import (
     initialize_megatron,
     write_args_to_tensorboard,
 )
-from src.model.denoising.learning_rates import AnnealingLR
-from src.model.denoising.model import DistributedDataParallel as LocalDDP
-from src.model.denoising.model import Float16Module
-from src.model.denoising.optimizer import get_megatron_optimizer
-from src.model.denoising.schedules import get_forward_backward_func
-from src.model.denoising.utils import (
+from .learning_rates import AnnealingLR
+from .model import DistributedDataParallel as LocalDDP
+from .model import Float16Module
+from .optimizer import get_megatron_optimizer
+from .schedules import get_forward_backward_func
+from .utils import (
     calc_params_l2_norm,
     check_adlr_autoresume_termination,
     report_memory,

@@ -8,10 +8,10 @@ from bidict import bidict
 from few.waveform import Pn5AAKWaveform
 from pycbc.waveform import get_td_waveform
 
-from ..utils.lisa.constant import Constant
-from ..utils.log_utils import MyLogger, TimerLog
+from .utils import Constant
+# from .utils.log_utils import MyLogger, TimerLog
 
-mylogger = MyLogger(__name__)
+# mylogger = MyLogger(__name__)
 
 
 class GB:
@@ -79,7 +79,7 @@ class GB:
 
         return hp + 1j * hc
 
-    @TimerLog(mylogger.logger, "Reading catalog from file")
+    # @TimerLog(mylogger.logger, "Reading catalog from file")
     def read_catalog(self, cat_path):
         if cat_path.suffix in [".txt", ".dat"]:
             par = np.loadtxt(cat_path)

@@ -9,7 +9,7 @@ from scipy import signal
 from scipy.stats import shapiro
 from statsmodels.tsa.stattools import adfuller
 
-from ...src.utils.lisa.constant import Constant
+from .utils import Constant
 
 
 def tukey(M, alpha=0.5):

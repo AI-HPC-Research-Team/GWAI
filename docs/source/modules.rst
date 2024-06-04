@@ -1,18 +1,10 @@
-.. _modules:
-
-Main Modules
-============
-
-.. autosummary::
-   :toctree: generated
+src
+===
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
 
    data
    eval
    model
    utils
-
-
-

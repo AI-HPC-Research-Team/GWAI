@@ -22,9 +22,9 @@ import torch
 from apex.multi_tensor_apply import multi_tensor_applier
 from torch.nn.parallel import DistributedDataParallel as torchDDP
 
-from src.model.denoising import get_adlr_autoresume, get_args, mpu, print_rank_0
-from src.model.denoising.model.module import param_is_not_shared
-from src.model.denoising.mpu.layers import param_is_not_tensor_parallel_duplicate
+from . import get_adlr_autoresume, get_args, mpu, print_rank_0
+from .model.module import param_is_not_shared
+from .mpu.layers import param_is_not_tensor_parallel_duplicate
 
 
 def unwrap_model(model, module_instances=(torchDDP)):
