@@ -28,7 +28,7 @@ from datetime import datetime
 import torch
 from torch.nn.parallel.distributed import DistributedDataParallel as torchDDP
 
-from . import (
+from src.model.denoising import (
     get_args,
     get_current_global_batch_size,
     get_num_microbatches,

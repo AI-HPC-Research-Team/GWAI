@@ -28,6 +28,14 @@ eval.task module
    :undoc-members:
    :show-inheritance:
 
+eval.utils module
+-----------------
+
+.. automodule:: eval.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
