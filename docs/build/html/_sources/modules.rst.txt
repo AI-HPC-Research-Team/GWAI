@@ -2,6 +2,8 @@ GWAI
 ====
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 3
 
-   submodules
+   data
+   eval
+   model

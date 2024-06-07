@@ -4,10 +4,9 @@ GWAI
 .. autosummary::
    :toctree: 
 
-
-    data
-    eval
-    model
+   data
+   eval
+   model
 
 
 
