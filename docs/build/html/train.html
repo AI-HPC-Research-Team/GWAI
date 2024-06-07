@@ -1,0 +1,606 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Training examples of AI-centered model &mdash; GWAI  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples of evaluation method" href="evaluation.html" />
+    <link rel="prev" title="Examples of space-based gravitational wave signal generation" href="waveform.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> GWAI
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about_gwai.html">About GWAI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="waveform.html">Examples of space-based gravitational wave signal generation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Training examples of AI-centered model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#signal-classification">Signal Classification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-denoising">Data Denoising</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#signal-detection">Signal Detection</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="evaluation.html">Examples of evaluation method</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">GWAI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citations.html">Citations</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GWAI</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="tutorials.html">Tutorials</a> &raquo;</li>
+        
+      <li>Training examples of AI-centered model</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/train.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="training-examples-of-ai-centered-model">
+<h1>Training examples of AI-centered model<a class="headerlink" href="#training-examples-of-ai-centered-model" title="Permalink to this headline">¶</a></h1>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+</tbody>
+</table>
+<div class="section" id="signal-classification">
+<h2>Signal Classification<a class="headerlink" href="#signal-classification" title="Permalink to this headline">¶</a></h2>
+<p>Firstly, activating <code class="docutils literal notranslate"><span class="pre">waveform</span></code> environment.
+Then, by running <a class="reference external" href="https://github.com/AI-HPC-Research-Team/GWAI/tree/main/demos/train_classify.py">train_classify.py</a> script, your own signal classification model can be trained.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="gp">$ </span>conda activate waveform
+<span class="linenos">2</span><span class="gp">$ </span><span class="nb">cd</span> /workspace/GWAI/demos
+<span class="linenos">3</span><span class="gp">$ </span>python train_classify.py
+</pre></div>
+</div>
+<p>You can modify <a class="reference external" href="https://github.com/AI-HPC-Research-Team/GWAI/tree/main/configs/classify.yaml">classify.yaml</a> to define your own training dataset as well as model configurations. For example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">dataset</span><span class="p">:</span>
+<span class="linenos"> 2</span><span class="nt">save_path</span><span class="p">:</span> <span class="s">&quot;../datasets/classify/&quot;</span>
+<span class="linenos"> 3</span><span class="nt">fn</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">emri_asd_test.hdf5</span>
+<span class="linenos"> 4</span><span class="nt">dataloader</span><span class="p">:</span>
+<span class="linenos"> 5</span><span class="nt">batch_size</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">256</span>
+<span class="linenos"> 6</span><span class="nt">num_workers</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">8</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="nt">training</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="nt">test_only</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="linenos">10</span><span class="nt">checkpoint_dir</span><span class="p">:</span>
+<span class="linenos">11</span><span class="nt">gpu</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="linenos">12</span><span class="nt">n_epoch</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="linenos">13</span><span class="c1"># loss_fn: &quot;bce_with_logits&quot;</span>
+<span class="linenos">14</span><span class="nt">loss_fn</span><span class="p">:</span> <span class="s">&quot;cross_entropy&quot;</span>
+<span class="linenos">15</span><span class="nt">optimizer_type</span><span class="p">:</span> <span class="s">&quot;adam&quot;</span>
+<span class="linenos">16</span><span class="nt">optimizer_kwargs</span><span class="p">:</span>
+<span class="linenos">17</span>    <span class="nt">lr</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5e-5</span>
+<span class="linenos">18</span>    <span class="nt">weight_decay</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1e-3</span>
+<span class="linenos">19</span><span class="nt">scheduler_type</span><span class="p">:</span> <span class="s">&quot;plateau&quot;</span>
+<span class="linenos">20</span><span class="nt">scheduler_kwargs</span><span class="p">:</span>
+<span class="linenos">21</span>    <span class="nt">mode</span><span class="p">:</span> <span class="s">&quot;min&quot;</span>
+<span class="linenos">22</span>    <span class="nt">factor</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.5</span>
+<span class="linenos">23</span>    <span class="nt">patience</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="linenos">24</span>    <span class="nt">threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1e-4</span>
+<span class="linenos">25</span><span class="nt">result_dir</span><span class="p">:</span> <span class="s">&quot;./results//${now:%Y-%m-%d}/${now:%H-%M-%S}&quot;</span>
+<span class="linenos">26</span><span class="nt">result_fn</span><span class="p">:</span> <span class="s">&quot;inf_result.npy&quot;</span>
+<span class="linenos">27</span><span class="nt">use_wandb</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="linenos">28</span>
+<span class="linenos">29</span><span class="nt">net</span><span class="p">:</span>
+<span class="linenos">30</span><span class="nt">input_channels</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="linenos">31</span><span class="nt">n_classes</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="linenos">32</span><span class="nt">n_hidden</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">128</span>
+<span class="linenos">33</span><span class="nt">n_levels</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
+<span class="linenos">34</span><span class="nt">kernel_size</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="linenos">35</span><span class="nt">num_classes</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="linenos">36</span><span class="nt">dropout</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+</pre></div>
+</div>
+<p>The output log can be seen as follows.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>  <span class="o">[</span><span class="m">2024</span>-02-04 <span class="m">10</span>:25:46,915<span class="o">][</span>nn.dataloader<span class="o">][</span>INFO<span class="o">]</span> - Loading data from ../datasets/detection/emri_asd_test.hdf5
+<span class="linenos"> 2</span>  Using Adam optimizer, <span class="nv">lr</span><span class="o">=</span>5e-05, <span class="nv">weight_decay</span><span class="o">=</span><span class="m">0</span>.001
+<span class="linenos"> 3</span>  Total parameters: <span class="m">940</span>.42K
+<span class="linenos"> 4</span>  Trainable parameters: <span class="m">940</span>.42K
+<span class="linenos"> 5</span>  Non-trainable parameters: <span class="m">0</span>
+<span class="linenos"> 6</span>  Epoch <span class="m">1</span>: <span class="m">100</span>%<span class="p">|</span>█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████<span class="p">|</span> <span class="m">200</span>/200 <span class="o">[</span><span class="m">00</span>:01&lt;<span class="m">00</span>:00, <span class="m">138</span>.53it/s, <span class="nv">loss</span><span class="o">=</span><span class="m">6</span>.94e-01, <span class="nv">acc</span><span class="o">=</span><span class="m">0</span>.49<span class="o">]</span>                                                                                                                                                                                                 <span class="p">|</span> <span class="m">0</span>/200 <span class="o">[</span><span class="m">00</span>:00&lt;?, ?it/s<span class="o">]</span>Time: <span class="m">0</span>.010484933853149414
+<span class="linenos"> 7</span>  <span class="m">100</span>%<span class="p">|</span>████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████<span class="p">|</span> <span class="m">200</span>/200 <span class="o">[</span><span class="m">00</span>:00&lt;<span class="m">00</span>:00, <span class="m">223</span>.66it/s, <span class="nv">loss</span><span class="o">=</span><span class="m">6</span>.91e-01, <span class="nv">acc</span><span class="o">=</span><span class="m">0</span>.5050<span class="o">]</span>
+<span class="linenos"> 8</span>  <span class="o">[</span><span class="m">2024</span>-02-04 <span class="m">10</span>:25:54,895<span class="o">][</span>nn.trainer<span class="o">][</span>INFO<span class="o">]</span> - EPOCH <span class="m">1</span>   : <span class="nv">lr</span><span class="o">=</span><span class="m">5</span>.00e-05,   <span class="nv">train_loss</span><span class="o">=</span><span class="m">6</span>.94e-01,    <span class="nv">train_acc</span><span class="o">=</span><span class="m">0</span>.4900,       <span class="nv">val_loss</span><span class="o">=</span><span class="m">6</span>.91e-01       <span class="nv">valid_acc</span><span class="o">=</span><span class="m">0</span>.5050
+<span class="linenos"> 9</span>  Epoch <span class="m">2</span>: <span class="m">100</span>%<span class="p">|</span>█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████<span class="p">|</span> <span class="m">200</span>/200 <span class="o">[</span><span class="m">00</span>:01&lt;<span class="m">00</span>:00, <span class="m">156</span>.30it/s, <span class="nv">loss</span><span class="o">=</span><span class="m">6</span>.91e-01, <span class="nv">acc</span><span class="o">=</span><span class="m">0</span>.50<span class="o">]</span>
+<span class="linenos">10</span>  <span class="m">0</span>%<span class="p">|</span>                                                                                                                                                                                                  <span class="p">|</span> <span class="m">0</span>/200 <span class="o">[</span><span class="m">00</span>:00&lt;?, ?it/s<span class="o">]</span>Time: <span class="m">0</span>.010904073715209961
+</pre></div>
+</div>
+</div>
+<div class="section" id="data-denoising">
+<h2>Data Denoising<a class="headerlink" href="#data-denoising" title="Permalink to this headline">¶</a></h2>
+<p>Firstly, downloading demo dataset (<code class="docutils literal notranslate"><span class="pre">train_data,</span> <span class="pre">valid_data,</span> <span class="pre">test_data</span></code>) from <a class="reference external" href="https://github.com/AI-HPC-Research-Team/LIGO_noise_suppression">this repository</a>.
+and put it under <a class="reference external" href="https://github.com/AI-HPC-Research-Team/GWAI/tree/main/datasets/denoise">datasets/denoise</a> folder.
+By running <a class="reference external" href="https://github.com/AI-HPC-Research-Team/GWAI/tree/main/demo/denoise_demo.sh">denoise_demo.sh</a> script, your own denoising model can be trained.</p>
+<p>You can modify configurations in <a class="reference external" href="https://github.com/AI-HPC-Research-Team/GWAI/tree/main/demo/denoise_demo.sh">denoise_demo.sh</a> to build your own model with different model size.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="gp">$ </span>conda activate base
+<span class="linenos">2</span><span class="gp">$ </span><span class="nb">cd</span> /workspace/GWAI/demos
+<span class="linenos">3</span><span class="gp">$ </span>bash denoise_demo.sh
+</pre></div>
+</div>
+<p>The training parameters can be modified in <cite>denoise_demo.sh</cite>, for example:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/bin/bash</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="nv">GPUS_PER_NODE</span><span class="o">=</span><span class="m">2</span>
+<span class="linenos"> 4</span><span class="nv">MASTER_ADDR</span><span class="o">=</span>localhost
+<span class="linenos"> 5</span><span class="nv">MASTER_PORT</span><span class="o">=</span><span class="m">6066</span>
+<span class="linenos"> 6</span><span class="nv">NNODES</span><span class="o">=</span><span class="m">1</span>
+<span class="linenos"> 7</span><span class="nv">NODE_RANK</span><span class="o">=</span><span class="m">0</span>
+<span class="linenos"> 8</span><span class="nv">WORLD_SIZE</span><span class="o">=</span><span class="k">$((</span><span class="nv">$GPUS_PER_NODE</span><span class="o">*</span><span class="nv">$NNODES</span><span class="k">))</span>
+<span class="linenos"> 9</span><span class="nv">DATA_PATH</span><span class="o">=</span>../dataset/denoise
+<span class="linenos">10</span>
+<span class="linenos">11</span><span class="nv">DETS</span><span class="o">=</span>H1
+<span class="linenos">12</span><span class="nv">CHECKPOINT_PATH</span><span class="o">=</span>demo
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="nv">DISTRIBUTED_ARGS</span><span class="o">=</span><span class="s2">&quot;--nproc_per_node </span><span class="nv">$GPUS_PER_NODE</span><span class="s2"> --nnodes </span><span class="nv">$NNODES</span><span class="s2"> --node_rank </span><span class="nv">$NODE_RANK</span><span class="s2"> --master_addr </span><span class="nv">$MASTER_ADDR</span><span class="s2"> --master_port </span><span class="nv">$MASTER_PORT</span><span class="s2">&quot;</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span><span class="nb">export</span> <span class="nv">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="m">6</span>,7
+<span class="linenos">17</span>python -m torch.distributed.launch <span class="nv">$DISTRIBUTED_ARGS</span> <span class="se">\</span>
+<span class="linenos">18</span>    pretrain_gw.py <span class="se">\</span>
+<span class="linenos">19</span>    --tensor-model-parallel-size <span class="m">1</span> <span class="se">\</span>
+<span class="linenos">20</span>    --pipeline-model-parallel-size <span class="m">1</span> <span class="se">\</span>
+<span class="linenos">21</span>    --num-layers <span class="m">16</span> <span class="se">\</span>
+<span class="linenos">22</span>    --hidden-size <span class="m">1024</span> <span class="se">\</span>
+<span class="linenos">23</span>    --num-attention-heads <span class="m">16</span> <span class="se">\</span>
+<span class="linenos">24</span>    --micro-batch-size <span class="m">8</span> <span class="se">\</span>
+<span class="linenos">25</span>    --segment-length <span class="m">256</span> <span class="se">\</span>
+<span class="linenos">26</span>    --dets <span class="nv">$DETS</span> <span class="se">\</span>
+<span class="linenos">27</span>    --seq-length <span class="m">128</span> <span class="se">\</span>
+<span class="linenos">28</span>    --max-position-embeddings <span class="m">128</span> <span class="se">\</span>
+<span class="linenos">29</span>    --train-iters <span class="m">30000</span> <span class="se">\</span>
+<span class="linenos">30</span>    --save <span class="nv">$CHECKPOINT_PATH</span> <span class="se">\</span>
+<span class="linenos">31</span>    --load <span class="nv">$CHECKPOINT_PATH</span> <span class="se">\</span>
+<span class="linenos">32</span>    --data-path <span class="nv">$DATA_PATH</span> <span class="se">\</span>
+<span class="linenos">33</span>    --data-impl mmap <span class="se">\</span>
+<span class="linenos">34</span>    --split <span class="m">949</span>,50,1 <span class="se">\</span>
+<span class="linenos">35</span>    --distributed-backend nccl <span class="se">\</span>
+<span class="linenos">36</span>    --lr <span class="m">0</span>.0001 <span class="se">\</span>
+<span class="linenos">37</span>    --lr-decay-style linear <span class="se">\</span>
+<span class="linenos">38</span>    --min-lr <span class="m">1</span>.0e-5 <span class="se">\</span>
+<span class="linenos">39</span>    --lr-decay-iters <span class="m">9900</span> <span class="se">\</span>
+<span class="linenos">40</span>    --weight-decay 1e-2 <span class="se">\</span>
+<span class="linenos">41</span>    --clip-grad <span class="m">1</span>.0 <span class="se">\</span>
+<span class="linenos">42</span>    --lr-warmup-fraction .002 <span class="se">\</span>
+<span class="linenos">43</span>    --log-interval <span class="m">1</span> <span class="se">\</span>
+<span class="linenos">44</span>    --save-interval <span class="m">10000</span> <span class="se">\</span>
+<span class="linenos">45</span>    --eval-interval <span class="m">1</span> <span class="se">\</span>
+<span class="linenos">46</span>    --dataloader-type cyclic <span class="se">\</span>
+<span class="linenos">47</span>    --fp16 <span class="se">\</span>
+<span class="linenos">48</span>    --no-binary-head
+</pre></div>
+</div>
+<p>The output log can be seen as follows.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>  using world size: <span class="m">2</span>, data-parallel-size: <span class="m">2</span>, tensor-model-parallel size: <span class="m">1</span>, pipeline-model-parallel size: <span class="m">1</span>
+<span class="linenos"> 2</span>  setting global batch size to <span class="m">16</span>
+<span class="linenos"> 3</span>  using torch.float16 <span class="k">for</span> parameters ...
+<span class="linenos"> 4</span>  ------------------------ arguments ------------------------
+<span class="linenos"> 5</span>  accumulate_allreduce_grads_in_fp32 .............. False
+<span class="linenos"> 6</span>  adam_beta1 ...................................... <span class="m">0</span>.9
+<span class="linenos"> 7</span>  xxxxxxx
+<span class="linenos"> 8</span>  -------------------- end of arguments ---------------------
+<span class="linenos"> 9</span>  setting number of micro-batches to constant <span class="m">1</span>
+<span class="linenos">10</span>  &gt; initializing torch distributed ...
+<span class="linenos">11</span>  &gt; initializing tensor model parallel with size <span class="m">1</span>
+<span class="linenos">12</span>  &gt; initializing pipeline model parallel with size <span class="m">1</span>
+<span class="linenos">13</span>  &gt; setting random seeds to <span class="m">1234</span> ...
+<span class="linenos">14</span>  &gt; initializing model parallel cuda seeds on global rank <span class="m">0</span>, model parallel rank <span class="m">0</span>, and data parallel rank <span class="m">0</span> with model parallel seed: <span class="m">3952</span> and data parallel seed: <span class="m">1234</span>
+<span class="linenos">15</span>  &gt; compiling and loading fused kernels ...
+<span class="linenos">16</span>  Detected CUDA files, patching ldflags
+<span class="linenos">17</span>  Emitting ninja build file /workspace/GWAI/demo/../src/model/denoising/fused_kernels/build/build.ninja...
+<span class="linenos">18</span>  Building extension module scaled_upper_triang_masked_softmax_cuda...
+<span class="linenos">19</span>  Allowing ninja to <span class="nb">set</span> a default number of workers... <span class="o">(</span>overridable by setting the environment variable <span class="nv">MAX_JOBS</span><span class="o">=</span>N<span class="o">)</span>
+<span class="linenos">20</span>  ninja: no work to <span class="k">do</span>.
+<span class="linenos">21</span>  Loading extension module scaled_upper_triang_masked_softmax_cuda...
+<span class="linenos">22</span>  Detected CUDA files, patching ldflags
+<span class="linenos">23</span>  Emitting ninja build file /workspace/GWAI/demo/../src/model/denoising/fused_kernels/build/build.ninja...
+<span class="linenos">24</span>  Building extension module scaled_masked_softmax_cuda...
+<span class="linenos">25</span>  Allowing ninja to <span class="nb">set</span> a default number of workers... <span class="o">(</span>overridable by setting the environment variable <span class="nv">MAX_JOBS</span><span class="o">=</span>N<span class="o">)</span>
+<span class="linenos">26</span>  ninja: no work to <span class="k">do</span>.
+<span class="linenos">27</span>  Loading extension module scaled_masked_softmax_cuda...
+<span class="linenos">28</span>  Detected CUDA files, patching ldflags
+<span class="linenos">29</span>  Emitting ninja build file /workspace/GWAI/demo/../src/model/denoising/fused_kernels/build/build.ninja...
+<span class="linenos">30</span>  Building extension module fused_mix_prec_layer_norm_cuda...
+<span class="linenos">31</span>  Allowing ninja to <span class="nb">set</span> a default number of workers... <span class="o">(</span>overridable by setting the environment variable <span class="nv">MAX_JOBS</span><span class="o">=</span>N<span class="o">)</span>
+<span class="linenos">32</span>  ninja: no work to <span class="k">do</span>.
+<span class="linenos">33</span>  Loading extension module fused_mix_prec_layer_norm_cuda...
+<span class="linenos">34</span>  &gt;&gt;&gt; <span class="k">done</span> with compiling and loading fused kernels. Compilation time: <span class="m">3</span>.274 seconds
+<span class="linenos">35</span>  <span class="nb">time</span> to initialize megatron <span class="o">(</span>seconds<span class="o">)</span>: <span class="m">41</span>.829
+<span class="linenos">36</span>  <span class="o">[</span>after megatron is initialized<span class="o">]</span> datetime: <span class="m">2024</span>-02-02 <span class="m">15</span>:50:01
+<span class="linenos">37</span>  building WaveFormer model ...
+<span class="linenos">38</span>  &gt; number of parameters on <span class="o">(</span>tensor, pipeline<span class="o">)</span> model parallel rank <span class="o">(</span><span class="m">0</span>, <span class="m">0</span><span class="o">)</span>: <span class="m">220058673</span>
+<span class="linenos">39</span>  &gt; learning rate decay style: linear
+<span class="linenos">40</span>  WARNING: could not find the metadata file demo/latest_checkpointed_iteration.txt
+<span class="linenos">41</span>     will not load any checkpoints and will start from random
+<span class="linenos">42</span>  <span class="nb">time</span> <span class="o">(</span>ms<span class="o">)</span> <span class="p">|</span> load-checkpoint: <span class="m">0</span>.16
+<span class="linenos">43</span>  <span class="o">[</span>after model, optimizer, and learning rate scheduler are built<span class="o">]</span> datetime: <span class="m">2024</span>-02-02 <span class="m">15</span>:50:01
+<span class="linenos">44</span>  &gt; building train, validation, and <span class="nb">test</span> datasets ...
+<span class="linenos">45</span>  &gt; building train, validation, and <span class="nb">test</span> datasets <span class="k">for</span> BERT ...
+<span class="linenos">46</span>  &gt; finished creating BERT datasets ...
+<span class="linenos">47</span>  <span class="o">[</span>after dataloaders are built<span class="o">]</span> datetime: <span class="m">2024</span>-02-02 <span class="m">15</span>:50:06
+<span class="linenos">48</span>  <span class="k">done</span> with setup ...time <span class="o">(</span>ms<span class="o">)</span> <span class="p">|</span> model-and-optimizer-setup: <span class="m">111</span>.39 <span class="p">|</span> train/valid/test-data-iterators-setup: <span class="m">4415</span>.50
+<span class="linenos">49</span>
+<span class="linenos">50</span>  training ...
+<span class="linenos">51</span>  <span class="o">[</span>before the start of training step<span class="o">]</span> datetime: <span class="m">2024</span>-02-02 <span class="m">15</span>:50:06
+<span class="linenos">52</span>  iteration        <span class="m">1</span>/   <span class="m">30000</span> <span class="p">|</span> current time: <span class="m">1706860208</span>.35 <span class="p">|</span> consumed samples:           <span class="m">16</span> <span class="p">|</span> elapsed <span class="nb">time</span> per iteration <span class="o">(</span>ms<span class="o">)</span>: <span class="m">1996</span>.1 <span class="p">|</span> learning rate: <span class="m">0</span>.000E+00 <span class="p">|</span> global batch size:    <span class="m">16</span> <span class="p">|</span> loss scale: <span class="m">4294967296</span>.0 <span class="p">|</span> number of skipped iterations:   <span class="m">1</span> <span class="p">|</span> number of nan iterations:   <span class="m">0</span> <span class="p">|</span>
+<span class="linenos">53</span>  <span class="nb">time</span> <span class="o">(</span>ms<span class="o">)</span> <span class="p">|</span> backward-compute: <span class="m">138</span>.46 <span class="p">|</span> backward-params-all-reduce: <span class="m">32</span>.71 <span class="p">|</span> backward-embedding-all-reduce: <span class="m">0</span>.04 <span class="p">|</span> optimizer-copy-to-main-grad: <span class="m">3</span>.17 <span class="p">|</span> optimizer-unscale-and-check-inf: <span class="m">42</span>.67 <span class="p">|</span> optimizer: <span class="m">45</span>.94 <span class="p">|</span> batch-generator: <span class="m">263</span>.80
+<span class="linenos">54</span>  ----------------------------------------------------------------------------------------------------
+<span class="linenos">55</span>  validation loss at iteration <span class="m">1</span> <span class="p">|</span> lm loss value: <span class="m">4</span>.280033E-01 <span class="p">|</span> lm loss PPL: <span class="m">1</span>.534191E+00 <span class="p">|</span>
+<span class="linenos">56</span>  --------------------------------------------------------------------------------------------
+<span class="linenos">57</span>  iteration        <span class="m">2</span>/   <span class="m">30000</span> <span class="p">|</span> current time: <span class="m">1706860208</span>.78 <span class="p">|</span> consumed samples:           <span class="m">32</span> <span class="p">|</span> elapsed <span class="nb">time</span> per iteration <span class="o">(</span>ms<span class="o">)</span>: <span class="m">429</span>.4 <span class="p">|</span> learning rate: <span class="m">0</span>.000E+00 <span class="p">|</span> global batch size:    <span class="m">16</span> <span class="p">|</span> loss scale: <span class="m">2147483648</span>.0 <span class="p">|</span> number of skipped iterations:   <span class="m">1</span> <span class="p">|</span> number of nan iterations:   <span class="m">0</span> <span class="p">|</span>
+<span class="linenos">58</span>  <span class="nb">time</span> <span class="o">(</span>ms<span class="o">)</span> <span class="p">|</span> backward-compute: <span class="m">31</span>.50 <span class="p">|</span> backward-params-all-reduce: <span class="m">35</span>.43 <span class="p">|</span> backward-embedding-all-reduce: <span class="m">0</span>.03 <span class="p">|</span> optimizer-copy-to-main-grad: <span class="m">2</span>.87 <span class="p">|</span> optimizer-unscale-and-check-inf: <span class="m">12</span>.14 <span class="p">|</span> optimizer: <span class="m">15</span>.32 <span class="p">|</span> batch-generator: <span class="m">274</span>.37
+<span class="linenos">59</span>  ----------------------------------------------------------------------------------------------------
+<span class="linenos">60</span>  validation loss at iteration <span class="m">2</span> <span class="p">|</span> lm loss value: <span class="m">4</span>.258614E-01 <span class="p">|</span> lm loss PPL: <span class="m">1</span>.530909E+00 <span class="p">|</span>
+<span class="linenos">61</span>  --------------------------------------------------------------------------------------------
+</pre></div>
+</div>
+</div>
+<div class="section" id="signal-detection">
+<h2>Signal Detection<a class="headerlink" href="#signal-detection" title="Permalink to this headline">¶</a></h2>
+<p>Firstly, activating <code class="docutils literal notranslate"><span class="pre">waveform</span></code> environment.
+Then, by running <a class="reference external" href="https://github.com/AI-HPC-Research-Team/GWAI/tree/main/demos/train_detection.py">train_detection.py</a> script, your own detection model can be trained.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="gp">$ </span>conda activate waveform
+<span class="linenos">2</span><span class="gp">$ </span><span class="nb">cd</span> /workspace/GWAI/
+<span class="linenos">3</span><span class="gp">$ </span>python demos/train_detection.py configs/detection.yaml
+</pre></div>
+</div>
+<p>You can modify <cite>detection.yaml</cite> to define your own training dataset as well as model configurations. For example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="c1"># Basic parameters</span>
+<span class="linenos">  2</span><span class="c1"># Seed needs to be set at top of yaml, before objects with parameters are made</span>
+<span class="linenos">  3</span><span class="c1">#</span>
+<span class="linenos">  4</span><span class="nt">seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1607</span>
+<span class="linenos">  5</span><span class="nt">__set_seed</span><span class="p">:</span> <span class="kt">!apply:torch.manual_seed</span> <span class="p p-Indicator">[</span><span class="kt">!ref</span> <span class="nv">&lt;seed&gt;</span><span class="p p-Indicator">]</span>
+<span class="linenos">  6</span>
+<span class="linenos">  7</span><span class="c1"># cuda device num</span>
+<span class="linenos">  8</span><span class="nt">cuda</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="linenos">  9</span><span class="c1"># Data params</span>
+<span class="linenos"> 10</span><span class="nt">data_folder</span><span class="p">:</span> <span class="s">&#39;./datasets/detection&#39;</span>
+<span class="linenos"> 11</span><span class="nt">data_hdf5</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">smbhb_test.hdf5</span>
+<span class="linenos"> 12</span><span class="nt">noise_hdf5</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">noise_test.hdf5</span>
+<span class="linenos"> 13</span>
+<span class="linenos"> 14</span><span class="nt">experiment_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">detection_demo</span>
+<span class="linenos"> 15</span><span class="c1">#----------------------------------------</span>
+<span class="linenos"> 16</span>
+<span class="linenos"> 17</span><span class="nt">output_folder</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">results/&lt;experiment_name&gt;/&lt;seed&gt;</span>
+<span class="linenos"> 18</span><span class="nt">train_log</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;output_folder&gt;/train_log.txt</span>
+<span class="linenos"> 19</span><span class="nt">save_folder</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;output_folder&gt;/save</span>
+<span class="linenos"> 20</span>
+<span class="linenos"> 21</span><span class="c1"># Experiment params</span>
+<span class="linenos"> 22</span><span class="nt">auto_mix_prec</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="linenos"> 23</span><span class="nt">test_only</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="linenos"> 24</span><span class="nt">num_spks</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="linenos"> 25</span><span class="nt">progressbar</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos"> 26</span><span class="nt">save_inf_data</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="linenos"> 27</span><span class="nt">save_attention_weights</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="linenos"> 28</span><span class="c1"># se loss * alpha + clsf loss * (1 - alpha)</span>
+<span class="linenos"> 29</span><span class="nt">alpha</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="linenos"> 30</span><span class="nt">inf_data</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;save_folder&gt;/inf_test/</span>
+<span class="linenos"> 31</span><span class="c1"># att_data: !ref &lt;save_folder&gt;/inf_test/</span>
+<span class="linenos"> 32</span>
+<span class="linenos"> 33</span><span class="c1"># Training parameters</span>
+<span class="linenos"> 34</span><span class="nt">N_epochs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="linenos"> 35</span><span class="nt">batch_size</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">16</span>
+<span class="linenos"> 36</span><span class="nt">lr</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0005</span>
+<span class="linenos"> 37</span><span class="nt">clip_grad_norm</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="linenos"> 38</span><span class="nt">loss_upper_lim</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">999999</span>  <span class="c1"># this is the upper limit for an acceptable loss</span>
+<span class="linenos"> 39</span><span class="c1"># if True, the training sequences are cut to a specified length</span>
+<span class="linenos"> 40</span><span class="nt">limit_training_signal_len</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="linenos"> 41</span><span class="c1"># this is the length of sequences if we choose to limit</span>
+<span class="linenos"> 42</span><span class="c1"># the signal length of training sequences</span>
+<span class="linenos"> 43</span><span class="nt">training_signal_len</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">4000</span>
+<span class="linenos"> 44</span><span class="nt">dataloader_opts</span><span class="p">:</span>
+<span class="linenos"> 45</span>    <span class="nt">batch_size</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;batch_size&gt;</span>
+<span class="linenos"> 46</span>    <span class="nt">num_workers</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="linenos"> 47</span>
+<span class="linenos"> 48</span><span class="c1"># loss thresholding -- this thresholds the training loss</span>
+<span class="linenos"> 49</span><span class="nt">threshold_byloss</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos"> 50</span><span class="nt">threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">-50</span>
+<span class="linenos"> 51</span>
+<span class="linenos"> 52</span><span class="c1"># Encoder parameters</span>
+<span class="linenos"> 53</span><span class="nt">N_encoder_out</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">256</span>
+<span class="linenos"> 54</span><span class="nt">out_channels</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">256</span>
+<span class="linenos"> 55</span><span class="nt">kernel_size</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">16</span>
+<span class="linenos"> 56</span><span class="nt">kernel_stride</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">8</span>
+<span class="linenos"> 57</span>
+<span class="linenos"> 58</span>
+<span class="linenos"> 59</span><span class="c1"># Specifying the network</span>
+<span class="linenos"> 60</span><span class="nt">Encoder</span><span class="p">:</span> <span class="kt">!new:speechbrain.lobes.models.dual_path.Encoder</span>
+<span class="linenos"> 61</span>    <span class="nt">kernel_size</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;kernel_size&gt;</span>
+<span class="linenos"> 62</span>    <span class="nt">out_channels</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;N_encoder_out&gt;</span>
+<span class="linenos"> 63</span>
+<span class="linenos"> 64</span>
+<span class="linenos"> 65</span><span class="nt">SBtfintra</span><span class="p">:</span> <span class="kt">!new:speechbrain.lobes.models.dual_path.SBTransformerBlock</span>
+<span class="linenos"> 66</span>    <span class="nt">num_layers</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="linenos"> 67</span>    <span class="nt">d_model</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;out_channels&gt;</span>
+<span class="linenos"> 68</span>    <span class="nt">nhead</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="linenos"> 69</span>    <span class="nt">d_ffn</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">256</span>
+<span class="linenos"> 70</span>    <span class="nt">dropout</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="linenos"> 71</span>    <span class="nt">use_positional_encoding</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos"> 72</span>    <span class="nt">norm_before</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos"> 73</span>
+<span class="linenos"> 74</span><span class="nt">SBtfinter</span><span class="p">:</span> <span class="kt">!new:speechbrain.lobes.models.dual_path.SBTransformerBlock</span>
+<span class="linenos"> 75</span>    <span class="nt">num_layers</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="linenos"> 76</span>    <span class="nt">d_model</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;out_channels&gt;</span>
+<span class="linenos"> 77</span>    <span class="nt">nhead</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="linenos"> 78</span>    <span class="nt">d_ffn</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">256</span>
+<span class="linenos"> 79</span>    <span class="nt">dropout</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="linenos"> 80</span>    <span class="nt">use_positional_encoding</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos"> 81</span>    <span class="nt">norm_before</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos"> 82</span>
+<span class="linenos"> 83</span><span class="nt">MaskNet</span><span class="p">:</span> <span class="kt">!new:speechbrain.lobes.models.dual_path.Dual_Path_Model</span>
+<span class="linenos"> 84</span>    <span class="nt">num_spks</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;num_spks&gt;</span>
+<span class="linenos"> 85</span>    <span class="nt">in_channels</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;N_encoder_out&gt;</span>
+<span class="linenos"> 86</span>    <span class="nt">out_channels</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;out_channels&gt;</span>
+<span class="linenos"> 87</span>    <span class="nt">num_layers</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="linenos"> 88</span>    <span class="nt">K</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">25</span>
+<span class="linenos"> 89</span>    <span class="nt">intra_model</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;SBtfintra&gt;</span>
+<span class="linenos"> 90</span>    <span class="nt">inter_model</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;SBtfinter&gt;</span>
+<span class="linenos"> 91</span>    <span class="nt">norm</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ln</span>
+<span class="linenos"> 92</span>    <span class="nt">linear_layer_after_inter_intra</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="linenos"> 93</span>    <span class="nt">skip_around_intra</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos"> 94</span>
+<span class="linenos"> 95</span><span class="nt">Decoder</span><span class="p">:</span> <span class="kt">!new:speechbrain.lobes.models.dual_path.Decoder</span>
+<span class="linenos"> 96</span>    <span class="nt">in_channels</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;N_encoder_out&gt;</span>
+<span class="linenos"> 97</span>    <span class="nt">out_channels</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="linenos"> 98</span>    <span class="nt">kernel_size</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;kernel_size&gt;</span>
+<span class="linenos"> 99</span>    <span class="nt">stride</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;kernel_stride&gt;</span>
+<span class="linenos">100</span>    <span class="nt">bias</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="linenos">101</span>
+<span class="linenos">102</span><span class="nt">linear_1</span><span class="p">:</span> <span class="kt">!new:speechbrain.nnet.linear.Linear</span>
+<span class="linenos">103</span>    <span class="nt">input_size</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;training_signal_len&gt;</span>
+<span class="linenos">104</span>    <span class="nt">n_neurons</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">512</span>
+<span class="linenos">105</span>
+<span class="linenos">106</span><span class="nt">relu</span><span class="p">:</span> <span class="kt">!new:torch.nn.ReLU</span>
+<span class="linenos">107</span>
+<span class="linenos">108</span><span class="nt">linear_2</span><span class="p">:</span> <span class="kt">!new:speechbrain.nnet.linear.Linear</span>
+<span class="linenos">109</span>    <span class="nt">input_size</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">512</span>
+<span class="linenos">110</span>    <span class="nt">n_neurons</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="linenos">111</span>
+<span class="linenos">112</span><span class="nt">optimizer</span><span class="p">:</span> <span class="kt">!name:torch.optim.Adam</span>
+<span class="linenos">113</span>    <span class="nt">lr</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;lr&gt;</span>
+<span class="linenos">114</span>    <span class="nt">weight_decay</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="linenos">115</span>
+<span class="linenos">116</span>
+<span class="linenos">117</span><span class="nt">loss</span><span class="p">:</span> <span class="kt">!name:speechbrain.nnet.losses.get_si_snr_with_pitwrapper</span>
+<span class="linenos">118</span><span class="nt">loss2</span><span class="p">:</span> <span class="kt">!name:speechbrain.nnet.losses.bce_loss</span>
+<span class="linenos">119</span>
+<span class="linenos">120</span><span class="nt">lr_scheduler</span><span class="p">:</span> <span class="kt">!new:speechbrain.nnet.schedulers.ReduceLROnPlateau</span>
+<span class="linenos">121</span>    <span class="nt">factor</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.5</span>
+<span class="linenos">122</span>    <span class="nt">patience</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="linenos">123</span>    <span class="nt">dont_halve_until_epoch</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">35</span>
+<span class="linenos">124</span>
+<span class="linenos">125</span><span class="nt">epoch_counter</span><span class="p">:</span> <span class="kt">!new:speechbrain.utils.epoch_loop.EpochCounter</span>
+<span class="linenos">126</span>    <span class="nt">limit</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;N_epochs&gt;</span>
+<span class="linenos">127</span>
+<span class="linenos">128</span><span class="nt">modules</span><span class="p">:</span>
+<span class="linenos">129</span>    <span class="nt">encoder</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;Encoder&gt;</span>
+<span class="linenos">130</span>    <span class="nt">decoder</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;Decoder&gt;</span>
+<span class="linenos">131</span>    <span class="nt">masknet</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;MaskNet&gt;</span>
+<span class="linenos">132</span>    <span class="nt">linear_1</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;linear_1&gt;</span>
+<span class="linenos">133</span>    <span class="nt">linear_2</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;linear_2&gt;</span>
+<span class="linenos">134</span>
+<span class="linenos">135</span><span class="nt">checkpointer</span><span class="p">:</span> <span class="kt">!new:speechbrain.utils.checkpoints.Checkpointer</span>
+<span class="linenos">136</span>    <span class="nt">checkpoints_dir</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;save_folder&gt;</span>
+<span class="linenos">137</span>    <span class="nt">recoverables</span><span class="p">:</span>
+<span class="linenos">138</span>        <span class="nt">encoder</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;Encoder&gt;</span>
+<span class="linenos">139</span>        <span class="nt">decoder</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;Decoder&gt;</span>
+<span class="linenos">140</span>        <span class="nt">masknet</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;MaskNet&gt;</span>
+<span class="linenos">141</span>        <span class="nt">linear_1</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;linear_1&gt;</span>
+<span class="linenos">142</span>        <span class="nt">linear_2</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;linear_2&gt;</span>
+<span class="linenos">143</span>        <span class="nt">counter</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;epoch_counter&gt;</span>
+<span class="linenos">144</span>        <span class="nt">lr_scheduler</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;lr_scheduler&gt;</span>
+<span class="linenos">145</span>        <span class="c1"># mlp: !ref &lt;MLP&gt;</span>
+<span class="linenos">146</span>
+<span class="linenos">147</span><span class="nt">train_logger</span><span class="p">:</span> <span class="kt">!new:speechbrain.utils.train_logger.FileTrainLogger</span>
+<span class="linenos">148</span>    <span class="nt">save_file</span><span class="p">:</span> <span class="kt">!ref</span> <span class="l l-Scalar l-Scalar-Plain">&lt;train_log&gt;</span>
+</pre></div>
+</div>
+<p>The output log can be seen as follows.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>  speechbrain.core - Beginning experiment!
+<span class="linenos"> 2</span>  speechbrain.core - Experiment folder: results/detection_demo22/1607
+<span class="linenos"> 3</span>  speechbrain.core - Info: test_only arg overridden by <span class="nb">command</span> line input to: False
+<span class="linenos"> 4</span>  speechbrain.core - Info: auto_mix_prec arg from hparam file is used
+<span class="linenos"> 5</span>  speechbrain.core - <span class="m">5</span>.6M trainable parameters <span class="k">in</span> Separation
+<span class="linenos"> 6</span>  speechbrain.utils.checkpoints - Would load a checkpoint here, but none found yet.
+<span class="linenos"> 7</span>  speechbrain.utils.epoch_loop - Going into epoch <span class="m">1</span>
+<span class="linenos"> 8</span>  <span class="m">100</span>%<span class="p">|</span>████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████<span class="p">|</span> <span class="m">13</span>/13 <span class="o">[</span><span class="m">00</span>:02&lt;<span class="m">00</span>:00,  <span class="m">5</span>.45it/s, <span class="nv">loss1</span><span class="o">=</span><span class="m">6</span>.18, <span class="nv">loss2</span><span class="o">=</span><span class="m">0</span>.693, <span class="nv">train_loss</span><span class="o">=</span><span class="m">6</span>.18<span class="o">]</span>
+<span class="linenos"> 9</span>  <span class="m">100</span>%<span class="p">|</span>████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████<span class="p">|</span> <span class="m">3</span>/3 <span class="o">[</span><span class="m">00</span>:00&lt;<span class="m">00</span>:00,  <span class="m">3</span>.50it/s<span class="o">]</span>
+<span class="linenos">10</span>  speechbrain.utils.train_logger - epoch: <span class="m">1</span>, lr: <span class="m">5</span>.00e-04 - train si-snr: <span class="m">6</span>.18, train loss1: <span class="m">6</span>.18, train loss2: <span class="m">6</span>.93e-01 - valid si-snr: -6.32e-01, valid loss1: -6.32e-01, valid loss2: <span class="m">6</span>.96e-01
+<span class="linenos">11</span>  speechbrain.utils.checkpoints - Saved an end-of-epoch checkpoint <span class="k">in</span> results/detection_demo22/1607/save/CKPT+2024-02-02+15-55-58+00
+<span class="linenos">12</span>  speechbrain.utils.epoch_loop - Going into epoch <span class="m">2</span>
+<span class="linenos">13</span>  <span class="m">100</span>%<span class="p">|</span>██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████<span class="p">|</span> <span class="m">13</span>/13 <span class="o">[</span><span class="m">00</span>:02&lt;<span class="m">00</span>:00,  <span class="m">5</span>.72it/s, <span class="nv">loss1</span><span class="o">=</span>-2.26, <span class="nv">loss2</span><span class="o">=</span><span class="m">0</span>.693, <span class="nv">train_loss</span><span class="o">=</span>-2.26<span class="o">]</span>
+<span class="linenos">14</span>  <span class="m">100</span>%<span class="p">|</span>████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████<span class="p">|</span> <span class="m">3</span>/3 <span class="o">[</span><span class="m">00</span>:00&lt;<span class="m">00</span>:00,  <span class="m">3</span>.47it/s<span class="o">]</span>
+<span class="linenos">15</span>  speechbrain.utils.train_logger - epoch: <span class="m">2</span>, lr: <span class="m">5</span>.00e-04 - train si-snr: -2.26e+00, train loss1: -2.26e+00, train loss2: <span class="m">6</span>.93e-01 - valid si-snr: -2.13e+00, valid loss1: -2.13e+00, valid loss2: <span class="m">6</span>.97e-01
+<span class="linenos">16</span>  speechbrain.utils.checkpoints - Saved an end-of-epoch checkpoint <span class="k">in</span> results/detection_demo22/1607/save/CKPT+2024-02-02+15-56-01+00
+<span class="linenos">17</span>  speechbrain.utils.checkpoints - Deleted checkpoint <span class="k">in</span> results/detection_demo22/1607/save/CKPT+2024-02-02+15-55-58+00
+<span class="linenos">18</span>  speechbrain.utils.epoch_loop - Going into epoch <span class="m">3</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="evaluation.html" class="btn btn-neutral float-right" title="Examples of evaluation method" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="waveform.html" class="btn btn-neutral float-left" title="Examples of space-based gravitational wave signal generation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2024, Yue Zhou, Tianyu Zhao.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
