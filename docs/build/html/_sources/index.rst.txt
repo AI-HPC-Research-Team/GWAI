@@ -21,5 +21,5 @@ Contents
    about_gwai
    getting_started
    tutorials
-   submodules
+   modules
    citations
