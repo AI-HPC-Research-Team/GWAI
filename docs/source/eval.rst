@@ -1,29 +1,45 @@
-﻿eval
-====
+eval package
+============
+
+Submodules
+----------
+
+eval.data module
+----------------
+
+.. automodule:: eval.data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+eval.model module
+-----------------
+
+.. automodule:: eval.model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+eval.task module
+----------------
+
+.. automodule:: eval.task
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+eval.utils module
+-----------------
+
+.. automodule:: eval.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
 
 .. automodule:: eval
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      get_version
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,939 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>model.denoising package &mdash; GWAI  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="model.denoising.data package" href="model.denoising.data.html" />
+    <link rel="prev" title="model.classify package" href="model.classify.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> GWAI
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about_gwai.html">About GWAI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="data.html">data package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eval.html">eval package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="model.html">model package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="model.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="model.classify.html">model.classify package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">model.denoising package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.detection.html">model.detection package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.html#module-model">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="citations.html">Citations</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GWAI</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">src</a> &raquo;</li>
+        
+          <li><a href="model.html">model package</a> &raquo;</li>
+        
+      <li>model.denoising package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/model.denoising.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="model-denoising-package">
+<h1>model.denoising package<a class="headerlink" href="#model-denoising-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="model.denoising.data.html">model.denoising.data package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.data.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.data.html#module-model.denoising.data.data_samplers">model.denoising.data.data_samplers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.data.html#module-model.denoising.data.dataset_utils">model.denoising.data.dataset_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.data.html#module-model.denoising.data.gw_dataset">model.denoising.data.gw_dataset module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.data.html#module-model.denoising.data">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model.denoising.fused_kernels.html">model.denoising.fused_kernels package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.fused_kernels.html#module-model.denoising.fused_kernels">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model.denoising.model.html">model.denoising.model package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.model.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.distributed">model.denoising.model.distributed module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.enums">model.denoising.model.enums module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.fused_bias_gelu">model.denoising.model.fused_bias_gelu module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.fused_layer_norm">model.denoising.model.fused_layer_norm module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.fused_softmax">model.denoising.model.fused_softmax module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.module">model.denoising.model.module module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.transformer">model.denoising.model.transformer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.utils">model.denoising.model.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.waveform_model">model.denoising.model.waveform_model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.waveformer_model">model.denoising.model.waveformer_model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model.denoising.mpu.html">model.denoising.mpu package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.mpu.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu.data">model.denoising.mpu.data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu.initialize">model.denoising.mpu.initialize module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu.layers">model.denoising.mpu.layers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu.mappings">model.denoising.mpu.mappings module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu.random">model.denoising.mpu.random module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu.utils">model.denoising.mpu.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model.denoising.optimizer.html">model.denoising.optimizer package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.optimizer.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.optimizer.html#module-model.denoising.optimizer.clip_grads">model.denoising.optimizer.clip_grads module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.optimizer.html#module-model.denoising.optimizer.grad_scaler">model.denoising.optimizer.grad_scaler module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.optimizer.html#module-model.denoising.optimizer.optimizer">model.denoising.optimizer.optimizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.optimizer.html#module-model.denoising.optimizer">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-model.denoising.arguments">
+<span id="model-denoising-arguments-module"></span><h2>model.denoising.arguments module<a class="headerlink" href="#module-model.denoising.arguments" title="Permalink to this headline">¶</a></h2>
+<p>Megatron arguments.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.arguments.parse_args">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.arguments.</span></span><span class="sig-name descname"><span class="pre">parse_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extra_args_provider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_unknown_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.arguments.parse_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse all arguments.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-model.denoising.checkpointing">
+<span id="model-denoising-checkpointing-module"></span><h2>model.denoising.checkpointing module<a class="headerlink" href="#module-model.denoising.checkpointing" title="Permalink to this headline">¶</a></h2>
+<p>Input/output checkpointing.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.checkpointing.check_checkpoint_args">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.checkpointing.</span></span><span class="sig-name descname"><span class="pre">check_checkpoint_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoint_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.checkpointing.check_checkpoint_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure fixed arguments for a model are the same for the input
+arguments and the one retrieved from checkpoint.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.checkpointing.ensure_directory_exists">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.checkpointing.</span></span><span class="sig-name descname"><span class="pre">ensure_directory_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.checkpointing.ensure_directory_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build filename’s path if it does not already exists.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.checkpointing.fix_query_key_value_ordering">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.checkpointing.</span></span><span class="sig-name descname"><span class="pre">fix_query_key_value_ordering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint_version</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.checkpointing.fix_query_key_value_ordering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fix up query/key/value matrix ordering if checkpoint
+version is smaller than 2.0</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.checkpointing.get_checkpoint_name">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.checkpointing.</span></span><span class="sig-name descname"><span class="pre">get_checkpoint_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoints_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iteration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">release</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.checkpointing.get_checkpoint_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A unified checkpoint name.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.checkpointing.get_checkpoint_tracker_filename">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.checkpointing.</span></span><span class="sig-name descname"><span class="pre">get_checkpoint_tracker_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoints_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.checkpointing.get_checkpoint_tracker_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tracker file rescords the latest chckpoint during
+training to restart from.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.checkpointing.get_checkpoint_version">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.checkpointing.</span></span><span class="sig-name descname"><span class="pre">get_checkpoint_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.checkpointing.get_checkpoint_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.checkpointing.load_biencoder_checkpoint">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.checkpointing.</span></span><span class="sig-name descname"><span class="pre">load_biencoder_checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_query_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_context_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_load_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.checkpointing.load_biencoder_checkpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>selectively load retrieval models for indexing/retrieving
+from saved checkpoints</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.checkpointing.load_checkpoint">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.checkpointing.</span></span><span class="sig-name descname"><span class="pre">load_checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_arg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'load'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.checkpointing.load_checkpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a model checkpoint and return the iteration.
+strict (bool): whether to strictly enforce that the keys in</p>
+<blockquote>
+<div><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">state_dict</span></code> of the checkpoint match the names of
+parameters and buffers in model.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.checkpointing.save_checkpoint">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.checkpointing.</span></span><span class="sig-name descname"><span class="pre">save_checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iteration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.checkpointing.save_checkpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a model checkpoint.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.checkpointing.set_checkpoint_version">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.checkpointing.</span></span><span class="sig-name descname"><span class="pre">set_checkpoint_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.checkpointing.set_checkpoint_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-model.denoising.global_vars">
+<span id="model-denoising-global-vars-module"></span><h2>model.denoising.global_vars module<a class="headerlink" href="#module-model.denoising.global_vars" title="Permalink to this headline">¶</a></h2>
+<p>Megatron global variables.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.denoising.global_vars.Timers">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">model.denoising.global_vars.</span></span><span class="sig-name descname"><span class="pre">Timers</span></span><a class="headerlink" href="#model.denoising.global_vars.Timers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Group of timers.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.global_vars.Timers.log">
+<span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.global_vars.Timers.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log a group of timers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.global_vars.Timers.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iteration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.global_vars.Timers.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write timers to a tensorboard writer</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.global_vars.get_adlr_autoresume">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.global_vars.</span></span><span class="sig-name descname"><span class="pre">get_adlr_autoresume</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.global_vars.get_adlr_autoresume" title="Permalink to this definition">¶</a></dt>
+<dd><p>ADLR autoresume object. It can be None so no need
+to check if it is initialized.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.global_vars.get_args">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.global_vars.</span></span><span class="sig-name descname"><span class="pre">get_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.global_vars.get_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return arguments.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.global_vars.get_current_global_batch_size">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.global_vars.</span></span><span class="sig-name descname"><span class="pre">get_current_global_batch_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.global_vars.get_current_global_batch_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.global_vars.get_num_microbatches">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.global_vars.</span></span><span class="sig-name descname"><span class="pre">get_num_microbatches</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.global_vars.get_num_microbatches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.global_vars.get_tensorboard_writer">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.global_vars.</span></span><span class="sig-name descname"><span class="pre">get_tensorboard_writer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.global_vars.get_tensorboard_writer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return tensorboard writer. It can be None so no need
+to check if it is initialized.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.global_vars.get_timers">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.global_vars.</span></span><span class="sig-name descname"><span class="pre">get_timers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.global_vars.get_timers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return timers.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.global_vars.get_tokenizer">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.global_vars.</span></span><span class="sig-name descname"><span class="pre">get_tokenizer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.global_vars.get_tokenizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return tokenizer.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.global_vars.set_global_variables">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.global_vars.</span></span><span class="sig-name descname"><span class="pre">set_global_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extra_args_provider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args_defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_unknown_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.global_vars.set_global_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set args, tokenizer, tensorboard-writer, adlr-autoresume, and timers.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.global_vars.update_num_microbatches">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.global_vars.</span></span><span class="sig-name descname"><span class="pre">update_num_microbatches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">consumed_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consistency_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.global_vars.update_num_microbatches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-model.denoising.initialize">
+<span id="model-denoising-initialize-module"></span><h2>model.denoising.initialize module<a class="headerlink" href="#module-model.denoising.initialize" title="Permalink to this headline">¶</a></h2>
+<p>Megatron initialization.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.initialize.initialize_megatron">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.initialize.</span></span><span class="sig-name descname"><span class="pre">initialize_megatron</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extra_args_provider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args_defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_unknown_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_no_cuda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.initialize.initialize_megatron" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set global variables, initialize distributed, and
+set autoresume and random seeds.
+<cite>allow_no_cuda</cite> should not be set unless using megatron for cpu only
+data processing. In general this arg should not be set unless you know
+what you are doing.
+Returns a function to finalize distributed env initialization
+(optionally, only when args.lazy_mpu_init == True)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.initialize.write_args_to_tensorboard">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.initialize.</span></span><span class="sig-name descname"><span class="pre">write_args_to_tensorboard</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.initialize.write_args_to_tensorboard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write arguments to tensorboard.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-model.denoising.learning_rates">
+<span id="model-denoising-learning-rates-module"></span><h2>model.denoising.learning_rates module<a class="headerlink" href="#module-model.denoising.learning_rates" title="Permalink to this headline">¶</a></h2>
+<p>Learning rate decay functions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.denoising.learning_rates.AnnealingLR">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">model.denoising.learning_rates.</span></span><span class="sig-name descname"><span class="pre">AnnealingLR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_lr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_lr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warmup_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decay_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decay_style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_checkpoint_lr_scheduler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_lr_scheduler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.learning_rates.AnnealingLR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Anneals the learning rate.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.learning_rates.AnnealingLR.get_lr">
+<span class="sig-name descname"><span class="pre">get_lr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.learning_rates.AnnealingLR.get_lr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Learning rate decay functions from:
+<a class="reference external" href="https://openreview.net/pdf?id=BJYwwY9ll">https://openreview.net/pdf?id=BJYwwY9ll</a> pg. 4</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.learning_rates.AnnealingLR.load_state_dict">
+<span class="sig-name descname"><span class="pre">load_state_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.learning_rates.AnnealingLR.load_state_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.learning_rates.AnnealingLR.state_dict">
+<span class="sig-name descname"><span class="pre">state_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.learning_rates.AnnealingLR.state_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.learning_rates.AnnealingLR.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">increment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.learning_rates.AnnealingLR.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set lr for all parameters groups.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-model.denoising.memory">
+<span id="model-denoising-memory-module"></span><h2>model.denoising.memory module<a class="headerlink" href="#module-model.denoising.memory" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.denoising.memory.MemoryBuffer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">model.denoising.memory.</span></span><span class="sig-name descname"><span class="pre">MemoryBuffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track_usage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.memory.MemoryBuffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Contiguous memory buffer.
+Allocate a contiguous memory of type <cite>dtype</cite> and size <cite>numel</cite>. It is
+used to reduce memory fragmentation.</p>
+<dl class="simple">
+<dt>Usage: After the allocation, the <cite>_start</cite> index is set tot the first</dt><dd><p>index of the memory. A memory chunk starting from <cite>_start</cite> index
+can be <cite>allocated</cite> for an input tensor, with the elements of the
+tensor being coppied. The buffer can be reused by resetting the
+<cite>_start</cite> index.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.memory.MemoryBuffer.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.memory.MemoryBuffer.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allocate a chunk of memory from the buffer to tensor and copy
+the values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.memory.MemoryBuffer.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.memory.MemoryBuffer.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the data currently in use.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.memory.MemoryBuffer.is_in_use">
+<span class="sig-name descname"><span class="pre">is_in_use</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.memory.MemoryBuffer.is_in_use" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the current buffer hold on to any memory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.memory.MemoryBuffer.numel_in_use">
+<span class="sig-name descname"><span class="pre">numel_in_use</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.memory.MemoryBuffer.numel_in_use" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return number of elements in use.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.memory.MemoryBuffer.print_average_usage">
+<span class="sig-name descname"><span class="pre">print_average_usage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.memory.MemoryBuffer.print_average_usage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print memory usage average over time. We would like this value
+to be as high as possible.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.memory.MemoryBuffer.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.memory.MemoryBuffer.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the buffer start index to the beginning of the buffer.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.denoising.memory.RingMemBuffer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">model.denoising.memory.</span></span><span class="sig-name descname"><span class="pre">RingMemBuffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_buffers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track_usage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.memory.RingMemBuffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A ring of memory buffers.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.memory.RingMemBuffer.get_next_buffer">
+<span class="sig-name descname"><span class="pre">get_next_buffer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.memory.RingMemBuffer.get_next_buffer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.memory.allocate_mem_buff">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.memory.</span></span><span class="sig-name descname"><span class="pre">allocate_mem_buff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track_usage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.memory.allocate_mem_buff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allocate a memory buffer.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.memory.get_mem_buff">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.memory.</span></span><span class="sig-name descname"><span class="pre">get_mem_buff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.memory.get_mem_buff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the memory buffer.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-model.denoising.microbatches">
+<span id="model-denoising-microbatches-module"></span><h2>model.denoising.microbatches module<a class="headerlink" href="#module-model.denoising.microbatches" title="Permalink to this headline">¶</a></h2>
+<p>Megatron number of micro-batches calculators.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.denoising.microbatches.ConstantNumMicroBatches">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">model.denoising.microbatches.</span></span><span class="sig-name descname"><span class="pre">ConstantNumMicroBatches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">global_batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">micro_batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_parallel_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.microbatches.ConstantNumMicroBatches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#model.denoising.microbatches.NumMicroBatchesCalculator" title="model.denoising.microbatches.NumMicroBatchesCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">model.denoising.microbatches.NumMicroBatchesCalculator</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.microbatches.ConstantNumMicroBatches.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">consumed_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consistency_check</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.microbatches.ConstantNumMicroBatches.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.denoising.microbatches.NumMicroBatchesCalculator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">model.denoising.microbatches.</span></span><span class="sig-name descname"><span class="pre">NumMicroBatchesCalculator</span></span><a class="headerlink" href="#model.denoising.microbatches.NumMicroBatchesCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.microbatches.NumMicroBatchesCalculator.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.microbatches.NumMicroBatchesCalculator.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.microbatches.NumMicroBatchesCalculator.get_current_global_batch_size">
+<span class="sig-name descname"><span class="pre">get_current_global_batch_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.microbatches.NumMicroBatchesCalculator.get_current_global_batch_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.microbatches.NumMicroBatchesCalculator.update">
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">consumed_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consistency_check</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.microbatches.NumMicroBatchesCalculator.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.denoising.microbatches.RampupBatchsizeNumMicroBatches">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">model.denoising.microbatches.</span></span><span class="sig-name descname"><span class="pre">RampupBatchsizeNumMicroBatches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size_increment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ramup_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">micro_batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_parallel_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.microbatches.RampupBatchsizeNumMicroBatches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#model.denoising.microbatches.NumMicroBatchesCalculator" title="model.denoising.microbatches.NumMicroBatchesCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">model.denoising.microbatches.NumMicroBatchesCalculator</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.denoising.microbatches.RampupBatchsizeNumMicroBatches.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">consumed_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consistency_check</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.microbatches.RampupBatchsizeNumMicroBatches.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.microbatches.build_num_microbatches_calculator">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.microbatches.</span></span><span class="sig-name descname"><span class="pre">build_num_microbatches_calculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.microbatches.build_num_microbatches_calculator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-model.denoising.p2p_communication">
+<span id="model-denoising-p2p-communication-module"></span><h2>model.denoising.p2p_communication module<a class="headerlink" href="#module-model.denoising.p2p_communication" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.p2p_communication.recv_backward">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.p2p_communication.</span></span><span class="sig-name descname"><span class="pre">recv_backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.p2p_communication.recv_backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive tensor from next rank in pipeline (backward receive).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.p2p_communication.recv_forward">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.p2p_communication.</span></span><span class="sig-name descname"><span class="pre">recv_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_scatter_gather_tensors_in_pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.p2p_communication.recv_forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive tensor from previous rank in pipeline (forward receive).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.p2p_communication.send_backward">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.p2p_communication.</span></span><span class="sig-name descname"><span class="pre">send_backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_tensor_grad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.p2p_communication.send_backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send tensor to previous rank in pipeline (backward send).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.p2p_communication.send_backward_recv_backward">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.p2p_communication.</span></span><span class="sig-name descname"><span class="pre">send_backward_recv_backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_tensor_grad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recv_next</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.p2p_communication.send_backward_recv_backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batched recv from next rank and send to previous rank in pipeline.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.p2p_communication.send_backward_recv_forward">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.p2p_communication.</span></span><span class="sig-name descname"><span class="pre">send_backward_recv_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_tensor_grad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.p2p_communication.send_backward_recv_forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batched send and recv with previous rank in pipeline.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.p2p_communication.send_forward">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.p2p_communication.</span></span><span class="sig-name descname"><span class="pre">send_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_scatter_gather_tensors_in_pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.p2p_communication.send_forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send tensor to next rank in pipeline (forward send).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.p2p_communication.send_forward_backward_recv_forward_backward">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.p2p_communication.</span></span><span class="sig-name descname"><span class="pre">send_forward_backward_recv_forward_backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_tensor_grad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recv_prev</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recv_next</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.p2p_communication.send_forward_backward_recv_forward_backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batched send and recv with previous and next ranks in pipeline.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.p2p_communication.send_forward_recv_backward">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.p2p_communication.</span></span><span class="sig-name descname"><span class="pre">send_forward_recv_backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.p2p_communication.send_forward_recv_backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batched send and recv with next rank in pipeline.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.p2p_communication.send_forward_recv_forward">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.p2p_communication.</span></span><span class="sig-name descname"><span class="pre">send_forward_recv_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recv_prev</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.p2p_communication.send_forward_recv_forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batched recv from previous rank and send to next rank in pipeline.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-model.denoising.package_info">
+<span id="model-denoising-package-info-module"></span><h2>model.denoising.package_info module<a class="headerlink" href="#module-model.denoising.package_info" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-model.denoising.schedules">
+<span id="model-denoising-schedules-module"></span><h2>model.denoising.schedules module<a class="headerlink" href="#module-model.denoising.schedules" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.schedules.backward_step">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.schedules.</span></span><span class="sig-name descname"><span class="pre">backward_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_tensor_grad</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.schedules.backward_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Backward step through passed-in output tensor.</p>
+<p>If last stage, output_tensor_grad is None, otherwise gradient of loss
+with respect to stage’s output tensor.</p>
+<p>Returns gradient of loss with respect to input tensor (None if first
+stage).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.schedules.dummy_handler">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.schedules.</span></span><span class="sig-name descname"><span class="pre">dummy_handler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.schedules.dummy_handler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.schedules.forward_backward_no_pipelining">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.schedules.</span></span><span class="sig-name descname"><span class="pre">forward_backward_no_pipelining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_step_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_only</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_only</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.schedules.forward_backward_no_pipelining" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run forward and backward passes with no pipeline parallelism
+(no inter-stage communication).</p>
+<p>Returns dictionary with losses.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.schedules.forward_backward_pipelining_with_interleaving">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.schedules.</span></span><span class="sig-name descname"><span class="pre">forward_backward_pipelining_with_interleaving</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_step_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_only</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.schedules.forward_backward_pipelining_with_interleaving" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run interleaved 1F1B schedule (model split into model chunks), with
+communication between pipeline stages as needed.</p>
+<p>Returns dictionary with losses if the last stage, empty dict otherwise.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.schedules.forward_backward_pipelining_without_interleaving">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.schedules.</span></span><span class="sig-name descname"><span class="pre">forward_backward_pipelining_without_interleaving</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_step_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_only</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.schedules.forward_backward_pipelining_without_interleaving" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run non-interleaved 1F1B schedule, with communication between pipeline
+stages.</p>
+<p>Returns dictionary with losses if the last stage, empty dict otherwise.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.schedules.forward_step">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.schedules.</span></span><span class="sig-name descname"><span class="pre">forward_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_step_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">losses_reduced</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.schedules.forward_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward step for passed-in model.</p>
+<p>If first stage, input tensor is obtained from data_iterator, otherwise
+passed-in input_tensor is used.</p>
+<p>Returns output tensor.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.schedules.forward_step_wrapper">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.schedules.</span></span><span class="sig-name descname"><span class="pre">forward_step_wrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_step_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">losses_reduced</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_only</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.schedules.forward_step_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward step for passed-in model.</p>
+<p>If first stage, input tensor is obtained from data_iterator, otherwise
+passed-in input_tensor is used.</p>
+<p>Returns output tensor.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.schedules.get_forward_backward_func">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.schedules.</span></span><span class="sig-name descname"><span class="pre">get_forward_backward_func</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.schedules.get_forward_backward_func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-model.denoising.training">
+<span id="model-denoising-training-module"></span><h2>model.denoising.training module<a class="headerlink" href="#module-model.denoising.training" title="Permalink to this headline">¶</a></h2>
+<p>Pretrain utilities.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.build_train_valid_test_data_iterators">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">build_train_valid_test_data_iterators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">build_train_valid_test_datasets_provider</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.build_train_valid_test_data_iterators" title="Permalink to this definition">¶</a></dt>
+<dd><p>XXX</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.cyclic_iter">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">cyclic_iter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.cyclic_iter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.evaluate">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_step_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.evaluate_and_print_results">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">evaluate_and_print_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_step_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iteration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.evaluate_and_print_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to evaluate and dump results on screen.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.get_learning_rate_scheduler">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">get_learning_rate_scheduler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.get_learning_rate_scheduler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the learning rate scheduler.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.get_model">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">get_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_provider_func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.get_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the model.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.pretrain">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">pretrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_valid_test_dataset_provider</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_step_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_args_provider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args_defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.pretrain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main training program.</p>
+<dl class="simple">
+<dt>This function will run the followings in the order provided:</dt><dd><ol class="arabic simple">
+<li><p>initialize Megatron.</p></li>
+<li><p>setup model, optimizer and lr schedule using the model_provider.</p></li>
+<li><p>call train_val_test_data_provider to get train/val/test datasets.</p></li>
+<li><p>train the modle using the forward_step_func.</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_valid_test_dataset_provider</strong> – a function that takes the size of
+train/valid/test dataset and returns <cite>train, valid, test</cite> datasets.</p></li>
+<li><p><strong>model_provider</strong> – a function that returns a vanilla version of the
+model. By vanilla we mean a simple model on cpu with no fp16 or ddp.</p></li>
+<li><p><strong>forward_step_func</strong> – a function that takes a <cite>data iterator</cite> and <cite>model</cite>,
+and returns a <cite>loss</cite> scalar with a dictionary with key:values being
+the info we would like to monitor during training, for example
+<cite>lm-loss: value</cite>. We also require that this function add
+<cite>batch generator</cite> to the timers class.</p></li>
+<li><p><strong>extra_args_provider</strong> – a function that takes a parser and adds arguments
+to it. It is used for programs to add their own arguments.</p></li>
+<li><p><strong>args_defaults</strong> – a dictionary from argument-name to argument-value. It
+to set already parse arguments.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.print_datetime">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">print_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.print_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note that this call will sync across all ranks.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.save_checkpoint_and_time">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">save_checkpoint_and_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iteration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.save_checkpoint_and_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.setup_model_and_optimizer">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">setup_model_and_optimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_provider_func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.setup_model_and_optimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup model and optimizer.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.train">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_step_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_data_iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_data_iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_data_iterator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the model function.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.train_step">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">train_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_step_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.train_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single training step.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.training_log">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">training_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_loss_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iteration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_memory_flag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipped_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_norm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_norm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_zeros_in_grad</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.training_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log training information such as losses, timing, ….</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.training.update_train_iters">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.training.</span></span><span class="sig-name descname"><span class="pre">update_train_iters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.training.update_train_iters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-model.denoising.utils">
+<span id="model-denoising-utils-module"></span><h2>model.denoising.utils module<a class="headerlink" href="#module-model.denoising.utils" title="Permalink to this headline">¶</a></h2>
+<p>General utilities.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.utils.average_losses_across_data_parallel_group">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.utils.</span></span><span class="sig-name descname"><span class="pre">average_losses_across_data_parallel_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">losses</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.utils.average_losses_across_data_parallel_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reduce a tensor of losses across all GPUs.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.utils.calc_params_l2_norm">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.utils.</span></span><span class="sig-name descname"><span class="pre">calc_params_l2_norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.utils.calc_params_l2_norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate l2 norm of parameters</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.utils.check_adlr_autoresume_termination">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.utils.</span></span><span class="sig-name descname"><span class="pre">check_adlr_autoresume_termination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iteration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.utils.check_adlr_autoresume_termination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check for autoresume signal and exit if it is received.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.utils.get_ltor_masks_and_position_ids">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.utils.</span></span><span class="sig-name descname"><span class="pre">get_ltor_masks_and_position_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eod_token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_position_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_attention_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eod_mask_loss</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.utils.get_ltor_masks_and_position_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build masks and position id for left to right model.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.utils.print_params_min_max_norm">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.utils.</span></span><span class="sig-name descname"><span class="pre">print_params_min_max_norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iteration</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.utils.print_params_min_max_norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print min, max, and norm of all parameters.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.utils.report_memory">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.utils.</span></span><span class="sig-name descname"><span class="pre">report_memory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.utils.report_memory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple GPU memory report.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.utils.unwrap_model">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.utils.</span></span><span class="sig-name descname"><span class="pre">unwrap_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">model</span></em>, <em class="sig-param"><span class="pre">module_instances=&lt;class</span> <span class="pre">'torch.nn.parallel.distributed.DistributedDataParallel'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.utils.unwrap_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-model.denoising">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-model.denoising" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.is_last_rank">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.</span></span><span class="sig-name descname"><span class="pre">is_last_rank</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.is_last_rank" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.print_rank_0">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.</span></span><span class="sig-name descname"><span class="pre">print_rank_0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.print_rank_0" title="Permalink to this definition">¶</a></dt>
+<dd><p>If distributed is initialized, print only on rank 0.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.denoising.print_rank_last">
+<span class="sig-prename descclassname"><span class="pre">model.denoising.</span></span><span class="sig-name descname"><span class="pre">print_rank_last</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.denoising.print_rank_last" title="Permalink to this definition">¶</a></dt>
+<dd><p>If distributed is initialized, print only on last rank.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="model.denoising.data.html" class="btn btn-neutral float-right" title="model.denoising.data package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="model.classify.html" class="btn btn-neutral float-left" title="model.classify package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2024, Yue Zhou, Tianyu Zhao.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

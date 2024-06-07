@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>model &mdash; GWAI  documentation</title>
+  <title>model package &mdash; GWAI  documentation</title>
   
 
   
@@ -40,7 +40,9 @@
 
     
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="model.classify package" href="model.classify.html" />
+    <link rel="prev" title="eval package" href="eval.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -85,10 +87,26 @@
               
             
             
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="about_gwai.html">About GWAI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="data.html">data package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eval.html">eval package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">model package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.classify.html">model.classify package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html">model.denoising package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.detection.html">model.detection package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-model">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils package</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="citations.html">Citations</a></li>
 </ul>
 
@@ -138,7 +156,9 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>model</li>
+          <li><a href="modules.html">src</a> &raquo;</li>
+        
+      <li>model package</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -157,21 +177,104 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-model">
-<span id="model"></span><h1>model<a class="headerlink" href="#module-model" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="model-package">
+<h1>model package<a class="headerlink" href="#model-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="model.classify.html">model.classify package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.classify.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.classify.html#module-model.classify.dataloader">model.classify.dataloader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.classify.html#module-model.classify.tcn">model.classify.tcn module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.classify.html#module-model.classify.trainer">model.classify.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.classify.html#module-model.classify">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model.denoising.html">model.denoising package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.data.html">model.denoising.data package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.data.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.data.html#module-model.denoising.data.data_samplers">model.denoising.data.data_samplers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.data.html#module-model.denoising.data.dataset_utils">model.denoising.data.dataset_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.data.html#module-model.denoising.data.gw_dataset">model.denoising.data.gw_dataset module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.data.html#module-model.denoising.data">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.fused_kernels.html">model.denoising.fused_kernels package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.fused_kernels.html#module-model.denoising.fused_kernels">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.model.html">model.denoising.model package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.model.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.distributed">model.denoising.model.distributed module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.enums">model.denoising.model.enums module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.fused_bias_gelu">model.denoising.model.fused_bias_gelu module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.fused_layer_norm">model.denoising.model.fused_layer_norm module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.fused_softmax">model.denoising.model.fused_softmax module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.module">model.denoising.model.module module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.transformer">model.denoising.model.transformer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.utils">model.denoising.model.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.waveform_model">model.denoising.model.waveform_model module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model.waveformer_model">model.denoising.model.waveformer_model module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.model.html#module-model.denoising.model">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.mpu.html">model.denoising.mpu package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.mpu.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu.data">model.denoising.mpu.data module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu.initialize">model.denoising.mpu.initialize module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu.layers">model.denoising.mpu.layers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu.mappings">model.denoising.mpu.mappings module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu.random">model.denoising.mpu.random module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu.utils">model.denoising.mpu.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.mpu.html#module-model.denoising.mpu">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.optimizer.html">model.denoising.optimizer package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#module-model.denoising.optimizer.clip_grads">model.denoising.optimizer.clip_grads module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#module-model.denoising.optimizer.grad_scaler">model.denoising.optimizer.grad_scaler module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#module-model.denoising.optimizer.optimizer">model.denoising.optimizer.optimizer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#module-model.denoising.optimizer">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.arguments">model.denoising.arguments module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.checkpointing">model.denoising.checkpointing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.global_vars">model.denoising.global_vars module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.initialize">model.denoising.initialize module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.learning_rates">model.denoising.learning_rates module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.memory">model.denoising.memory module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.microbatches">model.denoising.microbatches module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.p2p_communication">model.denoising.p2p_communication module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.package_info">model.denoising.package_info module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.schedules">model.denoising.schedules module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.training">model.denoising.training module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.utils">model.denoising.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model.detection.html">model.detection package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.detection.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.detection.html#module-model.detection.dataloader">model.detection.dataloader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.detection.html#module-model.detection">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-model">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-model" title="Permalink to this headline">¶</a></h2>
 <p>Detect EMRI signal using DNN</p>
-<p class="rubric">Functions</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_version</span></code>()</p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.get_version">
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#model.get_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
 </div>
 
 
@@ -179,6 +282,10 @@
            
           </div>
           <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="model.classify.html" class="btn btn-neutral float-right" title="model.classify package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="eval.html" class="btn btn-neutral float-left" title="eval package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
 
   <hr/>
 

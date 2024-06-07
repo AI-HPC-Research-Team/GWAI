@@ -1,29 +1,20 @@
-﻿model
-=====
+model package
+=============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   model.classify
+   model.denoising
+   model.detection
+
+Module contents
+---------------
 
 .. automodule:: model
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      get_version
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:
+   :show-inheritance:
