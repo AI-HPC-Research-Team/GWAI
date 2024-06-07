@@ -1,7 +1,7 @@
-﻿eval
-====
+﻿model
+=====
 
-.. automodule:: eval
+.. automodule:: model
 
    
    

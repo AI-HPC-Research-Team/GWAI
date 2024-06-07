@@ -1,8 +1,8 @@
-src
+GWAI
 ============
 
 .. autosummary::
-   :toctree: generated
+   :toctree: 
 
 
     data
