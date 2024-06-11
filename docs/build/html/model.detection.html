@@ -98,8 +98,54 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="model-detection-dataloader-module">
-<h2>model.detection.dataloader module<a class="headerlink" href="#model-detection-dataloader-module" title="Link to this heading"></a></h2>
+<section id="module-model.detection.dataloader">
+<span id="model-detection-dataloader-module"></span><h2>model.detection.dataloader module<a class="headerlink" href="#module-model.detection.dataloader" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.detection.dataloader.GWSEDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.detection.dataloader.</span></span><span class="sig-name descname"><span class="pre">GWSEDataset</span></span><a class="headerlink" href="#model.detection.dataloader.GWSEDataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.detection.dataloader.GWSEDataset.load_waveform">
+<span class="sig-name descname"><span class="pre">load_waveform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DIR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'waveform_dataset.hdf5'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.detection.dataloader.GWSEDataset.load_waveform" title="Link to this definition"></a></dt>
+<dd><p>Load the waveform dataset from a hdf5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>DIR</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory of the data. Defaults to “.”.</p></li>
+<li><p><strong>data_fn</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename of the data. Defaults to “waveform_dataset.hdf5”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.detection.dataloader.GWSEDataset.save_waveform">
+<span class="sig-name descname"><span class="pre">save_waveform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DIR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'waveform_dataset.hdf5'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.detection.dataloader.GWSEDataset.save_waveform" title="Link to this definition"></a></dt>
+<dd><p>Save the waveform dataset to a hdf5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>DIR</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory to save the data. Defaults to “.”.</p></li>
+<li><p><strong>data_fn</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename of the data. Defaults to “waveform_dataset.hdf5”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.detection.dataloader.WaveformDatasetTorch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.detection.dataloader.</span></span><span class="sig-name descname"><span class="pre">WaveformDatasetTorch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.detection.dataloader.WaveformDatasetTorch" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.detection.dataloader.WaveformDatasetTorch.merge_dataset">
+<span class="sig-name descname"><span class="pre">merge_dataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.detection.dataloader.WaveformDatasetTorch.merge_dataset" title="Link to this definition"></a></dt>
+<dd><p>Merge the waveform dataset and noise dataset</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-model.detection">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-model.detection" title="Link to this heading"></a></h2>

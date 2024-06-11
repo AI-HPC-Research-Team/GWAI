@@ -51,12 +51,20 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">data package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#data-tdi-module">data.tdi module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data.tdi">data.tdi module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data.tdi.TDIWaveformGen"><code class="docutils literal notranslate"><span class="pre">TDIWaveformGen</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data.utils">data.utils module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#data.utils.Constant"><code class="docutils literal notranslate"><span class="pre">Constant</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#data-waveform-module">data.waveform module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data.waveform">data.waveform module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data.waveform.AAK"><code class="docutils literal notranslate"><span class="pre">AAK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data.waveform.GB"><code class="docutils literal notranslate"><span class="pre">GB</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data.waveform.MBHB"><code class="docutils literal notranslate"><span class="pre">MBHB</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data">Module contents</a></li>
 </ul>
 </li>
@@ -98,8 +106,179 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="data-tdi-module">
-<h2>data.tdi module<a class="headerlink" href="#data-tdi-module" title="Link to this heading"></a></h2>
+<section id="module-data.tdi">
+<span id="data-tdi-module"></span><h2>data.tdi module<a class="headerlink" href="#module-data.tdi" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.tdi.</span></span><span class="sig-name descname"><span class="pre">TDIWaveformGen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tdi_gen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">det</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Taiji'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_gpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orbit_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'../orbit/taiji-orbit.hdf5'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.tdi.TDIWaveformGen" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.Nf">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Nf</span></span><a class="headerlink" href="#data.tdi.TDIWaveformGen.Nf" title="Link to this definition"></a></dt>
+<dd><p>The number of samples in the frequency domain.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.Nt">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Nt</span></span><a class="headerlink" href="#data.tdi.TDIWaveformGen.Nt" title="Link to this definition"></a></dt>
+<dd><p>The number of samples in the time domain.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.PSD_Noise_X15">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PSD_Noise_X15</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqSnoise</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L_arm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.tdi.TDIWaveformGen.PSD_Noise_X15" title="Link to this definition"></a></dt>
+<dd><p>Calculates the X channel PSD of TDI1.0/1.5.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fr</strong> (<em>float</em>) – Frequency value.</p></li>
+<li><p><strong>sqSnoise</strong> (<em>float</em>) – Square root of the noise component.</p></li>
+<li><p><strong>L_arm</strong> (<em>float</em>) – Length of the arm.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The calculated PSD value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.PSD_Noise_X20">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PSD_Noise_X20</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqSnoise</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L_arm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.tdi.TDIWaveformGen.PSD_Noise_X20" title="Link to this definition"></a></dt>
+<dd><p>Calculates the X channel PSD of TDI2.0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fr</strong> (<em>float</em>) – Frequency value.</p></li>
+<li><p><strong>sqSnoise</strong> (<em>float</em>) – Square root of the noise component.</p></li>
+<li><p><strong>L_arm</strong> (<em>float</em>) – Length of the arm.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The calculated PSD value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.PSD_Noise_XY15">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PSD_Noise_XY15</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqSnoise</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L_arm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.tdi.TDIWaveformGen.PSD_Noise_XY15" title="Link to this definition"></a></dt>
+<dd><p>Calculates the XY coorelation term of TDI1.0/1.5.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fr</strong> (<em>float</em>) – Frequency value.</p></li>
+<li><p><strong>sqSnoise</strong> (<em>float</em>) – Square root of the noise component.</p></li>
+<li><p><strong>L_arm</strong> (<em>float</em>) – Length of the arm.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The calculated PSD value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.PSD_Noise_components">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PSD_Noise_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqSnoise</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.tdi.TDIWaveformGen.PSD_Noise_components" title="Link to this definition"></a></dt>
+<dd><p>Calculates the power spectral density (PSD) of acceleration noise and optical metrology system (OMS) noise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fr</strong> (<em>float</em>) – The frequency at which the PSD is calculated.</p></li>
+<li><p><strong>sqSnoise</strong> (<em>list</em>) – A list containing the amplitude levels of acceleration noise and OMS noise.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list containing the PSD of acceleration noise and OMS noise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.TDI">
+<span class="sig-name descname"><span class="pre">TDI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wave_gen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_lambda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_sky_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_ecliptic_latitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orbit_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tdi_gen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'2nd</span> <span class="pre">generation'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tdi_chan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'XYZ'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.tdi.TDIWaveformGen.TDI" title="Link to this definition"></a></dt>
+<dd><p># 1st or 2nd or custom (see docs for custom)
+# tdi_gen = “2nd generation”
+# for GBWave
+# index_lambda = 6
+# index_beta = 7</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.delta_f">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delta_f</span></span><a class="headerlink" href="#data.tdi.TDIWaveformGen.delta_f" title="Link to this definition"></a></dt>
+<dd><p>The frequency interval between samples.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.delta_t">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delta_t</span></span><a class="headerlink" href="#data.tdi.TDIWaveformGen.delta_t" title="Link to this definition"></a></dt>
+<dd><p>The time interval between samples.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.f_max">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">f_max</span></span><a class="headerlink" href="#data.tdi.TDIWaveformGen.f_max" title="Link to this definition"></a></dt>
+<dd><p>Set the maximum frequency to half the sampling rate.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.gen_noise">
+<span class="sig-name descname"><span class="pre">gen_noise</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data.tdi.TDIWaveformGen.gen_noise" title="Link to this definition"></a></dt>
+<dd><p>Generates noise from a psd</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.get_psd">
+<span class="sig-name descname"><span class="pre">get_psd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data.tdi.TDIWaveformGen.get_psd" title="Link to this definition"></a></dt>
+<dd><p>Generates the PSD of the noise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.init_EMRI">
+<span class="sig-name descname"><span class="pre">init_EMRI</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data.tdi.TDIWaveformGen.init_EMRI" title="Link to this definition"></a></dt>
+<dd><p>Initialize the EMRI waveform generator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.init_GB">
+<span class="sig-name descname"><span class="pre">init_GB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">VGB</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.tdi.TDIWaveformGen.init_GB" title="Link to this definition"></a></dt>
+<dd><p>Initialize the GB waveform generator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.init_MBHB">
+<span class="sig-name descname"><span class="pre">init_MBHB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data.tdi.TDIWaveformGen.init_MBHB" title="Link to this definition"></a></dt>
+<dd><p>Initialize the MBHB waveform generator.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.sample_frequencies">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sample_frequencies</span></span><a class="headerlink" href="#data.tdi.TDIWaveformGen.sample_frequencies" title="Link to this definition"></a></dt>
+<dd><p>Array of frequencies at which waveforms are sampled.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.tdi.TDIWaveformGen.sample_times">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sample_times</span></span><a class="headerlink" href="#data.tdi.TDIWaveformGen.sample_times" title="Link to this definition"></a></dt>
+<dd><p>Array of times at which waveforms are sampled.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-data.utils">
 <span id="data-utils-module"></span><h2>data.utils module<a class="headerlink" href="#module-data.utils" title="Link to this heading"></a></h2>
@@ -265,8 +444,55 @@
 </dd></dl>
 
 </section>
-<section id="data-waveform-module">
-<h2>data.waveform module<a class="headerlink" href="#data-waveform-module" title="Link to this heading"></a></h2>
+<section id="module-data.waveform">
+<span id="data-waveform-module"></span><h2>data.waveform module<a class="headerlink" href="#module-data.waveform" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data.waveform.AAK">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.waveform.</span></span><span class="sig-name descname"><span class="pre">AAK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_gpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_signal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.waveform.AAK" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data.waveform.GB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.waveform.</span></span><span class="sig-name descname"><span class="pre">GB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_gpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">VGB</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.waveform.GB" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data.waveform.GB.read_catalog">
+<span class="sig-name descname"><span class="pre">read_catalog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cat_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.waveform.GB.read_catalog" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data.waveform.MBHB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.waveform.</span></span><span class="sig-name descname"><span class="pre">MBHB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T_buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_ind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SEOBNRv4_opt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.waveform.MBHB" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data.waveform.MBHB.m1_m2_from_M_Chirp_q">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">m1_m2_from_M_Chirp_q</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M_Chirp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.waveform.MBHB.m1_m2_from_M_Chirp_q" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.waveform.MBHB.m1_m2_from_M_q">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">m1_m2_from_M_q</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.waveform.MBHB.m1_m2_from_M_q" title="Link to this definition"></a></dt>
+<dd><p>Compute individual masses from total mass and mass ratio.</p>
+<p>Choose m1 &gt;= m2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mass</strong> (<em>M {float} -- total</em>)</p></li>
+<li><p><strong>ratio</strong> (<em>q {mass ratio} -- mass</em>)</p></li>
+<li><p><strong>1.0</strong> (<em>0.0&lt; q &lt;=</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(float, float) – (mass_1, mass_2)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-data">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-data" title="Link to this heading"></a></h2>

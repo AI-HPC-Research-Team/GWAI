@@ -63,4 +63,4 @@ class GeLUFunction(torch.autograd.Function):
         return tmp, tmp
 
 
-bias_gelu_impl = GeLUFunction.apply
+# bias_gelu_impl = GeLUFunction.apply

@@ -75,7 +75,12 @@
 <li class="toctree-l4"><a class="reference internal" href="#eval.model.truncate"><code class="docutils literal notranslate"><span class="pre">truncate()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#eval-task-module">eval.task module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-eval.task">eval.task module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#eval.task.corner_plot"><code class="docutils literal notranslate"><span class="pre">corner_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.task.pp_plot"><code class="docutils literal notranslate"><span class="pre">pp_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.task.roc_plot"><code class="docutils literal notranslate"><span class="pre">roc_plot()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-eval.utils">eval.utils module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#eval.utils.Constant"><code class="docutils literal notranslate"><span class="pre">Constant</span></code></a></li>
 </ul>
@@ -421,8 +426,51 @@ predictions : torch.Tensor</p>
 </dd></dl>
 
 </section>
-<section id="eval-task-module">
-<h2>eval.task module<a class="headerlink" href="#eval-task-module" title="Link to this heading"></a></h2>
+<section id="module-eval.task">
+<span id="eval-task-module"></span><h2>eval.task module<a class="headerlink" href="#module-eval.task" title="Link to this heading"></a></h2>
+<p>Down stream task evaluation.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="eval.task.corner_plot">
+<span class="sig-prename descclassname"><span class="pre">eval.task.</span></span><span class="sig-name descname"><span class="pre">corner_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.task.corner_plot" title="Link to this definition"></a></dt>
+<dd><p>corner contour plot of the data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – shape (n_samples, n_dims)</p></li>
+<li><p><strong>true_value</strong> – shape (n_dims)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="eval.task.pp_plot">
+<span class="sig-prename descclassname"><span class="pre">eval.task.</span></span><span class="sig-name descname"><span class="pre">pp_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.task.pp_plot" title="Link to this definition"></a></dt>
+<dd><p>pp plot of the posterior probabilities</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – true label shape (n_events, n_dims)</p></li>
+<li><p><strong>pred</strong> – predicted label shape (n_events, n_samples, n_dims)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="eval.task.roc_plot">
+<span class="sig-prename descclassname"><span class="pre">eval.task.</span></span><span class="sig-name descname"><span class="pre">roc_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.task.roc_plot" title="Link to this definition"></a></dt>
+<dd><p>ROC plot of the classifier</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – true label shape (n_events, n_dims)</p></li>
+<li><p><strong>pred</strong> – predicted label shape (n_events, n_dims)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-eval.utils">
 <span id="eval-utils-module"></span><h2>eval.utils module<a class="headerlink" href="#module-eval.utils" title="Link to this heading"></a></h2>

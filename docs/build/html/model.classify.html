@@ -98,14 +98,66 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="model-classify-dataloader-module">
-<h2>model.classify.dataloader module<a class="headerlink" href="#model-classify-dataloader-module" title="Link to this heading"></a></h2>
+<section id="module-model.classify.dataloader">
+<span id="model-classify-dataloader-module"></span><h2>model.classify.dataloader module<a class="headerlink" href="#module-model.classify.dataloader" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.classify.dataloader.EMRIDatasetTorch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.classify.dataloader.</span></span><span class="sig-name descname"><span class="pre">EMRIDatasetTorch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.dataloader.EMRIDatasetTorch" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.classify.dataloader.NpzDatasetTorch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.classify.dataloader.</span></span><span class="sig-name descname"><span class="pre">NpzDatasetTorch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.dataloader.NpzDatasetTorch" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.classify.dataloader.TinyEMRIDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.classify.dataloader.</span></span><span class="sig-name descname"><span class="pre">TinyEMRIDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DIR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.dataloader.TinyEMRIDataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.dataloader.TinyEMRIDataset.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DIR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.dataloader.TinyEMRIDataset.save" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.classify.dataloader.load_waveform">
+<span class="sig-prename descclassname"><span class="pre">model.classify.dataloader.</span></span><span class="sig-name descname"><span class="pre">load_waveform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DIR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'waveform_dataset.hdf5'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.dataloader.load_waveform" title="Link to this definition"></a></dt>
+<dd><p>load waveform dataset from hdf5 file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>DIR</strong> (<em>str</em><em>, </em><em>optional</em>) – Specified directory to the waveform dataset, by default ‘.’</p></li>
+<li><p><strong>data_fn</strong> (<em>str</em><em>, </em><em>optional</em>) – Specified file name to the waveform dataset, by default ‘waveform_dataset.hdf5’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.classify.dataloader.save_waveform">
+<span class="sig-prename descclassname"><span class="pre">model.classify.dataloader.</span></span><span class="sig-name descname"><span class="pre">save_waveform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DIR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'waveform_dataset.hdf5'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.dataloader.save_waveform" title="Link to this definition"></a></dt>
+<dd><p>Save waveform dataset to hdf5 file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>list</em><em>, </em><em>optional</em>) – Dataset to save, [waveform_dataset, waveform_params]</p></li>
+<li><p><strong>DIR</strong> (<em>str</em><em>, </em><em>optional</em>) – Specified directory to save waveform dataset, by default ‘.’</p></li>
+<li><p><strong>data_fn</strong> (<em>str</em><em>, </em><em>optional</em>) – Specified file name to save waveform dataset, by default ‘waveform_dataset.hdf5’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-model.classify.tcn">
 <span id="model-classify-tcn-module"></span><h2>model.classify.tcn module<a class="headerlink" href="#module-model.classify.tcn" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="model.classify.tcn.Chomp1d">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.classify.tcn.</span></span><span class="sig-name descname"><span class="pre">Chomp1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chomp_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.tcn.Chomp1d" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.classify.tcn.</span></span><span class="sig-name descname"><span class="pre">Chomp1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.tcn.Chomp1d" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="model.classify.tcn.Chomp1d.forward">
@@ -125,7 +177,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="model.classify.tcn.TCN">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.classify.tcn.</span></span><span class="sig-name descname"><span class="pre">TCN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.tcn.TCN" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.classify.tcn.</span></span><span class="sig-name descname"><span class="pre">TCN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.tcn.TCN" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="model.classify.tcn.TCN.clear_activation_maps">
@@ -154,7 +206,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="model.classify.tcn.TemporalBlock">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.classify.tcn.</span></span><span class="sig-name descname"><span class="pre">TemporalBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.tcn.TemporalBlock" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.classify.tcn.</span></span><span class="sig-name descname"><span class="pre">TemporalBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.tcn.TemporalBlock" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="model.classify.tcn.TemporalBlock.forward">
@@ -177,7 +229,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="model.classify.tcn.TemporalConvNet">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.classify.tcn.</span></span><span class="sig-name descname"><span class="pre">TemporalConvNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.tcn.TemporalConvNet" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.classify.tcn.</span></span><span class="sig-name descname"><span class="pre">TemporalConvNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.tcn.TemporalConvNet" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="model.classify.tcn.TemporalConvNet.clear_activation_maps">
@@ -220,8 +272,243 @@
 </dd></dl>
 
 </section>
-<section id="model-classify-trainer-module">
-<h2>model.classify.trainer module<a class="headerlink" href="#model-classify-trainer-module" title="Link to this heading"></a></h2>
+<section id="module-model.classify.trainer">
+<span id="model-classify-trainer-module"></span><h2>model.classify.trainer module<a class="headerlink" href="#module-model.classify.trainer" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.classify.trainer.</span></span><span class="sig-name descname"><span class="pre">Trainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_loader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_loader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheduler_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheduler_kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inf_result.npy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_wandb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.accuracy">
+<span class="sig-name descname"><span class="pre">accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.accuracy" title="Link to this definition"></a></dt>
+<dd><p>Compute the accuracy of the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output</strong> (<em>torch.Tensor</em>) – The model output.</p></li>
+<li><p><strong>target</strong> (<em>torch.Tensor</em>) – The target labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The accuracy of the model.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.calculate_accuracy">
+<span class="sig-name descname"><span class="pre">calculate_accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.calculate_accuracy" title="Link to this definition"></a></dt>
+<dd><p>Calculate the classification accuracy for binary classification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logits</strong> – The raw output scores from the model (before sigmoid).
+Expected shape is (batch_size).</p></li>
+<li><p><strong>true_labels</strong> – The ground truth labels.
+Expected shape is (batch_size).</p></li>
+<li><p><strong>threshold</strong> – The threshold to classify samples as positive or negative.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The accuracy as a floating point number between 0 and 1.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.count_parameters">
+<span class="sig-name descname"><span class="pre">count_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.count_parameters" title="Link to this definition"></a></dt>
+<dd><p>Count the number of parameters in the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>model</strong> – torch.nn.Module The model to count the parameters of.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.evaluate" title="Link to this definition"></a></dt>
+<dd><p>Evaluate the model on the test data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataloader</strong> – torch.utils.data.DataLoader The test data loader.</p></li>
+<li><p><strong>save</strong> – bool Whether to save the inference results.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>float The average test loss.
+avg_acc : float The average test accuracy.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>avg_loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.format_number_with_unit">
+<span class="sig-name descname"><span class="pre">format_number_with_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.format_number_with_unit" title="Link to this definition"></a></dt>
+<dd><p>Format a number with a unit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num</strong> – int The number to format.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The formatted number string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.get_gpu_tensors_sorted_by_size">
+<span class="sig-name descname"><span class="pre">get_gpu_tensors_sorted_by_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.get_gpu_tensors_sorted_by_size" title="Link to this definition"></a></dt>
+<dd><p>Get the GPU tensors sorted by size.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.get_loss_fn">
+<span class="sig-name descname"><span class="pre">get_loss_fn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss_choice</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.get_loss_fn" title="Link to this definition"></a></dt>
+<dd><p>Get the loss function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loss_choice</strong> – str The loss function to use.</p></li>
+<li><p><strong>**kwargs</strong> – dict The loss function keyword arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The loss function.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.nn.modules.loss._Loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.get_lr_scheduler">
+<span class="sig-name descname"><span class="pre">get_lr_scheduler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scheduler_choice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.get_lr_scheduler" title="Link to this definition"></a></dt>
+<dd><p>Get the learning rate scheduler.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scheduler_choice</strong> – str The scheduler to use.</p></li>
+<li><p><strong>optimizer</strong> – torch.optim.Optimizer The optimizer.</p></li>
+<li><p><strong>**kwargs</strong> – dict The scheduler keyword arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The learning rate scheduler.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.optim.lr_scheduler._LRScheduler</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.get_optimizer">
+<span class="sig-name descname"><span class="pre">get_optimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer_choice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.get_optimizer" title="Link to this definition"></a></dt>
+<dd><p>Get the optimizer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optimizer_choice</strong> – str The optimizer to use.</p></li>
+<li><p><strong>model</strong> – torch.nn.Module The model to optimize.</p></li>
+<li><p><strong>**kwargs</strong> – dict The optimizer keyword arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The optimizer.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.optim.Optimizer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.load_checkpoint">
+<span class="sig-name descname"><span class="pre">load_checkpoint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.load_checkpoint" title="Link to this definition"></a></dt>
+<dd><p>Load the model from the checkpoint.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.print_gpu_tensors">
+<span class="sig-name descname"><span class="pre">print_gpu_tensors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">top_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.print_gpu_tensors" title="Link to this definition"></a></dt>
+<dd><p>Print the GPU tensors sorted by size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>top_n</strong> – int The number of tensors to display.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_epochs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.train" title="Link to this definition"></a></dt>
+<dd><p>Train the model for n_epochs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n_epochs</strong> – int The number of epochs to train the model.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.train_epoch">
+<span class="sig-name descname"><span class="pre">train_epoch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.train_epoch" title="Link to this definition"></a></dt>
+<dd><p>Train the model for one epoch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataloader</strong> – torch.utils.data.DataLoader The training data loader.</p></li>
+<li><p><strong>epoch</strong> – int The current epoch number.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>float The average training loss.
+avg_acc : float The average training accuracy.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>avg_loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.classify.trainer.Trainer.update_average">
+<span class="sig-name descname"><span class="pre">update_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_loss</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.classify.trainer.Trainer.update_average" title="Link to this definition"></a></dt>
+<dd><p>Update running average of the loss.</p>
+<p>Args:
+loss : torch.tensor</p>
+<blockquote>
+<div><p>detached loss, a single float value.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>avg_loss<span class="classifier">float</span></dt><dd><p>current running average.</p>
+</dd>
+</dl>
+<p>Returns:
+avg_loss : float</p>
+<blockquote>
+<div><p>The average loss.</p>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-model.classify">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-model.classify" title="Link to this heading"></a></h2>

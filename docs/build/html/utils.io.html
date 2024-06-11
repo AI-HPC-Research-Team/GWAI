@@ -101,8 +101,37 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="utils-io-hdf5-wfd-module">
-<h2>utils.io.hdf5_wfd module<a class="headerlink" href="#utils-io-hdf5-wfd-module" title="Link to this heading"></a></h2>
+<section id="module-utils.io.hdf5_wfd">
+<span id="utils-io-hdf5-wfd-module"></span><h2>utils.io.hdf5_wfd module<a class="headerlink" href="#module-utils.io.hdf5_wfd" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.io.hdf5_wfd.load_waveform">
+<span class="sig-prename descclassname"><span class="pre">utils.io.hdf5_wfd.</span></span><span class="sig-name descname"><span class="pre">load_waveform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DIR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'waveform_dataset.hdf5'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.io.hdf5_wfd.load_waveform" title="Link to this definition"></a></dt>
+<dd><p>load waveform dataset from hdf5 file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>DIR</strong> (<em>str</em><em>, </em><em>optional</em>) – Specified directory to the waveform dataset, by default ‘.’</p></li>
+<li><p><strong>data_fn</strong> (<em>str</em><em>, </em><em>optional</em>) – Specified file name to the waveform dataset, by default ‘waveform_dataset.hdf5’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.io.hdf5_wfd.save_waveform">
+<span class="sig-prename descclassname"><span class="pre">utils.io.hdf5_wfd.</span></span><span class="sig-name descname"><span class="pre">save_waveform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DIR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'waveform_dataset.hdf5'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.io.hdf5_wfd.save_waveform" title="Link to this definition"></a></dt>
+<dd><p>Save waveform dataset to hdf5 file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>list</em><em>, </em><em>optional</em>) – Dataset to save, [waveform_dataset, waveform_params]</p></li>
+<li><p><strong>DIR</strong> (<em>str</em><em>, </em><em>optional</em>) – Specified directory to save waveform dataset, by default ‘.’</p></li>
+<li><p><strong>data_fn</strong> (<em>str</em><em>, </em><em>optional</em>) – Specified file name to save waveform dataset, by default ‘waveform_dataset.hdf5’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-utils.io">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-utils.io" title="Link to this heading"></a></h2>

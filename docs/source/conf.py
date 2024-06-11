@@ -19,7 +19,52 @@ project_root = current_script_path.resolve().parent.parent.parent
 sys.path.append(str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 # sys.path.insert(0, os.path.abspath("/workspace/sdb1/zhaoty/GWAI/src"))
-autodoc_mock_imports = ["fastlisaresponse", "few"]
+autodoc_mock_imports = [
+    "fastlisaresponse", 
+    "few",
+    "amp_C",
+    "apex",
+    "astropy",
+    "bidict",
+    "corner",
+    "deepspeed",
+    "esbonio",
+    "fastdtw",
+    "fftw",
+    "gwdatafind",
+    "gwpy",
+    "gwsurrogate",
+    "h5py",
+    "hydra-core",
+    "imbalanced-learn",
+    "lalsimulation",
+    "lalsuite",
+    "librosa",
+    "ligotimegps",
+    # lisaorbits,
+    # nflows,
+    "numpy",
+    "matplotlib",
+    "omegaconf",
+    "pandas",
+    "pillow",
+    "pybind11",
+    "pycbc",
+    "pyfftw",
+    "rich",
+    "sklearn",
+    "scipy",
+    "speechbrain",
+    "statsmodels",
+    "tqdm",
+    "tensorrt",
+    "torch",
+    "torchsummary",
+    "torchtext",
+    "torchvision",
+    "transformers",
+    "wandb",
+]
 
 # -- Project information -----------------------------------------------------
 
