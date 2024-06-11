@@ -1,92 +1,49 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>eval package &mdash; GWAI  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
   
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="model package" href="model.html" />
     <link rel="prev" title="data package" href="data.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="index.html" class="icon icon-home"> GWAI
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            GWAI
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="about_gwai.html">About GWAI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
@@ -95,11 +52,38 @@
 <li class="toctree-l2"><a class="reference internal" href="data.html">data package</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">eval package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-eval.data">eval.data module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-eval.model">eval.model module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-eval.task">eval.task module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-eval.utils">eval.utils module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-eval">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-eval.data">eval.data module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#eval.data.ADF_test"><code class="docutils literal notranslate"><span class="pre">ADF_test()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.data.get_amp_snr"><code class="docutils literal notranslate"><span class="pre">get_amp_snr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.data.get_mf_snr"><code class="docutils literal notranslate"><span class="pre">get_mf_snr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.data.plot_fd_data"><code class="docutils literal notranslate"><span class="pre">plot_fd_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.data.plot_spectrogram"><code class="docutils literal notranslate"><span class="pre">plot_spectrogram()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.data.plot_td_data"><code class="docutils literal notranslate"><span class="pre">plot_td_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.data.shapiro_wilks_test"><code class="docutils literal notranslate"><span class="pre">shapiro_wilks_test()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.data.tukey"><code class="docutils literal notranslate"><span class="pre">tukey()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-eval.model">eval.model module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#eval.model.bce_loss"><code class="docutils literal notranslate"><span class="pre">bce_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.model.classification_error"><code class="docutils literal notranslate"><span class="pre">classification_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.model.compute_masked_loss"><code class="docutils literal notranslate"><span class="pre">compute_masked_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.model.get_mask"><code class="docutils literal notranslate"><span class="pre">get_mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.model.kldiv_loss"><code class="docutils literal notranslate"><span class="pre">kldiv_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.model.l1_loss"><code class="docutils literal notranslate"><span class="pre">l1_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.model.mse_loss"><code class="docutils literal notranslate"><span class="pre">mse_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.model.nll_loss"><code class="docutils literal notranslate"><span class="pre">nll_loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval.model.truncate"><code class="docutils literal notranslate"><span class="pre">truncate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#eval-task-module">eval.task module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-eval.utils">eval.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#eval.utils.Constant"><code class="docutils literal notranslate"><span class="pre">Constant</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-eval">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#eval.get_version"><code class="docutils literal notranslate"><span class="pre">get_version()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="model.html">model package</a></li>
@@ -109,87 +93,45 @@
 <li class="toctree-l1"><a class="reference internal" href="citations.html">Citations</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">GWAI</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="modules.html">src</a> &raquo;</li>
-        
-      <li>eval package</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+      <li class="breadcrumb-item active">eval package</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/eval.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="eval-package">
-<h1>eval package<a class="headerlink" href="#eval-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-eval.data">
-<span id="eval-data-module"></span><h2>eval.data module<a class="headerlink" href="#module-eval.data" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="eval-package">
+<h1>eval package<a class="headerlink" href="#eval-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-eval.data">
+<span id="eval-data-module"></span><h2>eval.data module<a class="headerlink" href="#module-eval.data" title="Link to this heading"></a></h2>
 <p>data evaluation and visualization functions</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.data.ADF_test">
-<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">ADF_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.ADF_test" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">ADF_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.ADF_test" title="Link to this definition"></a></dt>
 <dd><p>Augmented Dickey-Fuller test for stationarity</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> (<em>array</em>) – The data.</p>
 </dd>
 </dl>
@@ -197,19 +139,19 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.data.get_amp_snr">
-<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">get_amp_snr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.get_amp_snr" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">get_amp_snr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.get_amp_snr" title="Link to this definition"></a></dt>
 <dd><p>Get the signal-to-noise ratio (SNR) of a signal given the noise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sig</strong> (<em>array</em>) – The signal.</p></li>
 <li><p><strong>noise</strong> (<em>array</em>) – The noise.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The SNR.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -217,10 +159,10 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.data.get_mf_snr">
-<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">get_mf_snr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.get_mf_snr" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">get_mf_snr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.get_mf_snr" title="Link to this definition"></a></dt>
 <dd><p>computes the snr of a signal given a PSD starting from a particular frequency index</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>array</em>) – The data.</p></li>
 <li><p><strong>T_obs</strong> (<em>float</em>) – The observation time.</p></li>
@@ -234,10 +176,10 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.data.plot_fd_data">
-<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">plot_fd_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.plot_fd_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">plot_fd_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.plot_fd_data" title="Link to this definition"></a></dt>
 <dd><p>Plot frequency domain data psd</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>f</strong> (<em>array</em>) – The frequency.</p></li>
 <li><p><strong>data</strong> (<em>array</em>) – The data.</p></li>
@@ -249,10 +191,10 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.data.plot_spectrogram">
-<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">plot_spectrogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.plot_spectrogram" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">plot_spectrogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.plot_spectrogram" title="Link to this definition"></a></dt>
 <dd><p>Plot spectrogram</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>array</em>) – The data.</p></li>
 <li><p><strong>fs</strong> (<em>float</em>) – The sampling frequency.</p></li>
@@ -263,10 +205,10 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.data.plot_td_data">
-<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">plot_td_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.plot_td_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">plot_td_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.plot_td_data" title="Link to this definition"></a></dt>
 <dd><p>Plot time domain data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> (<em>array</em>) – The time.</p></li>
 <li><p><strong>data</strong> (<em>array</em>) – The data.</p></li>
@@ -277,10 +219,10 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.data.shapiro_wilks_test">
-<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">shapiro_wilks_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.shapiro_wilks_test" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">shapiro_wilks_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.shapiro_wilks_test" title="Link to this definition"></a></dt>
 <dd><p>Shapiro-Wilks test for normality</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> (<em>array</em>) – The data.</p>
 </dd>
 </dl>
@@ -288,10 +230,10 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.data.tukey">
-<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">tukey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.tukey" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.data.</span></span><span class="sig-name descname"><span class="pre">tukey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.data.tukey" title="Link to this definition"></a></dt>
 <dd><p>Tukey window code copied from scipy</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>M</strong> (<em>int</em>) – The window length.</p></li>
 <li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – The alpha parameter. Defaults to 0.5.</p></li>
@@ -300,13 +242,13 @@
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-eval.model">
-<span id="eval-model-module"></span><h2>eval.model module<a class="headerlink" href="#module-eval.model" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-eval.model">
+<span id="eval-model-module"></span><h2>eval.model module<a class="headerlink" href="#module-eval.model" title="Link to this heading"></a></h2>
 <p>model evaluation and visualization functions</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.model.bce_loss">
-<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">bce_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_smoothing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.bce_loss" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">bce_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_smoothing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.bce_loss" title="Link to this definition"></a></dt>
 <dd><p>Computes binary cross-entropy (BCE) loss. It also applies the sigmoid function directly (this improves the numerical stability).</p>
 <p>Args:
 inputs : torch.Tensor</p>
@@ -337,10 +279,10 @@ one loss per item in the batch, ‘batchmean’ returns sum / batch size.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.model.classification_error">
-<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">classification_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.classification_error" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">classification_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.classification_error" title="Link to this definition"></a></dt>
 <dd><p>Computes the classification error</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>probabilities</strong> (<em>torch.Tensor</em>) – The posterior probabilities</p></li>
 <li><p><strong>targets</strong> (<em>torch.Tensor</em>) – The targets</p></li>
@@ -354,10 +296,10 @@ one loss per item in the batch, ‘batchmean’ returns sum / batch size.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.model.compute_masked_loss">
-<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">compute_masked_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_smoothing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.compute_masked_loss" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">compute_masked_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_smoothing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.compute_masked_loss" title="Link to this definition"></a></dt>
 <dd><p>Compute the average loss</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>loss_fn</strong> – The loss function</p></li>
 <li><p><strong>predictions</strong> – The predictions tensor</p></li>
@@ -372,10 +314,10 @@ one loss per item in the batch, ‘batchmean’ returns sum / batch size.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.model.get_mask">
-<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">get_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_lengths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.get_mask" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">get_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_lengths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.get_mask" title="Link to this definition"></a></dt>
 <dd><p>Get the mask for the source tensor</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>source</strong> – The source tensor</p></li>
 <li><p><strong>source_lengths</strong> – The source lengths</p></li>
@@ -386,7 +328,7 @@ one loss per item in the batch, ‘batchmean’ returns sum / batch size.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.model.kldiv_loss">
-<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">kldiv_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_smoothing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.kldiv_loss" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">kldiv_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_smoothing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.kldiv_loss" title="Link to this definition"></a></dt>
 <dd><p>Computes the KL-divergence error at the batch level.
 This loss applies label smoothing directly to the targets</p>
 <p>Args:
@@ -411,10 +353,10 @@ one loss per item in the batch, ‘batchmean’ returns sum / batch size.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.model.l1_loss">
-<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">l1_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.l1_loss" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">l1_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.l1_loss" title="Link to this definition"></a></dt>
 <dd><p>Compute the l1 loss</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>predictions</strong> (<em>torch.Tensor</em>) – The predictions tensor</p></li>
 <li><p><strong>targets</strong> (<em>torch.Tensor</em>) – The targets tensor</p></li>
@@ -428,10 +370,10 @@ one loss per item in the batch, ‘batchmean’ returns sum / batch size.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.model.mse_loss">
-<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">mse_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.mse_loss" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">mse_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.mse_loss" title="Link to this definition"></a></dt>
 <dd><p>Compute the mean squared error</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>predictions</strong> (<em>torch.Tensor</em>) – The predictions tensor</p></li>
 <li><p><strong>targets</strong> (<em>torch.Tensor</em>) – The targets tensor</p></li>
@@ -445,10 +387,10 @@ one loss per item in the batch, ‘batchmean’ returns sum / batch size.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.model.nll_loss">
-<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">nll_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_smoothing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.nll_loss" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">nll_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_smoothing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.nll_loss" title="Link to this definition"></a></dt>
 <dd><p>Computes negative log likelihood loss.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>log_probabilities</strong> (<em>torch.Tensor</em>) – The log probabilities</p></li>
 <li><p><strong>targets</strong> (<em>torch.Tensor</em>) – The targets</p></li>
@@ -463,7 +405,7 @@ one loss per item in the batch, ‘batchmean’ returns sum / batch size.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.model.truncate">
-<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">truncate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.truncate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.model.</span></span><span class="sig-name descname"><span class="pre">truncate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_len_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.model.truncate" title="Link to this definition"></a></dt>
 <dd><p>Ensure that predictions and targets are the same length.</p>
 <p>Args:
 predictions : torch.Tensor</p>
@@ -478,274 +420,214 @@ predictions : torch.Tensor</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-eval.task">
-<span id="eval-task-module"></span><h2>eval.task module<a class="headerlink" href="#module-eval.task" title="Permalink to this headline">¶</a></h2>
-<p>Down stream task evaluation.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="eval.task.corner_plot">
-<span class="sig-prename descclassname"><span class="pre">eval.task.</span></span><span class="sig-name descname"><span class="pre">corner_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.task.corner_plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>corner contour plot of the data</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> – shape (n_samples, n_dims)</p></li>
-<li><p><strong>true_value</strong> – shape (n_dims)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="eval.task.pp_plot">
-<span class="sig-prename descclassname"><span class="pre">eval.task.</span></span><span class="sig-name descname"><span class="pre">pp_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.task.pp_plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>pp plot of the posterior probabilities</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>label</strong> – true label shape (n_events, n_dims)</p></li>
-<li><p><strong>pred</strong> – predicted label shape (n_events, n_samples, n_dims)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="eval.task.roc_plot">
-<span class="sig-prename descclassname"><span class="pre">eval.task.</span></span><span class="sig-name descname"><span class="pre">roc_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#eval.task.roc_plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>ROC plot of the classifier</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>label</strong> – true label shape (n_events, n_dims)</p></li>
-<li><p><strong>pred</strong> – predicted label shape (n_events, n_dims)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="module-eval.utils">
-<span id="eval-utils-module"></span><h2>eval.utils module<a class="headerlink" href="#module-eval.utils" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="eval-task-module">
+<h2>eval.task module<a class="headerlink" href="#eval-task-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-eval.utils">
+<span id="eval-utils-module"></span><h2>eval.utils module<a class="headerlink" href="#module-eval.utils" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="eval.utils.Constant">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">eval.utils.</span></span><span class="sig-name descname"><span class="pre">Constant</span></span><a class="headerlink" href="#eval.utils.Constant" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eval.utils.</span></span><span class="sig-name descname"><span class="pre">Constant</span></span><a class="headerlink" href="#eval.utils.Constant" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.AU_SI">
-<span class="sig-name descname"><span class="pre">AU_SI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">149597870700.0</span></em><a class="headerlink" href="#eval.utils.Constant.AU_SI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">AU_SI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">149597870700.0</span></em><a class="headerlink" href="#eval.utils.Constant.AU_SI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.C_SI">
-<span class="sig-name descname"><span class="pre">C_SI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">299792458.0</span></em><a class="headerlink" href="#eval.utils.Constant.C_SI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">C_SI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">299792458.0</span></em><a class="headerlink" href="#eval.utils.Constant.C_SI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.EPS">
-<span class="sig-name descname"><span class="pre">EPS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1e-08</span></em><a class="headerlink" href="#eval.utils.Constant.EPS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">EPS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-08</span></em><a class="headerlink" href="#eval.utils.Constant.EPS" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.F0">
-<span class="sig-name descname"><span class="pre">F0</span></span><em class="property"> <span class="pre">=</span> <span class="pre">3.168753578687779e-08</span></em><a class="headerlink" href="#eval.utils.Constant.F0" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">F0</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3.168753578687779e-08</span></em><a class="headerlink" href="#eval.utils.Constant.F0" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.GAMMA">
-<span class="sig-name descname"><span class="pre">GAMMA</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0.5772156649015329</span></em><a class="headerlink" href="#eval.utils.Constant.GAMMA" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GAMMA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5772156649015329</span></em><a class="headerlink" href="#eval.utils.Constant.GAMMA" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.GMSUN">
-<span class="sig-name descname"><span class="pre">GMSUN</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1.3271244210789466e+20</span></em><a class="headerlink" href="#eval.utils.Constant.GMSUN" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GMSUN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.3271244210789466e+20</span></em><a class="headerlink" href="#eval.utils.Constant.GMSUN" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.G_SI">
-<span class="sig-name descname"><span class="pre">G_SI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">6.67408e-11</span></em><a class="headerlink" href="#eval.utils.Constant.G_SI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">G_SI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6.67408e-11</span></em><a class="headerlink" href="#eval.utils.Constant.G_SI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.H0">
-<span class="sig-name descname"><span class="pre">H0</span></span><em class="property"> <span class="pre">=</span> <span class="pre">67.1</span></em><a class="headerlink" href="#eval.utils.Constant.H0" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">H0</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">67.1</span></em><a class="headerlink" href="#eval.utils.Constant.H0" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.H0_SI">
-<span class="sig-name descname"><span class="pre">H0_SI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">2.1745629032171688e-18</span></em><a class="headerlink" href="#eval.utils.Constant.H0_SI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">H0_SI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.1745629032171688e-18</span></em><a class="headerlink" href="#eval.utils.Constant.H0_SI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.INVSQRT2">
-<span class="sig-name descname"><span class="pre">INVSQRT2</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0.7071067811865476</span></em><a class="headerlink" href="#eval.utils.Constant.INVSQRT2" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">INVSQRT2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.7071067811865476</span></em><a class="headerlink" href="#eval.utils.Constant.INVSQRT2" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.INVSQRT3">
-<span class="sig-name descname"><span class="pre">INVSQRT3</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0.5773502691896257</span></em><a class="headerlink" href="#eval.utils.Constant.INVSQRT3" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">INVSQRT3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5773502691896257</span></em><a class="headerlink" href="#eval.utils.Constant.INVSQRT3" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.INVSQRT6">
-<span class="sig-name descname"><span class="pre">INVSQRT6</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0.408248290463863</span></em><a class="headerlink" href="#eval.utils.Constant.INVSQRT6" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">INVSQRT6</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.408248290463863</span></em><a class="headerlink" href="#eval.utils.Constant.INVSQRT6" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.INVSQRTPI">
-<span class="sig-name descname"><span class="pre">INVSQRTPI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0.5641895835477563</span></em><a class="headerlink" href="#eval.utils.Constant.INVSQRTPI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">INVSQRTPI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5641895835477563</span></em><a class="headerlink" href="#eval.utils.Constant.INVSQRTPI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.INVSQRTTWOPI">
-<span class="sig-name descname"><span class="pre">INVSQRTTWOPI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0.3989422804014327</span></em><a class="headerlink" href="#eval.utils.Constant.INVSQRTTWOPI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">INVSQRTTWOPI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.3989422804014327</span></em><a class="headerlink" href="#eval.utils.Constant.INVSQRTTWOPI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.MRSUN_SI">
-<span class="sig-name descname"><span class="pre">MRSUN_SI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1476.6250615036158</span></em><a class="headerlink" href="#eval.utils.Constant.MRSUN_SI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">MRSUN_SI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1476.6250615036158</span></em><a class="headerlink" href="#eval.utils.Constant.MRSUN_SI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.MSUN_SI">
-<span class="sig-name descname"><span class="pre">MSUN_SI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1.98848e+30</span></em><a class="headerlink" href="#eval.utils.Constant.MSUN_SI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">MSUN_SI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.98848e+30</span></em><a class="headerlink" href="#eval.utils.Constant.MSUN_SI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.MTSUN_SI">
-<span class="sig-name descname"><span class="pre">MTSUN_SI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">4.925491025873693e-06</span></em><a class="headerlink" href="#eval.utils.Constant.MTSUN_SI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">MTSUN_SI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4.925491025873693e-06</span></em><a class="headerlink" href="#eval.utils.Constant.MTSUN_SI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.Omega0">
-<span class="sig-name descname"><span class="pre">Omega0</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1.9909865927683788e-07</span></em><a class="headerlink" href="#eval.utils.Constant.Omega0" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Omega0</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.9909865927683788e-07</span></em><a class="headerlink" href="#eval.utils.Constant.Omega0" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.Omegalam">
-<span class="sig-name descname"><span class="pre">Omegalam</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0.6825</span></em><a class="headerlink" href="#eval.utils.Constant.Omegalam" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Omegalam</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.6825</span></em><a class="headerlink" href="#eval.utils.Constant.Omegalam" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.Omegam">
-<span class="sig-name descname"><span class="pre">Omegam</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0.3175</span></em><a class="headerlink" href="#eval.utils.Constant.Omegam" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Omegam</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.3175</span></em><a class="headerlink" href="#eval.utils.Constant.Omegam" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.PC_SI">
-<span class="sig-name descname"><span class="pre">PC_SI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">3.085677581491367e+16</span></em><a class="headerlink" href="#eval.utils.Constant.PC_SI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">PC_SI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3.085677581491367e+16</span></em><a class="headerlink" href="#eval.utils.Constant.PC_SI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.PI">
-<span class="sig-name descname"><span class="pre">PI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">3.141592653589793</span></em><a class="headerlink" href="#eval.utils.Constant.PI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">PI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3.141592653589793</span></em><a class="headerlink" href="#eval.utils.Constant.PI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.PI_2">
-<span class="sig-name descname"><span class="pre">PI_2</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1.5707963267948966</span></em><a class="headerlink" href="#eval.utils.Constant.PI_2" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">PI_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.5707963267948966</span></em><a class="headerlink" href="#eval.utils.Constant.PI_2" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.PI_3">
-<span class="sig-name descname"><span class="pre">PI_3</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1.0471975511965979</span></em><a class="headerlink" href="#eval.utils.Constant.PI_3" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">PI_3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0471975511965979</span></em><a class="headerlink" href="#eval.utils.Constant.PI_3" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.PI_4">
-<span class="sig-name descname"><span class="pre">PI_4</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0.7853981633974483</span></em><a class="headerlink" href="#eval.utils.Constant.PI_4" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">PI_4</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.7853981633974483</span></em><a class="headerlink" href="#eval.utils.Constant.PI_4" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.SQRT2">
-<span class="sig-name descname"><span class="pre">SQRT2</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1.4142135623730951</span></em><a class="headerlink" href="#eval.utils.Constant.SQRT2" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SQRT2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.4142135623730951</span></em><a class="headerlink" href="#eval.utils.Constant.SQRT2" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.SQRT3">
-<span class="sig-name descname"><span class="pre">SQRT3</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1.7320508075688772</span></em><a class="headerlink" href="#eval.utils.Constant.SQRT3" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SQRT3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.7320508075688772</span></em><a class="headerlink" href="#eval.utils.Constant.SQRT3" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.SQRT6">
-<span class="sig-name descname"><span class="pre">SQRT6</span></span><em class="property"> <span class="pre">=</span> <span class="pre">2.449489742783178</span></em><a class="headerlink" href="#eval.utils.Constant.SQRT6" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SQRT6</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.449489742783178</span></em><a class="headerlink" href="#eval.utils.Constant.SQRT6" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.SQRTPI">
-<span class="sig-name descname"><span class="pre">SQRTPI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1.772453850905516</span></em><a class="headerlink" href="#eval.utils.Constant.SQRTPI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SQRTPI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.772453850905516</span></em><a class="headerlink" href="#eval.utils.Constant.SQRTPI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.SQRTTWOPI">
-<span class="sig-name descname"><span class="pre">SQRTTWOPI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">2.5066282746310007</span></em><a class="headerlink" href="#eval.utils.Constant.SQRTTWOPI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SQRTTWOPI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.5066282746310007</span></em><a class="headerlink" href="#eval.utils.Constant.SQRTTWOPI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eval.utils.Constant.YRSID_SI">
-<span class="sig-name descname"><span class="pre">YRSID_SI</span></span><em class="property"> <span class="pre">=</span> <span class="pre">31558149.763545603</span></em><a class="headerlink" href="#eval.utils.Constant.YRSID_SI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">YRSID_SI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">31558149.763545603</span></em><a class="headerlink" href="#eval.utils.Constant.YRSID_SI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-eval">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-eval" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-eval">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-eval" title="Link to this heading"></a></h2>
 <p>Detect EMRI signal using DNN</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="eval.get_version">
-<span class="sig-prename descclassname"><span class="pre">eval.</span></span><span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#eval.get_version" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">eval.</span></span><span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#eval.get_version" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="model.html" class="btn btn-neutral float-right" title="model package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="data.html" class="btn btn-neutral float-left" title="data package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="model.html" class="btn btn-neutral float-right" title="model package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2024, Yue Zhou, Tianyu Zhao.
-
-    </p>
+    <p>&#169; Copyright 2024, Yue Zhou, Tianyu Zhao.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

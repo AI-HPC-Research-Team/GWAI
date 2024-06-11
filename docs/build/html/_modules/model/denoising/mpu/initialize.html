@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>model.denoising.mpu.initialize &mdash; GWAI  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            GWAI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about_gwai.html">About GWAI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Main Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../citations.html">Citations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">GWAI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../model.html">model</a></li>
+          <li class="breadcrumb-item"><a href="../../denoising.html">model.denoising</a></li>
+      <li class="breadcrumb-item active">model.denoising.mpu.initialize</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for model.denoising.mpu.initialize</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="c1"># Copyright (c) 2020, NVIDIA CORPORATION.  All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+
+<span class="sd">&quot;&quot;&quot;Model and data parallel groups.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">ensure_divisibility</span>
+
+<span class="c1"># Intra-layer model parallel group that the current rank belongs to.</span>
+<span class="n">_TENSOR_MODEL_PARALLEL_GROUP</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="c1"># Inter-layer model parallel group that the current rank belongs to.</span>
+<span class="n">_PIPELINE_MODEL_PARALLEL_GROUP</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="c1"># Model parallel group (both intra- and pipeline) that the current rank belongs to.</span>
+<span class="n">_MODEL_PARALLEL_GROUP</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="c1"># Embedding group.</span>
+<span class="n">_EMBEDDING_GROUP</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="c1"># Data parallel group that the current rank belongs to.</span>
+<span class="n">_DATA_PARALLEL_GROUP</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">_VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">_VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># These values enable us to change the mpu sizes on the fly.</span>
+<span class="n">_MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">_MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">_MPU_TENSOR_MODEL_PARALLEL_RANK</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">_MPU_PIPELINE_MODEL_PARALLEL_RANK</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># A list of global ranks for each pipeline group to ease calculation of the source</span>
+<span class="c1"># rank when broadcasting from the first or last pipeline stage</span>
+<span class="n">_PIPELINE_GLOBAL_RANKS</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="is_unitialized">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.is_unitialized">[docs]</a>
+<span class="k">def</span> <span class="nf">is_unitialized</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Useful for code segments that may be accessed with or without mpu initialization&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_DATA_PARALLEL_GROUP</span> <span class="ow">is</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="initialize_model_parallel">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.initialize_model_parallel">[docs]</a>
+<span class="k">def</span> <span class="nf">initialize_model_parallel</span><span class="p">(</span>
+    <span class="n">tensor_model_parallel_size_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">pipeline_model_parallel_size_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">virtual_pipeline_model_parallel_size_</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialize model data parallel groups.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        tensor_model_parallel_size: number of GPUs used to parallelize model tensor.</span>
+<span class="sd">        pipeline_model_parallel_size: number of GPUs used to parallelize model pipeline.</span>
+
+<span class="sd">    Let&#39;s say we have a total of 16 GPUs denoted by g0 ... g15 and we</span>
+<span class="sd">    use 2 GPUs to parallelize the model tensor, and 4 GPUs to parallelize</span>
+<span class="sd">    the model pipeline. The present function will</span>
+<span class="sd">    create 8 tensor model-parallel groups, 4 pipeline model-parallel groups</span>
+<span class="sd">    and 8 data-parallel groups as:</span>
+<span class="sd">        8 data_parallel groups:</span>
+<span class="sd">            [g0, g2], [g1, g3], [g4, g6], [g5, g7], [g8, g10], [g9, g11], [g12, g14], [g13, g15]</span>
+<span class="sd">        8 tensor model-parallel groups:</span>
+<span class="sd">            [g0, g1], [g2, g3], [g4, g5], [g6, g7], [g8, g9], [g10, g11], [g12, g13], [g14, g15]</span>
+<span class="sd">        4 pipeline model-parallel groups:</span>
+<span class="sd">            [g0, g4, g8, g12], [g1, g5, g9, g13], [g2, g6, g10, g14], [g3, g7, g11, g15]</span>
+<span class="sd">    Note that for efficiency, the caller should make sure adjacent ranks</span>
+<span class="sd">    are on the same DGX box. For example if we are using 2 DGX-1 boxes</span>
+<span class="sd">    with a total of 16 GPUs, rank 0 to 7 belong to the first box and</span>
+<span class="sd">    ranks 8 to 15 belong to the second box.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;&gt; initializing tensor model parallel with size </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">tensor_model_parallel_size_</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;&gt; initializing pipeline model parallel with size </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">pipeline_model_parallel_size_</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="c1"># Get world size and rank. Ensure some consistencies.</span>
+    <span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">()</span>
+    <span class="n">world_size</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_world_size</span><span class="p">()</span>
+    <span class="n">tensor_model_parallel_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">tensor_model_parallel_size_</span><span class="p">,</span> <span class="n">world_size</span><span class="p">)</span>
+    <span class="n">pipeline_model_parallel_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">pipeline_model_parallel_size_</span><span class="p">,</span> <span class="n">world_size</span><span class="p">)</span>
+    <span class="n">ensure_divisibility</span><span class="p">(</span>
+        <span class="n">world_size</span><span class="p">,</span> <span class="n">tensor_model_parallel_size</span> <span class="o">*</span> <span class="n">pipeline_model_parallel_size</span>
+    <span class="p">)</span>
+    <span class="n">data_parallel_size</span> <span class="o">=</span> <span class="n">world_size</span> <span class="o">//</span> <span class="p">(</span>
+        <span class="n">tensor_model_parallel_size</span> <span class="o">*</span> <span class="n">pipeline_model_parallel_size</span>
+    <span class="p">)</span>
+
+    <span class="n">num_tensor_model_parallel_groups</span> <span class="o">=</span> <span class="n">world_size</span> <span class="o">//</span> <span class="n">tensor_model_parallel_size</span>
+    <span class="n">num_pipeline_model_parallel_groups</span> <span class="o">=</span> <span class="n">world_size</span> <span class="o">//</span> <span class="n">pipeline_model_parallel_size</span>
+    <span class="c1"># num_data_parallel_groups = world_size // data_parallel_size</span>
+
+    <span class="k">if</span> <span class="n">virtual_pipeline_model_parallel_size_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">global</span> <span class="n">_VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK</span>
+        <span class="k">global</span> <span class="n">_VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE</span>
+        <span class="n">_VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">_VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">virtual_pipeline_model_parallel_size_</span>
+        <span class="p">)</span>
+
+    <span class="n">rank</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_rank</span><span class="p">()</span>
+
+    <span class="c1"># Build the data-parallel groups.</span>
+    <span class="k">global</span> <span class="n">_DATA_PARALLEL_GROUP</span>
+    <span class="k">assert</span> <span class="n">_DATA_PARALLEL_GROUP</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;data parallel group is already initialized&quot;</span>
+    <span class="n">all_data_parallel_group_ranks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pipeline_model_parallel_size</span><span class="p">):</span>
+        <span class="n">start_rank</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">num_pipeline_model_parallel_groups</span>
+        <span class="n">end_rank</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">num_pipeline_model_parallel_groups</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">tensor_model_parallel_size</span><span class="p">):</span>
+            <span class="n">ranks</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_rank</span> <span class="o">+</span> <span class="n">j</span><span class="p">,</span> <span class="n">end_rank</span><span class="p">,</span> <span class="n">tensor_model_parallel_size</span><span class="p">)</span>
+            <span class="n">all_data_parallel_group_ranks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ranks</span><span class="p">))</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">new_group</span><span class="p">(</span><span class="n">ranks</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rank</span> <span class="ow">in</span> <span class="n">ranks</span><span class="p">:</span>
+                <span class="n">_DATA_PARALLEL_GROUP</span> <span class="o">=</span> <span class="n">group</span>
+
+    <span class="c1"># Build the model-parallel groups.</span>
+    <span class="k">global</span> <span class="n">_MODEL_PARALLEL_GROUP</span>
+    <span class="k">assert</span> <span class="n">_MODEL_PARALLEL_GROUP</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;model parallel group is already initialized&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_parallel_size</span><span class="p">):</span>
+        <span class="n">ranks</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">data_parallel_group_ranks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">data_parallel_group_ranks</span> <span class="ow">in</span> <span class="n">all_data_parallel_group_ranks</span>
+        <span class="p">]</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">new_group</span><span class="p">(</span><span class="n">ranks</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rank</span> <span class="ow">in</span> <span class="n">ranks</span><span class="p">:</span>
+            <span class="n">_MODEL_PARALLEL_GROUP</span> <span class="o">=</span> <span class="n">group</span>
+
+    <span class="c1"># Build the tensor model-parallel groups.</span>
+    <span class="k">global</span> <span class="n">_TENSOR_MODEL_PARALLEL_GROUP</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">_TENSOR_MODEL_PARALLEL_GROUP</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="p">),</span> <span class="s2">&quot;tensor model parallel group is already initialized&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_tensor_model_parallel_groups</span><span class="p">):</span>
+        <span class="n">ranks</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span>
+            <span class="n">i</span> <span class="o">*</span> <span class="n">tensor_model_parallel_size</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">tensor_model_parallel_size</span>
+        <span class="p">)</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">new_group</span><span class="p">(</span><span class="n">ranks</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rank</span> <span class="ow">in</span> <span class="n">ranks</span><span class="p">:</span>
+            <span class="n">_TENSOR_MODEL_PARALLEL_GROUP</span> <span class="o">=</span> <span class="n">group</span>
+
+    <span class="c1"># Build the pipeline model-parallel groups and embedding groups</span>
+    <span class="c1"># (first and last rank in each pipeline model-parallel group).</span>
+    <span class="k">global</span> <span class="n">_PIPELINE_MODEL_PARALLEL_GROUP</span>
+    <span class="k">global</span> <span class="n">_PIPELINE_GLOBAL_RANKS</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">_PIPELINE_MODEL_PARALLEL_GROUP</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="p">),</span> <span class="s2">&quot;pipeline model parallel group is already initialized&quot;</span>
+    <span class="k">global</span> <span class="n">_EMBEDDING_GROUP</span>
+    <span class="k">assert</span> <span class="n">_EMBEDDING_GROUP</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;embedding group is already initialized&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_pipeline_model_parallel_groups</span><span class="p">):</span>
+        <span class="n">ranks</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">num_pipeline_model_parallel_groups</span><span class="p">)</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">new_group</span><span class="p">(</span><span class="n">ranks</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rank</span> <span class="ow">in</span> <span class="n">ranks</span><span class="p">:</span>
+            <span class="n">_PIPELINE_MODEL_PARALLEL_GROUP</span> <span class="o">=</span> <span class="n">group</span>
+            <span class="n">_PIPELINE_GLOBAL_RANKS</span> <span class="o">=</span> <span class="n">ranks</span>
+        <span class="c1"># Setup embedding group (to exchange gradients between</span>
+        <span class="c1"># first and last stages).</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ranks</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">embedding_ranks</span> <span class="o">=</span> <span class="p">[</span><span class="n">ranks</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ranks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">embedding_ranks</span> <span class="o">=</span> <span class="n">ranks</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">new_group</span><span class="p">(</span><span class="n">embedding_ranks</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rank</span> <span class="ow">in</span> <span class="n">embedding_ranks</span><span class="p">:</span>
+            <span class="n">_EMBEDDING_GROUP</span> <span class="o">=</span> <span class="n">group</span></div>
+
+
+
+<div class="viewcode-block" id="model_parallel_is_initialized">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.model_parallel_is_initialized">[docs]</a>
+<span class="k">def</span> <span class="nf">model_parallel_is_initialized</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if model and data parallel groups are initialized.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">_TENSOR_MODEL_PARALLEL_GROUP</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="ow">or</span> <span class="n">_PIPELINE_MODEL_PARALLEL_GROUP</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="ow">or</span> <span class="n">_DATA_PARALLEL_GROUP</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="get_model_parallel_group">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_model_parallel_group">[docs]</a>
+<span class="k">def</span> <span class="nf">get_model_parallel_group</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the model parallel group the caller rank belongs to.&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">_MODEL_PARALLEL_GROUP</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;model parallel group is not initialized&quot;</span>
+    <span class="k">return</span> <span class="n">_MODEL_PARALLEL_GROUP</span></div>
+
+
+
+<div class="viewcode-block" id="get_tensor_model_parallel_group">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_tensor_model_parallel_group">[docs]</a>
+<span class="k">def</span> <span class="nf">get_tensor_model_parallel_group</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the tensor model parallel group the caller rank belongs to.&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">_TENSOR_MODEL_PARALLEL_GROUP</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">),</span> <span class="s2">&quot;intra_layer_model parallel group is not initialized&quot;</span>
+    <span class="k">return</span> <span class="n">_TENSOR_MODEL_PARALLEL_GROUP</span></div>
+
+
+
+<div class="viewcode-block" id="get_pipeline_model_parallel_group">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_pipeline_model_parallel_group">[docs]</a>
+<span class="k">def</span> <span class="nf">get_pipeline_model_parallel_group</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the pipeline model parallel group the caller rank belongs to.&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">_PIPELINE_MODEL_PARALLEL_GROUP</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">),</span> <span class="s2">&quot;pipeline_model parallel group is not initialized&quot;</span>
+    <span class="k">return</span> <span class="n">_PIPELINE_MODEL_PARALLEL_GROUP</span></div>
+
+
+
+<div class="viewcode-block" id="get_data_parallel_group">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_data_parallel_group">[docs]</a>
+<span class="k">def</span> <span class="nf">get_data_parallel_group</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the data parallel group the caller rank belongs to.&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">_DATA_PARALLEL_GROUP</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;data parallel group is not initialized&quot;</span>
+    <span class="k">return</span> <span class="n">_DATA_PARALLEL_GROUP</span></div>
+
+
+
+<div class="viewcode-block" id="get_embedding_group">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_embedding_group">[docs]</a>
+<span class="k">def</span> <span class="nf">get_embedding_group</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the embedding group the caller rank belongs to.&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">_EMBEDDING_GROUP</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;embedding group is not initialized&quot;</span>
+    <span class="k">return</span> <span class="n">_EMBEDDING_GROUP</span></div>
+
+
+
+<div class="viewcode-block" id="set_tensor_model_parallel_world_size">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.set_tensor_model_parallel_world_size">[docs]</a>
+<span class="k">def</span> <span class="nf">set_tensor_model_parallel_world_size</span><span class="p">(</span><span class="n">world_size</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the tensor model parallel size&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE</span>
+    <span class="n">_MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE</span> <span class="o">=</span> <span class="n">world_size</span></div>
+
+
+
+<div class="viewcode-block" id="set_pipeline_model_parallel_world_size">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.set_pipeline_model_parallel_world_size">[docs]</a>
+<span class="k">def</span> <span class="nf">set_pipeline_model_parallel_world_size</span><span class="p">(</span><span class="n">world_size</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the pipeline model parallel size&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE</span>
+    <span class="n">_MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE</span> <span class="o">=</span> <span class="n">world_size</span></div>
+
+
+
+<div class="viewcode-block" id="get_tensor_model_parallel_world_size">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_tensor_model_parallel_world_size">[docs]</a>
+<span class="k">def</span> <span class="nf">get_tensor_model_parallel_world_size</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return world size for the tensor model parallel group.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE</span>
+    <span class="k">if</span> <span class="n">_MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_world_size</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">get_tensor_model_parallel_group</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="get_pipeline_model_parallel_world_size">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_pipeline_model_parallel_world_size">[docs]</a>
+<span class="k">def</span> <span class="nf">get_pipeline_model_parallel_world_size</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return world size for the pipeline model parallel group.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE</span>
+    <span class="k">if</span> <span class="n">_MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_world_size</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">get_pipeline_model_parallel_group</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="set_tensor_model_parallel_rank">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.set_tensor_model_parallel_rank">[docs]</a>
+<span class="k">def</span> <span class="nf">set_tensor_model_parallel_rank</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set tensor model parallel rank.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_MPU_TENSOR_MODEL_PARALLEL_RANK</span>
+    <span class="n">_MPU_TENSOR_MODEL_PARALLEL_RANK</span> <span class="o">=</span> <span class="n">rank</span></div>
+
+
+
+<div class="viewcode-block" id="set_pipeline_model_parallel_rank">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.set_pipeline_model_parallel_rank">[docs]</a>
+<span class="k">def</span> <span class="nf">set_pipeline_model_parallel_rank</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set pipeline model parallel rank.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_MPU_PIPELINE_MODEL_PARALLEL_RANK</span>
+    <span class="n">_MPU_PIPELINE_MODEL_PARALLEL_RANK</span> <span class="o">=</span> <span class="n">rank</span></div>
+
+
+
+<div class="viewcode-block" id="get_tensor_model_parallel_rank">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_tensor_model_parallel_rank">[docs]</a>
+<span class="k">def</span> <span class="nf">get_tensor_model_parallel_rank</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return my rank for the tensor model parallel group.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_MPU_TENSOR_MODEL_PARALLEL_RANK</span>
+    <span class="k">if</span> <span class="n">_MPU_TENSOR_MODEL_PARALLEL_RANK</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_MPU_TENSOR_MODEL_PARALLEL_RANK</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_rank</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">get_tensor_model_parallel_group</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="get_pipeline_model_parallel_rank">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_pipeline_model_parallel_rank">[docs]</a>
+<span class="k">def</span> <span class="nf">get_pipeline_model_parallel_rank</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return my rank for the pipeline model parallel group.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_MPU_PIPELINE_MODEL_PARALLEL_RANK</span>
+    <span class="k">if</span> <span class="n">_MPU_PIPELINE_MODEL_PARALLEL_RANK</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_MPU_PIPELINE_MODEL_PARALLEL_RANK</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_rank</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">get_pipeline_model_parallel_group</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="is_pipeline_first_stage">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.is_pipeline_first_stage">[docs]</a>
+<span class="k">def</span> <span class="nf">is_pipeline_first_stage</span><span class="p">(</span><span class="n">ignore_virtual</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return True if in the first pipeline model-parallel stage, False otherwise.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ignore_virtual</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">get_virtual_pipeline_model_parallel_world_size</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">get_virtual_pipeline_model_parallel_rank</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">get_pipeline_model_parallel_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span></div>
+
+
+
+<div class="viewcode-block" id="is_pipeline_last_stage">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.is_pipeline_last_stage">[docs]</a>
+<span class="k">def</span> <span class="nf">is_pipeline_last_stage</span><span class="p">(</span><span class="n">ignore_virtual</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return True if in the last pipeline model-parallel stage, False otherwise.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ignore_virtual</span><span class="p">:</span>
+        <span class="n">virtual_pipeline_model_parallel_world_size</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">get_virtual_pipeline_model_parallel_world_size</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">virtual_pipeline_model_parallel_world_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">get_virtual_pipeline_model_parallel_rank</span><span class="p">()</span>
+            <span class="o">!=</span> <span class="p">(</span><span class="n">virtual_pipeline_model_parallel_world_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">get_pipeline_model_parallel_rank</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span>
+        <span class="n">get_pipeline_model_parallel_world_size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_virtual_pipeline_model_parallel_rank">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_virtual_pipeline_model_parallel_rank">[docs]</a>
+<span class="k">def</span> <span class="nf">get_virtual_pipeline_model_parallel_rank</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the virtual pipeline-parallel rank.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK</span>
+    <span class="k">return</span> <span class="n">_VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK</span></div>
+
+
+
+<div class="viewcode-block" id="set_virtual_pipeline_model_parallel_rank">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.set_virtual_pipeline_model_parallel_rank">[docs]</a>
+<span class="k">def</span> <span class="nf">set_virtual_pipeline_model_parallel_rank</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the virtual pipeline-parallel rank.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK</span>
+    <span class="n">_VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK</span> <span class="o">=</span> <span class="n">rank</span></div>
+
+
+
+<div class="viewcode-block" id="get_virtual_pipeline_model_parallel_world_size">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_virtual_pipeline_model_parallel_world_size">[docs]</a>
+<span class="k">def</span> <span class="nf">get_virtual_pipeline_model_parallel_world_size</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the virtual pipeline-parallel world size.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE</span>
+    <span class="k">return</span> <span class="n">_VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE</span></div>
+
+
+
+<div class="viewcode-block" id="get_tensor_model_parallel_src_rank">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_tensor_model_parallel_src_rank">[docs]</a>
+<span class="k">def</span> <span class="nf">get_tensor_model_parallel_src_rank</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the global rank corresponding to the first local rank</span>
+<span class="sd">    in the tensor model parallel group.&quot;&quot;&quot;</span>
+    <span class="n">global_rank</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_rank</span><span class="p">()</span>
+    <span class="n">local_world_size</span> <span class="o">=</span> <span class="n">get_tensor_model_parallel_world_size</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">global_rank</span> <span class="o">//</span> <span class="n">local_world_size</span><span class="p">)</span> <span class="o">*</span> <span class="n">local_world_size</span></div>
+
+
+
+<div class="viewcode-block" id="get_pipeline_model_parallel_first_rank">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_pipeline_model_parallel_first_rank">[docs]</a>
+<span class="k">def</span> <span class="nf">get_pipeline_model_parallel_first_rank</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">_PIPELINE_GLOBAL_RANKS</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">),</span> <span class="s2">&quot;Pipeline parallel group is not initialized&quot;</span>
+    <span class="k">return</span> <span class="n">_PIPELINE_GLOBAL_RANKS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_pipeline_model_parallel_last_rank">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_pipeline_model_parallel_last_rank">[docs]</a>
+<span class="k">def</span> <span class="nf">get_pipeline_model_parallel_last_rank</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">_PIPELINE_GLOBAL_RANKS</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">),</span> <span class="s2">&quot;Pipeline parallel group is not initialized&quot;</span>
+    <span class="n">last_rank_local</span> <span class="o">=</span> <span class="n">get_pipeline_model_parallel_world_size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">_PIPELINE_GLOBAL_RANKS</span><span class="p">[</span><span class="n">last_rank_local</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_pipeline_model_parallel_next_rank">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_pipeline_model_parallel_next_rank">[docs]</a>
+<span class="k">def</span> <span class="nf">get_pipeline_model_parallel_next_rank</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">_PIPELINE_GLOBAL_RANKS</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">),</span> <span class="s2">&quot;Pipeline parallel group is not initialized&quot;</span>
+    <span class="n">rank_in_pipeline</span> <span class="o">=</span> <span class="n">get_pipeline_model_parallel_rank</span><span class="p">()</span>
+    <span class="n">world_size</span> <span class="o">=</span> <span class="n">get_pipeline_model_parallel_world_size</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">_PIPELINE_GLOBAL_RANKS</span><span class="p">[(</span><span class="n">rank_in_pipeline</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">world_size</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_pipeline_model_parallel_prev_rank">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_pipeline_model_parallel_prev_rank">[docs]</a>
+<span class="k">def</span> <span class="nf">get_pipeline_model_parallel_prev_rank</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">_PIPELINE_GLOBAL_RANKS</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">),</span> <span class="s2">&quot;Pipeline parallel group is not initialized&quot;</span>
+    <span class="n">rank_in_pipeline</span> <span class="o">=</span> <span class="n">get_pipeline_model_parallel_rank</span><span class="p">()</span>
+    <span class="n">world_size</span> <span class="o">=</span> <span class="n">get_pipeline_model_parallel_world_size</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">_PIPELINE_GLOBAL_RANKS</span><span class="p">[(</span><span class="n">rank_in_pipeline</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">world_size</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_data_parallel_world_size">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_data_parallel_world_size">[docs]</a>
+<span class="k">def</span> <span class="nf">get_data_parallel_world_size</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return world size for the data parallel group.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_world_size</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">get_data_parallel_group</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="get_data_parallel_rank">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.get_data_parallel_rank">[docs]</a>
+<span class="k">def</span> <span class="nf">get_data_parallel_rank</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return my rank for the data parallel group.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_rank</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">get_data_parallel_group</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="destroy_model_parallel">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.initialize.destroy_model_parallel">[docs]</a>
+<span class="k">def</span> <span class="nf">destroy_model_parallel</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the groups to none.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_TENSOR_MODEL_PARALLEL_GROUP</span>
+    <span class="n">_TENSOR_MODEL_PARALLEL_GROUP</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">global</span> <span class="n">_PIPELINE_MODEL_PARALLEL_GROUP</span>
+    <span class="n">_PIPELINE_MODEL_PARALLEL_GROUP</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">global</span> <span class="n">_DATA_PARALLEL_GROUP</span>
+    <span class="n">_DATA_PARALLEL_GROUP</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yue Zhou, Tianyu Zhao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

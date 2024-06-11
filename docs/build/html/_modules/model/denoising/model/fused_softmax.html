@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>model.denoising.model.fused_softmax &mdash; GWAI  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            GWAI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about_gwai.html">About GWAI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Main Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../citations.html">Citations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">GWAI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../model.html">model</a></li>
+          <li class="breadcrumb-item"><a href="../../denoising.html">model.denoising</a></li>
+      <li class="breadcrumb-item active">model.denoising.model.fused_softmax</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for model.denoising.model.fused_softmax</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="c1"># Copyright (c) 2020, NVIDIA CORPORATION.  All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">src.model.denoising.model.enums</span> <span class="kn">import</span> <span class="n">AttnMaskType</span>
+
+
+<div class="viewcode-block" id="ScaledUpperTriangMaskedSoftmax">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.fused_softmax.ScaledUpperTriangMaskedSoftmax">[docs]</a>
+<span class="k">class</span> <span class="nc">ScaledUpperTriangMaskedSoftmax</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fused operation which performs following three operations in sequence</span>
+<span class="sd">    1. Scale the tensor.</span>
+<span class="sd">    2. Apply upper triangular mask (typically used in gpt models).</span>
+<span class="sd">    3. Perform softmax.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ScaledUpperTriangMaskedSoftmax.forward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.fused_softmax.ScaledUpperTriangMaskedSoftmax.forward">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">scaled_upper_triang_masked_softmax_cuda</span>
+
+        <span class="n">scale_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">scale</span><span class="p">])</span>
+
+        <span class="n">softmax_results</span> <span class="o">=</span> <span class="n">scaled_upper_triang_masked_softmax_cuda</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="p">,</span> <span class="n">scale_t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">save_for_backward</span><span class="p">(</span><span class="n">softmax_results</span><span class="p">,</span> <span class="n">scale_t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">softmax_results</span></div>
+
+
+<div class="viewcode-block" id="ScaledUpperTriangMaskedSoftmax.backward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.fused_softmax.ScaledUpperTriangMaskedSoftmax.backward">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">output_grads</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">scaled_upper_triang_masked_softmax_cuda</span>
+
+        <span class="n">softmax_results</span><span class="p">,</span> <span class="n">scale_t</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_tensors</span>
+
+        <span class="n">input_grads</span> <span class="o">=</span> <span class="n">scaled_upper_triang_masked_softmax_cuda</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span>
+            <span class="n">output_grads</span><span class="p">,</span> <span class="n">softmax_results</span><span class="p">,</span> <span class="n">scale_t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">input_grads</span><span class="p">,</span> <span class="kc">None</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ScaledMaskedSoftmax">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.fused_softmax.ScaledMaskedSoftmax">[docs]</a>
+<span class="k">class</span> <span class="nc">ScaledMaskedSoftmax</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fused operation which performs following three operations in sequence</span>
+<span class="sd">    1. Scale the tensor.</span>
+<span class="sd">    2. Apply the mask.</span>
+<span class="sd">    3. Perform softmax.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ScaledMaskedSoftmax.forward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.fused_softmax.ScaledMaskedSoftmax.forward">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">scaled_masked_softmax_cuda</span>
+
+        <span class="n">scale_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">scale</span><span class="p">])</span>
+
+        <span class="n">softmax_results</span> <span class="o">=</span> <span class="n">scaled_masked_softmax_cuda</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">scale_t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">save_for_backward</span><span class="p">(</span><span class="n">softmax_results</span><span class="p">,</span> <span class="n">scale_t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">softmax_results</span></div>
+
+
+<div class="viewcode-block" id="ScaledMaskedSoftmax.backward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.fused_softmax.ScaledMaskedSoftmax.backward">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">output_grads</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">scaled_masked_softmax_cuda</span>
+
+        <span class="n">softmax_results</span><span class="p">,</span> <span class="n">scale_t</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_tensors</span>
+
+        <span class="n">input_grads</span> <span class="o">=</span> <span class="n">scaled_masked_softmax_cuda</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span>
+            <span class="n">output_grads</span><span class="p">,</span> <span class="n">softmax_results</span><span class="p">,</span> <span class="n">scale_t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">input_grads</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="FusedScaleMaskSoftmax">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.fused_softmax.FusedScaleMaskSoftmax">[docs]</a>
+<span class="k">class</span> <span class="nc">FusedScaleMaskSoftmax</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    fused operation: scaling + mask + softmax</span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        input_in_fp16: flag to indicate if input in fp16 data format.</span>
+<span class="sd">        attn_mask_type: attention mask type (pad or causal)</span>
+<span class="sd">        mask_func: mask function to be applied.</span>
+<span class="sd">        softmax_in_fp32: if true, softmax in performed at fp32 precision.</span>
+<span class="sd">        scale: scaling factor used in input tensor scaling.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_in_fp16</span><span class="p">,</span>
+        <span class="n">input_in_bf16</span><span class="p">,</span>
+        <span class="n">attn_mask_type</span><span class="p">,</span>
+        <span class="n">scaled_masked_softmax_fusion</span><span class="p">,</span>
+        <span class="n">mask_func</span><span class="p">,</span>
+        <span class="n">softmax_in_fp32</span><span class="p">,</span>
+        <span class="n">scale</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FusedScaleMaskSoftmax</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_in_fp16</span> <span class="o">=</span> <span class="n">input_in_fp16</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_in_bf16</span> <span class="o">=</span> <span class="n">input_in_bf16</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_in_fp16</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_in_bf16</span>
+        <span class="p">),</span> <span class="s2">&quot;both fp16 and bf16 flags cannot be active at the same time.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_in_float16</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_in_fp16</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_in_bf16</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attn_mask_type</span> <span class="o">=</span> <span class="n">attn_mask_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaled_masked_softmax_fusion</span> <span class="o">=</span> <span class="n">scaled_masked_softmax_fusion</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_func</span> <span class="o">=</span> <span class="n">mask_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">softmax_in_fp32</span> <span class="o">=</span> <span class="n">softmax_in_fp32</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span>
+
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">softmax_in_fp32</span>
+        <span class="p">),</span> <span class="s2">&quot;softmax should be in fp32 when scaled&quot;</span>
+
+<div class="viewcode-block" id="FusedScaleMaskSoftmax.forward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.fused_softmax.FusedScaleMaskSoftmax.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="c1"># [b, np, sq, sk]</span>
+        <span class="k">assert</span> <span class="nb">input</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">4</span>
+        <span class="n">data_size</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="n">query_seq_len</span> <span class="o">=</span> <span class="n">data_size</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">key_seq_len</span> <span class="o">=</span> <span class="n">data_size</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">attn_batch_size</span> <span class="o">=</span> <span class="n">data_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">data_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># constraints on various tensor dimensions to enable warp based</span>
+        <span class="c1"># optimization and upper triangular optimization (for causal mask)</span>
+        <span class="n">custom_kernel_constraint</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">key_seq_len</span> <span class="o">&gt;</span> <span class="mi">16</span>
+            <span class="ow">and</span> <span class="n">key_seq_len</span> <span class="o">&lt;=</span> <span class="mi">2048</span>
+            <span class="ow">and</span> <span class="n">query_seq_len</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="ow">and</span> <span class="n">attn_batch_size</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="p">)</span>
+
+        <span class="c1"># invoke custom kernel</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_in_float16</span>
+            <span class="ow">and</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">custom_kernel_constraint</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaled_masked_softmax_fusion</span>
+        <span class="p">):</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">1.0</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">attn_mask_type</span> <span class="o">==</span> <span class="n">AttnMaskType</span><span class="o">.</span><span class="n">causal</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="p">(</span>
+                    <span class="n">query_seq_len</span> <span class="o">==</span> <span class="n">key_seq_len</span>
+                <span class="p">),</span> <span class="s2">&quot;causal mask is only for self attention&quot;</span>
+                <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">query_seq_len</span><span class="p">,</span> <span class="n">key_seq_len</span><span class="p">)</span>
+                <span class="n">probs</span> <span class="o">=</span> <span class="n">ScaledUpperTriangMaskedSoftmax</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span>
+                <span class="n">probs</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">*</span><span class="n">data_size</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">attn_mask_type</span> <span class="o">==</span> <span class="n">AttnMaskType</span><span class="o">.</span><span class="n">padding</span>
+                <span class="n">probs</span> <span class="o">=</span> <span class="n">ScaledMaskedSoftmax</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_in_float16</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmax_in_fp32</span><span class="p">:</span>
+                <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span>
+            <span class="n">mask_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_func</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span> <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">input</span>
+            <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Softmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)(</span><span class="n">mask_output</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_in_float16</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmax_in_fp32</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_in_fp16</span><span class="p">:</span>
+                    <span class="n">probs</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">half</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">probs</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">probs</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yue Zhou, Tianyu Zhao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

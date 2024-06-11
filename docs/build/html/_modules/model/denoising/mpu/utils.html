@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>model.denoising.mpu.utils &mdash; GWAI  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            GWAI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about_gwai.html">About GWAI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Main Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../citations.html">Citations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">GWAI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../model.html">model</a></li>
+          <li class="breadcrumb-item"><a href="../../denoising.html">model.denoising</a></li>
+      <li class="breadcrumb-item active">model.denoising.mpu.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for model.denoising.mpu.utils</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="c1"># Copyright (c) 2020, NVIDIA CORPORATION.  All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+
+<span class="kn">import</span> <span class="nn">torch</span>
+
+
+<div class="viewcode-block" id="ensure_divisibility">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.utils.ensure_divisibility">[docs]</a>
+<span class="k">def</span> <span class="nf">ensure_divisibility</span><span class="p">(</span><span class="n">numerator</span><span class="p">,</span> <span class="n">denominator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure that numerator is divisible by the denominator.&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">numerator</span> <span class="o">%</span> <span class="n">denominator</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is not divisible by </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">numerator</span><span class="p">,</span> <span class="n">denominator</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="divide">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.utils.divide">[docs]</a>
+<span class="k">def</span> <span class="nf">divide</span><span class="p">(</span><span class="n">numerator</span><span class="p">,</span> <span class="n">denominator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure that numerator is divisible by the denominator and return</span>
+<span class="sd">    the division value.&quot;&quot;&quot;</span>
+    <span class="n">ensure_divisibility</span><span class="p">(</span><span class="n">numerator</span><span class="p">,</span> <span class="n">denominator</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">numerator</span> <span class="o">//</span> <span class="n">denominator</span></div>
+
+
+
+<div class="viewcode-block" id="split_tensor_along_last_dim">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.utils.split_tensor_along_last_dim">[docs]</a>
+<span class="k">def</span> <span class="nf">split_tensor_along_last_dim</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">num_partitions</span><span class="p">,</span> <span class="n">contiguous_split_chunks</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split a tensor along its last dimension.</span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        tensor: input tensor.</span>
+<span class="sd">        num_partitions: number of partitions to split the tensor</span>
+<span class="sd">        contiguous_split_chunks: If True, make each chunk contiguous</span>
+<span class="sd">                                 in memory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the size and dimension.</span>
+    <span class="n">last_dim</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">last_dim_size</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="n">last_dim</span><span class="p">],</span> <span class="n">num_partitions</span><span class="p">)</span>
+    <span class="c1"># Split.</span>
+    <span class="n">tensor_list</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">last_dim_size</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">last_dim</span><span class="p">)</span>
+    <span class="c1"># Note: torch.split does not create contiguous tensors by default.</span>
+    <span class="k">if</span> <span class="n">contiguous_split_chunks</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">chunk</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">tensor_list</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tensor_list</span></div>
+
+
+
+<div class="viewcode-block" id="VocabUtility">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.utils.VocabUtility">[docs]</a>
+<span class="k">class</span> <span class="nc">VocabUtility</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split the vocabulary into `world_size` chunks amd return the</span>
+<span class="sd">    first and last index of the vocabulary belonging to the `rank`</span>
+<span class="sd">    partition: Note that indecies in [fist, last)&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="VocabUtility.vocab_range_from_per_partition_vocab_size">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.utils.VocabUtility.vocab_range_from_per_partition_vocab_size">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">vocab_range_from_per_partition_vocab_size</span><span class="p">(</span>
+        <span class="n">per_partition_vocab_size</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span>
+    <span class="p">):</span>
+        <span class="n">index_f</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">*</span> <span class="n">per_partition_vocab_size</span>
+        <span class="n">index_l</span> <span class="o">=</span> <span class="n">index_f</span> <span class="o">+</span> <span class="n">per_partition_vocab_size</span>
+        <span class="k">return</span> <span class="n">index_f</span><span class="p">,</span> <span class="n">index_l</span></div>
+
+
+<div class="viewcode-block" id="VocabUtility.vocab_range_from_global_vocab_size">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.utils.VocabUtility.vocab_range_from_global_vocab_size">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">vocab_range_from_global_vocab_size</span><span class="p">(</span><span class="n">global_vocab_size</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">):</span>
+        <span class="n">per_partition_vocab_size</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">global_vocab_size</span><span class="p">,</span> <span class="n">world_size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">VocabUtility</span><span class="o">.</span><span class="n">vocab_range_from_per_partition_vocab_size</span><span class="p">(</span>
+            <span class="n">per_partition_vocab_size</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span>
+        <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yue Zhou, Tianyu Zhao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>model.denoising.mpu.layers &mdash; GWAI  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            GWAI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about_gwai.html">About GWAI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Main Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../citations.html">Citations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">GWAI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../model.html">model</a></li>
+          <li class="breadcrumb-item"><a href="../../denoising.html">model.denoising</a></li>
+      <li class="breadcrumb-item active">model.denoising.mpu.layers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for model.denoising.mpu.layers</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="c1"># Copyright (c) 2022, PengCheng Laboratory.  All rights reserved.</span>
+<span class="c1"># Copyright (c) 2020, NVIDIA CORPORATION.  All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="c1"># Most of the code here has been copied from:</span>
+<span class="c1">#   https://github.com/NVIDIA/Megatron-LM/blob/v2.5/megatron/mpu/layers.py</span>
+<span class="c1"># with some modifications.</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torch.nn.init</span> <span class="k">as</span> <span class="nn">init</span>
+<span class="kn">from</span> <span class="nn">torch.nn.parameter</span> <span class="kn">import</span> <span class="n">Parameter</span>
+
+<span class="kn">from</span> <span class="nn">src.model.denoising</span> <span class="kn">import</span> <span class="n">get_args</span>
+
+<span class="kn">from</span> <span class="nn">.initialize</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_tensor_model_parallel_rank</span><span class="p">,</span>
+    <span class="n">get_tensor_model_parallel_world_size</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.mappings</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">copy_to_tensor_model_parallel_region</span><span class="p">,</span>
+    <span class="n">gather_from_tensor_model_parallel_region</span><span class="p">,</span>
+    <span class="n">reduce_from_tensor_model_parallel_region</span><span class="p">,</span>
+    <span class="n">scatter_to_tensor_model_parallel_region</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.random</span> <span class="kn">import</span> <span class="n">get_cuda_rng_tracker</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">divide</span>
+
+<span class="n">_MODEL_PARALLEL_ATTRIBUTE_DEFAULTS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;tensor_model_parallel&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;partition_dim&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;partition_stride&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="param_is_not_tensor_parallel_duplicate">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.layers.param_is_not_tensor_parallel_duplicate">[docs]</a>
+<span class="k">def</span> <span class="nf">param_is_not_tensor_parallel_duplicate</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="nb">hasattr</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="s2">&quot;tensor_model_parallel&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">param</span><span class="o">.</span><span class="n">tensor_model_parallel</span>
+    <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">get_tensor_model_parallel_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_tensor_model_parallel_attributes">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.layers.set_tensor_model_parallel_attributes">[docs]</a>
+<span class="k">def</span> <span class="nf">set_tensor_model_parallel_attributes</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">is_parallel</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">stride</span><span class="p">):</span>
+    <span class="c1"># Make sure the attributes are not set.</span>
+    <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">_MODEL_PARALLEL_ATTRIBUTE_DEFAULTS</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">attribute</span><span class="p">)</span>
+    <span class="c1"># Set the attributes.</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="s2">&quot;tensor_model_parallel&quot;</span><span class="p">,</span> <span class="n">is_parallel</span><span class="p">)</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="s2">&quot;partition_dim&quot;</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="s2">&quot;partition_stride&quot;</span><span class="p">,</span> <span class="n">stride</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_defaults_if_not_set_tensor_model_parallel_attributes">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.layers.set_defaults_if_not_set_tensor_model_parallel_attributes">[docs]</a>
+<span class="k">def</span> <span class="nf">set_defaults_if_not_set_tensor_model_parallel_attributes</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">maybe_set</span><span class="p">(</span><span class="n">attribute</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">_MODEL_PARALLEL_ATTRIBUTE_DEFAULTS</span><span class="p">:</span>
+        <span class="n">maybe_set</span><span class="p">(</span><span class="n">attribute</span><span class="p">,</span> <span class="n">_MODEL_PARALLEL_ATTRIBUTE_DEFAULTS</span><span class="p">[</span><span class="n">attribute</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="copy_tensor_model_parallel_attributes">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.layers.copy_tensor_model_parallel_attributes">[docs]</a>
+<span class="k">def</span> <span class="nf">copy_tensor_model_parallel_attributes</span><span class="p">(</span><span class="n">destination_tensor</span><span class="p">,</span> <span class="n">source_tensor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">maybe_copy</span><span class="p">(</span><span class="n">attribute</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">source_tensor</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">destination_tensor</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">source_tensor</span><span class="p">,</span> <span class="n">attribute</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">_MODEL_PARALLEL_ATTRIBUTE_DEFAULTS</span><span class="p">:</span>
+        <span class="n">maybe_copy</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_initialize_affine_weight_gpu</span><span class="p">(</span><span class="n">weight</span><span class="p">,</span> <span class="n">init_method</span><span class="p">,</span> <span class="n">partition_dim</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize affine weight for model parallel on GPU.&quot;&quot;&quot;</span>
+
+    <span class="n">set_tensor_model_parallel_attributes</span><span class="p">(</span>
+        <span class="n">tensor</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span> <span class="n">is_parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">partition_dim</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">stride</span>
+    <span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">get_cuda_rng_tracker</span><span class="p">()</span><span class="o">.</span><span class="n">fork</span><span class="p">():</span>
+        <span class="n">init_method</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_initialize_affine_weight_cpu</span><span class="p">(</span>
+    <span class="n">weight</span><span class="p">,</span>
+    <span class="n">output_size</span><span class="p">,</span>
+    <span class="n">input_size</span><span class="p">,</span>
+    <span class="n">per_partition_size</span><span class="p">,</span>
+    <span class="n">partition_dim</span><span class="p">,</span>
+    <span class="n">init_method</span><span class="p">,</span>
+    <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">return_master_weight</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize affine weight for model parallel.</span>
+
+<span class="sd">    Build the master weight on all processes and scatter</span>
+<span class="sd">    the relevant chunk.&quot;&quot;&quot;</span>
+
+    <span class="n">set_tensor_model_parallel_attributes</span><span class="p">(</span>
+        <span class="n">tensor</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span> <span class="n">is_parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">partition_dim</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">stride</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Initialize master weight</span>
+    <span class="n">master_weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+        <span class="n">output_size</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">init_method</span><span class="p">(</span><span class="n">master_weight</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+    <span class="n">master_weight</span> <span class="o">=</span> <span class="n">master_weight</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">)</span>
+
+    <span class="c1"># Split and copy</span>
+    <span class="n">per_partition_per_stride_size</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">per_partition_size</span><span class="p">,</span> <span class="n">stride</span><span class="p">)</span>
+    <span class="n">weight_list</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+        <span class="n">master_weight</span><span class="p">,</span> <span class="n">per_partition_per_stride_size</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">partition_dim</span>
+    <span class="p">)</span>
+    <span class="n">rank</span> <span class="o">=</span> <span class="n">get_tensor_model_parallel_rank</span><span class="p">()</span>
+    <span class="n">world_size</span> <span class="o">=</span> <span class="n">get_tensor_model_parallel_world_size</span><span class="p">()</span>
+    <span class="n">my_weight_list</span> <span class="o">=</span> <span class="n">weight_list</span><span class="p">[</span><span class="n">rank</span><span class="p">::</span><span class="n">world_size</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">my_weight_list</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">partition_dim</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">weight</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_master_weight</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">master_weight</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="VocabParallelEmbedding">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.layers.VocabParallelEmbedding">[docs]</a>
+<span class="k">class</span> <span class="nc">VocabParallelEmbedding</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Embedding parallelized in the vocabulary dimension.</span>
+
+<span class="sd">    This is mainly adapted from torch.nn.Embedding and all the default</span>
+<span class="sd">    values are kept.</span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        num_embeddings: vocabulary size.</span>
+<span class="sd">        embedding_dim: size of hidden state.</span>
+<span class="sd">        init_method: method to initialize weights.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_embeddings</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">,</span> <span class="n">init_method</span><span class="o">=</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_normal_</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">VocabParallelEmbedding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="c1"># Keep the input dimensions.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_embeddings</span> <span class="o">=</span> <span class="n">num_embeddings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_dim</span> <span class="o">=</span> <span class="n">embedding_dim</span>
+        <span class="c1"># Set the detauls for compatibility.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">padding_idx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_norm</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm_type</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale_grad_by_freq</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparse</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tensor_model_parallel_size</span> <span class="o">=</span> <span class="n">get_tensor_model_parallel_world_size</span><span class="p">()</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params_dtype</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patlen</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">segment_length</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">embedding_dim</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor_model_parallel_size</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="p">),</span> <span class="s2">&quot;expected embedding_dim divided by tensor-model-parallel-size.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_embeddings_per_partition</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">embedding_dim</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor_model_parallel_size</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Allocate weights and initialize.</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">use_cpu_initialization</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">num_embeddings_per_partition</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">embedding_dim</span><span class="p">,</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">_initialize_affine_weight_cpu</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_embeddings</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">embedding_dim</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_embeddings_per_partition</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="n">init_method</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># token embedding (TE)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">num_embeddings_per_partition</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">patlen</span><span class="p">,</span>
+                    <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">current_device</span><span class="p">(),</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">_initialize_affine_weight_gpu</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">init_method</span><span class="p">,</span> <span class="n">partition_dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="VocabParallelEmbedding.forward">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.layers.VocabParallelEmbedding.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor_model_parallel_size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">input_parallel</span> <span class="o">=</span> <span class="n">copy_to_tensor_model_parallel_region</span><span class="p">(</span>
+                <span class="n">input_</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">input_parallel</span> <span class="o">=</span> <span class="n">input_</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">)</span>
+        <span class="c1"># Matrix multiply.</span>
+
+        <span class="n">output_parallel</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">input_parallel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor_model_parallel_size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># All-gather across the partitions.</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">gather_from_tensor_model_parallel_region</span><span class="p">(</span><span class="n">output_parallel</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">output_parallel</span>
+
+        <span class="k">return</span> <span class="n">output</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ColumnParallelLinear">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.layers.ColumnParallelLinear">[docs]</a>
+<span class="k">class</span> <span class="nc">ColumnParallelLinear</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Linear layer with column parallelism.</span>
+
+<span class="sd">    The linear layer is defined as Y = XA + b. A is parallelized along</span>
+<span class="sd">    its second dimension as A = [A_1, ..., A_p].</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        input_size: first dimension of matrix A.</span>
+<span class="sd">        output_size: second dimension of matrix A.</span>
+<span class="sd">        bias: If true, add bias</span>
+<span class="sd">        gather_output: If true, call all-gether on output and make Y avaiable</span>
+<span class="sd">                       to all GPUs, otherwise, every GPU will have its output</span>
+<span class="sd">                       which is Y_i = XA_i</span>
+<span class="sd">        init_method: method to initialize weights. Note that bias is always set</span>
+<span class="sd">                     to zero.</span>
+<span class="sd">        stride: For the strided linear layers.</span>
+<span class="sd">        keep_master_weight_for_test: This was added for testing and should be</span>
+<span class="sd">                                     set to False. It returns the master weights</span>
+<span class="sd">                                     used for initialization.</span>
+<span class="sd">        skip_bias_add: This was added to enable performance optimations where bias</span>
+<span class="sd">                       can be fused with other elementwise operations. we skip</span>
+<span class="sd">                       adding bias but instead return it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_size</span><span class="p">,</span>
+        <span class="n">output_size</span><span class="p">,</span>
+        <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">gather_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">init_method</span><span class="o">=</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_normal_</span><span class="p">,</span>
+        <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">keep_master_weight_for_test</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">skip_bias_add</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ColumnParallelLinear</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Keep input parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span> <span class="o">=</span> <span class="n">input_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="n">output_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gather_output</span> <span class="o">=</span> <span class="n">gather_output</span>
+        <span class="c1"># Divide the weight matrix along the last dimension.</span>
+        <span class="n">world_size</span> <span class="o">=</span> <span class="n">get_tensor_model_parallel_world_size</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_size_per_partition</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">output_size</span><span class="p">,</span> <span class="n">world_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skip_bias_add</span> <span class="o">=</span> <span class="n">skip_bias_add</span>
+
+        <span class="c1"># Parameters.</span>
+        <span class="c1"># Note: torch.nn.functional.linear performs XA^T + b and as a result</span>
+        <span class="c1"># we allocate the transpose.</span>
+        <span class="c1"># Initialize weight.</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">use_cpu_initialization</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">output_size_per_partition</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">,</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">master_weight</span> <span class="o">=</span> <span class="n">_initialize_affine_weight_cpu</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">output_size_per_partition</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="n">init_method</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="n">stride</span><span class="p">,</span>
+                <span class="n">return_master_weight</span><span class="o">=</span><span class="n">keep_master_weight_for_test</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">output_size_per_partition</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">,</span>
+                    <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">current_device</span><span class="p">(),</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">_initialize_affine_weight_gpu</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">init_method</span><span class="p">,</span> <span class="n">partition_dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">stride</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">bias</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">use_cpu_initialization</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span>
+                    <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_size_per_partition</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span>
+                    <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">output_size_per_partition</span><span class="p">,</span>
+                        <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">current_device</span><span class="p">(),</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="n">set_tensor_model_parallel_attributes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">stride</span><span class="p">)</span>
+            <span class="c1"># Always initialize bias to zero.</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_parameter</span><span class="p">(</span><span class="s2">&quot;bias&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ColumnParallelLinear.forward">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.layers.ColumnParallelLinear.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_</span><span class="p">):</span>
+        <span class="c1"># Set up backprop all-reduce.</span>
+        <span class="n">input_parallel</span> <span class="o">=</span> <span class="n">copy_to_tensor_model_parallel_region</span><span class="p">(</span><span class="n">input_</span><span class="p">)</span>
+        <span class="c1"># Matrix multiply.</span>
+
+        <span class="n">bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_bias_add</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">output_parallel</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">input_parallel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">bias</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gather_output</span><span class="p">:</span>
+            <span class="c1"># All-gather across the partitions.</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">gather_from_tensor_model_parallel_region</span><span class="p">(</span><span class="n">output_parallel</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">output_parallel</span>
+        <span class="n">output_bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_bias_add</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">output_bias</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RowParallelLinear">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.layers.RowParallelLinear">[docs]</a>
+<span class="k">class</span> <span class="nc">RowParallelLinear</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Linear layer with row parallelism.</span>
+
+<span class="sd">    The linear layer is defined as Y = XA + b. A is parallelized along</span>
+<span class="sd">    its first dimension and X along its second dimension as:</span>
+<span class="sd">               -   -</span>
+<span class="sd">              | A_1 |</span>
+<span class="sd">              | .   |</span>
+<span class="sd">          A = | .   |        X = [X_1, ..., X_p]</span>
+<span class="sd">              | .   |</span>
+<span class="sd">              | A_p |</span>
+<span class="sd">               -   -</span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        input_size: first dimension of matrix A.</span>
+<span class="sd">        output_size: second dimension of matrix A.</span>
+<span class="sd">        bias: If true, add bias. Note that bias is not parallelized.</span>
+<span class="sd">        input_is_parallel: If true, we assume that the input is already</span>
+<span class="sd">                           split across the GPUs and we do not split</span>
+<span class="sd">                           again.</span>
+<span class="sd">        init_method: method to initialize weights. Note that bias is always set</span>
+<span class="sd">                     to zero.</span>
+<span class="sd">        stride: For the strided linear layers.</span>
+<span class="sd">        keep_master_weight_for_test: This was added for testing and should be</span>
+<span class="sd">                                     set to False. It returns the master weights</span>
+<span class="sd">                                     used for initialization.</span>
+<span class="sd">        skip_bias_add: This was added to enable performance optimations where bias</span>
+<span class="sd">                       can be fused with other elementwise operations. we skip</span>
+<span class="sd">                       adding bias but instead return it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_size</span><span class="p">,</span>
+        <span class="n">output_size</span><span class="p">,</span>
+        <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">input_is_parallel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">init_method</span><span class="o">=</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_normal_</span><span class="p">,</span>
+        <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">keep_master_weight_for_test</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">skip_bias_add</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RowParallelLinear</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Keep input parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span> <span class="o">=</span> <span class="n">input_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="n">output_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_is_parallel</span> <span class="o">=</span> <span class="n">input_is_parallel</span>
+        <span class="c1"># Divide the weight matrix along the last dimension.</span>
+        <span class="n">world_size</span> <span class="o">=</span> <span class="n">get_tensor_model_parallel_world_size</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_size_per_partition</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">world_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skip_bias_add</span> <span class="o">=</span> <span class="n">skip_bias_add</span>
+
+        <span class="c1"># Parameters.</span>
+        <span class="c1"># Note: torch.nn.functional.linear performs XA^T + b and as a result</span>
+        <span class="c1"># we allocate the transpose.</span>
+        <span class="c1"># Initialize weight.</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">use_cpu_initialization</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">input_size_per_partition</span><span class="p">,</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">master_weight</span> <span class="o">=</span> <span class="n">_initialize_affine_weight_cpu</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">input_size_per_partition</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">,</span>
+                <span class="n">init_method</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="n">stride</span><span class="p">,</span>
+                <span class="n">return_master_weight</span><span class="o">=</span><span class="n">keep_master_weight_for_test</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">input_size_per_partition</span><span class="p">,</span>
+                    <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">current_device</span><span class="p">(),</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">_initialize_affine_weight_gpu</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">init_method</span><span class="p">,</span> <span class="n">partition_dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">stride</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">bias</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">use_cpu_initialization</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span>
+                    <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span>
+                    <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span>
+                        <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">current_device</span><span class="p">(),</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="c1"># Always initialize bias to zero.</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_parameter</span><span class="p">(</span><span class="s2">&quot;bias&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RowParallelLinear.forward">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.layers.RowParallelLinear.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_</span><span class="p">):</span>
+        <span class="c1"># Set up backprop all-reduce.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_is_parallel</span><span class="p">:</span>
+            <span class="n">input_parallel</span> <span class="o">=</span> <span class="n">input_</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">input_parallel</span> <span class="o">=</span> <span class="n">scatter_to_tensor_model_parallel_region</span><span class="p">(</span><span class="n">input_</span><span class="p">)</span>
+        <span class="c1"># Matrix multiply.</span>
+        <span class="n">output_parallel</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">input_parallel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+        <span class="c1"># All-reduce across all the partitions.</span>
+        <span class="n">output_</span> <span class="o">=</span> <span class="n">reduce_from_tensor_model_parallel_region</span><span class="p">(</span><span class="n">output_parallel</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_bias_add</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">output_</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">output_</span>
+            <span class="n">output_bias</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">output_</span>
+            <span class="n">output_bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">output_bias</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yue Zhou, Tianyu Zhao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

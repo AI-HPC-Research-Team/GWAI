@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>model.denoising.initialize &mdash; GWAI  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            GWAI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../about_gwai.html">About GWAI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Main Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../citations.html">Citations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">GWAI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../model.html">model</a></li>
+          <li class="breadcrumb-item"><a href="../denoising.html">model.denoising</a></li>
+      <li class="breadcrumb-item active">model.denoising.initialize</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for model.denoising.initialize</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="c1"># Copyright (c) 2022, PengCheng Laboratory.  All rights reserved.</span>
+<span class="c1"># Copyright (c) 2020, NVIDIA CORPORATION.  All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Most of the code here has been copied from:</span>
+<span class="c1">#   https://github.com/NVIDIA/Megatron-LM/blob/v2.5/megatron/initialize.py</span>
+<span class="c1"># with some modifications.</span>
+
+<span class="sd">&quot;&quot;&quot;Megatron initialization.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">src.model.denoising</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">fused_kernels</span><span class="p">,</span>
+    <span class="n">get_adlr_autoresume</span><span class="p">,</span>
+    <span class="n">get_args</span><span class="p">,</span>
+    <span class="n">get_tensorboard_writer</span><span class="p">,</span>
+    <span class="n">mpu</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.model.denoising.global_vars</span> <span class="kn">import</span> <span class="n">set_global_variables</span>
+<span class="kn">from</span> <span class="nn">src.model.denoising.mpu</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">set_tensor_model_parallel_rank</span><span class="p">,</span>
+    <span class="n">set_tensor_model_parallel_world_size</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="initialize_megatron">
+<a class="viewcode-back" href="../../../model.denoising.html#model.denoising.initialize.initialize_megatron">[docs]</a>
+<span class="k">def</span> <span class="nf">initialize_megatron</span><span class="p">(</span>
+    <span class="n">extra_args_provider</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">args_defaults</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">ignore_unknown_args</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">allow_no_cuda</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set global variables, initialize distributed, and</span>
+<span class="sd">    set autoresume and random seeds.</span>
+<span class="sd">    `allow_no_cuda` should not be set unless using megatron for cpu only</span>
+<span class="sd">    data processing. In general this arg should not be set unless you know</span>
+<span class="sd">    what you are doing.</span>
+<span class="sd">    Returns a function to finalize distributed env initialization</span>
+<span class="sd">    (optionally, only when args.lazy_mpu_init == True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_no_cuda</span><span class="p">:</span>
+        <span class="c1"># Make sure cuda is available.</span>
+        <span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">(),</span> <span class="s2">&quot;Megatron requires CUDA.&quot;</span>
+
+    <span class="c1"># Parse args, build tokenizer, and set adlr-autoresume,</span>
+    <span class="c1"># tensorboard-writer, and timers.</span>
+    <span class="n">set_global_variables</span><span class="p">(</span>
+        <span class="n">extra_args_provider</span><span class="o">=</span><span class="n">extra_args_provider</span><span class="p">,</span>
+        <span class="n">args_defaults</span><span class="o">=</span><span class="n">args_defaults</span><span class="p">,</span>
+        <span class="n">ignore_unknown_args</span><span class="o">=</span><span class="n">ignore_unknown_args</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># torch.distributed initialization</span>
+    <span class="k">def</span> <span class="nf">finish_mpu_init</span><span class="p">():</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+        <span class="c1"># Pytorch distributed.</span>
+        <span class="n">_initialize_distributed</span><span class="p">()</span>
+
+        <span class="c1"># Random seeds for reproducibility.</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&gt; setting random seeds to </span><span class="si">{}</span><span class="s2"> ...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span class="p">))</span>
+        <span class="n">_set_random_seed</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">lazy_mpu_init</span><span class="p">:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">use_cpu_initialization</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># delayed initialization of DDP-related stuff</span>
+        <span class="c1"># We only set basic DDP globals</span>
+        <span class="n">set_tensor_model_parallel_world_size</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">tensor_model_parallel_size</span><span class="p">)</span>
+        <span class="c1"># and return function for external DDP manager</span>
+        <span class="c1"># to call when it has DDP initialized</span>
+        <span class="n">set_tensor_model_parallel_rank</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">rank</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">finish_mpu_init</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Megatron&#39;s MPU is the master. Complete initialization right away.</span>
+        <span class="n">finish_mpu_init</span><span class="p">()</span>
+
+        <span class="c1"># Initialize memory buffers.</span>
+        <span class="n">_initialize_mem_buffs</span><span class="p">()</span>  <span class="c1"># pass</span>
+
+        <span class="c1"># Autoresume.</span>
+        <span class="n">_init_autoresume</span><span class="p">()</span>  <span class="c1"># pass</span>
+
+        <span class="c1"># Compile dependencies.</span>
+        <span class="n">_compile_dependencies</span><span class="p">()</span>  <span class="c1"># fused kernel, pass</span>
+
+        <span class="c1"># No continuation function</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_compile_dependencies</span><span class="p">():</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+
+    <span class="c1"># =========================</span>
+    <span class="c1"># Compile dataset C++ code.</span>
+    <span class="c1"># =========================</span>
+    <span class="c1"># TODO: move this to ninja</span>
+    <span class="c1"># if torch.distributed.get_rank() == 0:</span>
+    <span class="c1">#     start_time = time.time()</span>
+    <span class="c1">#     print(&#39;&gt; compiling dataset index builder ...&#39;)</span>
+    <span class="c1">#     from megatron.data.dataset_utils import compile_helper</span>
+    <span class="c1">#     compile_helper()</span>
+    <span class="c1">#     print(&#39;&gt;&gt;&gt; done with dataset index builder. Compilation time: {:.3f} &#39;</span>
+    <span class="c1">#           &#39;seconds&#39;.format(time.time() - start_time), flush=True)</span>
+
+    <span class="c1"># ==================</span>
+    <span class="c1"># Load fused kernels</span>
+    <span class="c1"># ==================</span>
+
+    <span class="c1"># Custom kernel constraints check.</span>
+    <span class="n">seq_len</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">seq_length</span>
+    <span class="n">attn_batch_size</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">num_attention_heads</span> <span class="o">/</span> <span class="n">args</span><span class="o">.</span><span class="n">tensor_model_parallel_size</span>
+    <span class="p">)</span> <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">micro_batch_size</span>
+    <span class="c1"># Constraints on sequence length and attn_batch_size to enable warp based</span>
+    <span class="c1"># optimization and upper triangular optimization (for causal mask)</span>
+    <span class="n">custom_kernel_constraint</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">seq_len</span> <span class="o">&gt;</span> <span class="mi">16</span>
+        <span class="ow">and</span> <span class="n">seq_len</span> <span class="o">&lt;=</span> <span class="mi">2048</span>
+        <span class="ow">and</span> <span class="n">seq_len</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="ow">and</span> <span class="n">attn_batch_size</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="p">)</span>
+    <span class="c1"># Print a warning.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">fp16</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">bf16</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">custom_kernel_constraint</span>
+        <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">masked_softmax_fusion</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;WARNING: constraints for invoking optimized&quot;</span>
+                <span class="s2">&quot; fused softmax kernel are not met. We default&quot;</span>
+                <span class="s2">&quot; back to unfused kernel invocations.&quot;</span><span class="p">,</span>
+                <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="c1"># Always build on rank zero first.</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&gt; compiling and loading fused kernels ...&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">fused_kernels</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+        <span class="n">fused_kernels</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="c1"># Simple barrier to make sure all ranks have passed the</span>
+    <span class="c1"># compilation phase successfully before moving on to the</span>
+    <span class="c1"># rest of the program. We think this might ensure that</span>
+    <span class="c1"># the lock is released.</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;&gt;&gt;&gt; done with compiling and loading fused kernels. &quot;</span>
+            <span class="s2">&quot;Compilation time: </span><span class="si">{:.3f}</span><span class="s2"> seconds&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">),</span>
+            <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_initialize_distributed</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize torch.distributed and mpu.&quot;&quot;&quot;</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+
+    <span class="n">device_count</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;torch distributed is already initialized, &quot;</span>
+                <span class="s2">&quot;skipping initialization ...&quot;</span><span class="p">,</span>
+                <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_rank</span><span class="p">()</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">world_size</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_world_size</span><span class="p">()</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&gt; initializing torch distributed ...&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Manually set the device ids.</span>
+        <span class="k">if</span> <span class="n">device_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">rank</span> <span class="o">%</span> <span class="n">device_count</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">local_rank</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="p">(</span>
+                    <span class="n">args</span><span class="o">.</span><span class="n">local_rank</span> <span class="o">==</span> <span class="n">device</span>
+                <span class="p">),</span> <span class="s2">&quot;expected local-rank to be the same as rank </span><span class="si">% d</span><span class="s2">evice-count.&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">local_rank</span> <span class="o">=</span> <span class="n">device</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">set_device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="c1"># Call the init process</span>
+        <span class="n">init_method</span> <span class="o">=</span> <span class="s2">&quot;env://&quot;</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">init_process_group</span><span class="p">(</span>
+            <span class="n">backend</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">distributed_backend</span><span class="p">,</span>
+            <span class="n">world_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span><span class="p">,</span>
+            <span class="n">rank</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span>
+            <span class="n">init_method</span><span class="o">=</span><span class="n">init_method</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># init_method = &#39;tcp://&#39;</span>
+        <span class="c1"># master_ip = os.getenv(&#39;MASTER_ADDR&#39;, &#39;localhost&#39;)</span>
+        <span class="c1"># master_port = os.getenv(&#39;MASTER_PORT&#39;, &#39;6066&#39;)</span>
+        <span class="c1"># init_method += master_ip + &#39;:&#39; + master_port</span>
+        <span class="c1"># # torch.distributed.init_process_group(</span>
+        <span class="c1"># #    backend=args.distributed_backend,</span>
+        <span class="c1"># #    rank=args.rank) #, timeout=datatime.timedelta(seconds=180))</span>
+        <span class="c1"># torch.distributed.init_process_group(</span>
+        <span class="c1">#    backend=args.distributed_backend,</span>
+        <span class="c1">#    world_size=args.world_size, rank=args.rank,</span>
+        <span class="c1">#    init_method=init_method)</span>
+
+    <span class="c1"># Set the tensor model-parallel, pipeline model-parallel, and</span>
+    <span class="c1"># data-parallel communicators.</span>
+    <span class="k">if</span> <span class="n">device_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mpu</span><span class="o">.</span><span class="n">model_parallel_is_initialized</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;model parallel is already initialized&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mpu</span><span class="o">.</span><span class="n">initialize_model_parallel</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">tensor_model_parallel_size</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">pipeline_model_parallel_size</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">virtual_pipeline_model_parallel_size</span><span class="p">,</span>
+            <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_init_autoresume</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set autoresume start time.&quot;&quot;&quot;</span>
+    <span class="n">autoresume</span> <span class="o">=</span> <span class="n">get_adlr_autoresume</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">autoresume</span><span class="p">:</span>  <span class="c1"># default: false</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+        <span class="n">autoresume</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_set_random_seed</span><span class="p">(</span><span class="n">seed_</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set random seed for reproducability.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">seed_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">seed_</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Ensure that different pipeline MP stages get different seeds.</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="n">seed_</span> <span class="o">+</span> <span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">mpu</span><span class="o">.</span><span class="n">get_pipeline_model_parallel_rank</span><span class="p">())</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">mpu</span><span class="o">.</span><span class="n">model_parallel_cuda_manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Seed (</span><span class="si">{}</span><span class="s2">) should be a positive integer.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">seed</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="write_args_to_tensorboard">
+<a class="viewcode-back" href="../../../model.denoising.html#model.denoising.initialize.write_args_to_tensorboard">[docs]</a>
+<span class="k">def</span> <span class="nf">write_args_to_tensorboard</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write arguments to tensorboard.&quot;&quot;&quot;</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">get_tensorboard_writer</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">writer</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">add_text</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">arg</span><span class="p">)),</span> <span class="n">global_step</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">iteration</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_initialize_mem_buffs</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize manually allocated static memory.&quot;&quot;&quot;</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+
+    <span class="c1"># Initialize memory for checkpointed activations.</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">distribute_checkpointed_activations</span><span class="p">:</span>  <span class="c1"># Default: False</span>
+        <span class="n">mpu</span><span class="o">.</span><span class="n">init_checkpointed_activations_memory_buffer</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yue Zhou, Tianyu Zhao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

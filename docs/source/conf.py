@@ -12,8 +12,13 @@
 #
 import os
 import sys
-
-sys.path.insert(0, os.path.abspath("/workspace/sdb1/zhaoty/GWAI/src"))
+from pathlib import Path
+ 
+current_script_path = Path(__file__)
+project_root = current_script_path.resolve().parent.parent.parent
+sys.path.append(str(project_root))
+sys.path.insert(0, str(project_root / "src"))
+# sys.path.insert(0, os.path.abspath("/workspace/sdb1/zhaoty/GWAI/src"))
 autodoc_mock_imports = ["fastlisaresponse", "few"]
 
 # -- Project information -----------------------------------------------------

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>model.denoising.model.waveform_model &mdash; GWAI  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            GWAI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about_gwai.html">About GWAI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Main Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../citations.html">Citations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">GWAI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../model.html">model</a></li>
+          <li class="breadcrumb-item"><a href="../../denoising.html">model.denoising</a></li>
+      <li class="breadcrumb-item active">model.denoising.model.waveform_model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for model.denoising.model.waveform_model</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="c1"># Copyright (c) 2022, PengCheng Laboratory.  All rights reserved.</span>
+<span class="c1"># Copyright (c) 2020, NVIDIA CORPORATION.  All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Most of the code here has been copied from:</span>
+<span class="c1">#   https://github.com/NVIDIA/Megatron-LM/blob/v2.5/megatron/model/language_model.py</span>
+<span class="c1"># with some modifications.</span>
+
+<span class="sd">&quot;&quot;&quot;Transformer based language model.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+
+<span class="kn">from</span> <span class="nn">src.model.denoising</span> <span class="kn">import</span> <span class="n">get_args</span><span class="p">,</span> <span class="n">mpu</span>
+<span class="kn">from</span> <span class="nn">src.model.denoising.model.enums</span> <span class="kn">import</span> <span class="n">AttnMaskType</span><span class="p">,</span> <span class="n">LayerType</span>
+<span class="kn">from</span> <span class="nn">src.model.denoising.model.transformer</span> <span class="kn">import</span> <span class="n">ParallelTransformer</span>
+<span class="kn">from</span> <span class="nn">src.model.denoising.model.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_linear_layer</span><span class="p">,</span>
+    <span class="n">init_method_normal</span><span class="p">,</span>
+    <span class="n">scaled_init_method_normal</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">.module</span> <span class="kn">import</span> <span class="n">MegatronModule</span>
+
+
+<div class="viewcode-block" id="parallel_gw_logits">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.waveform_model.parallel_gw_logits">[docs]</a>
+<span class="k">def</span> <span class="nf">parallel_gw_logits</span><span class="p">(</span><span class="n">input_</span><span class="p">,</span> <span class="n">word_embeddings_weight</span><span class="p">,</span> <span class="n">parallel_output</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;LM logits using word embedding weights.&quot;&quot;&quot;</span>
+    <span class="c1"># Parallel logits.</span>
+    <span class="n">input_parallel</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">scatter_to_tensor_model_parallel_region</span><span class="p">(</span><span class="n">input_</span><span class="p">)</span>
+    <span class="c1"># Matrix multiply.</span>
+    <span class="n">word_embeddings_weight</span> <span class="o">=</span> <span class="n">word_embeddings_weight</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bias</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logits_parallel</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">input_parallel</span><span class="p">,</span> <span class="n">word_embeddings_weight</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logits_parallel</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">input_parallel</span><span class="p">,</span> <span class="n">word_embeddings_weight</span><span class="p">,</span> <span class="n">bias</span><span class="p">)</span>
+    <span class="c1"># Gather if needed.</span>
+    <span class="k">if</span> <span class="n">parallel_output</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">logits_parallel</span>
+
+    <span class="k">return</span> <span class="n">mpu</span><span class="o">.</span><span class="n">reduce_from_tensor_model_parallel_region</span><span class="p">(</span><span class="n">logits_parallel</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_waveform_model">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.waveform_model.get_waveform_model">[docs]</a>
+<span class="k">def</span> <span class="nf">get_waveform_model</span><span class="p">(</span>
+    <span class="n">num_tokentypes</span><span class="p">,</span>
+    <span class="n">add_pooler</span><span class="p">,</span>
+    <span class="n">encoder_attn_mask_type</span><span class="p">,</span>
+    <span class="n">init_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">scaled_init_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">add_decoder</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">decoder_attn_mask_type</span><span class="o">=</span><span class="n">AttnMaskType</span><span class="o">.</span><span class="n">causal</span><span class="p">,</span>
+    <span class="n">pre_process</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">post_process</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">get_atten_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build language model and return along with the key to save.&quot;&quot;&quot;</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">init_method</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">init_method</span> <span class="o">=</span> <span class="n">init_method_normal</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">init_method_std</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">scaled_init_method</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">scaled_init_method</span> <span class="o">=</span> <span class="n">scaled_init_method_normal</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">init_method_std</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">num_layers</span>
+        <span class="p">)</span>
+
+    <span class="c1"># GW model.</span>
+    <span class="n">gw_model</span> <span class="o">=</span> <span class="n">TransformerWaveformModel</span><span class="p">(</span>
+        <span class="n">init_method</span><span class="p">,</span>
+        <span class="n">scaled_init_method</span><span class="p">,</span>
+        <span class="n">encoder_attn_mask_type</span><span class="p">,</span>
+        <span class="n">num_tokentypes</span><span class="o">=</span><span class="n">num_tokentypes</span><span class="p">,</span>
+        <span class="n">add_decoder</span><span class="o">=</span><span class="n">add_decoder</span><span class="p">,</span>
+        <span class="n">decoder_attn_mask_type</span><span class="o">=</span><span class="n">decoder_attn_mask_type</span><span class="p">,</span>
+        <span class="n">add_pooler</span><span class="o">=</span><span class="n">add_pooler</span><span class="p">,</span>
+        <span class="n">pre_process</span><span class="o">=</span><span class="n">pre_process</span><span class="p">,</span>
+        <span class="n">post_process</span><span class="o">=</span><span class="n">post_process</span><span class="p">,</span>
+        <span class="n">get_atten_value</span><span class="o">=</span><span class="n">get_atten_value</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># key used for checkpoints.</span>
+    <span class="n">gw_model_key</span> <span class="o">=</span> <span class="s2">&quot;gw_model&quot;</span>
+
+    <span class="k">return</span> <span class="n">gw_model</span><span class="p">,</span> <span class="n">gw_model_key</span></div>
+
+
+
+<div class="viewcode-block" id="Pooler">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.waveform_model.Pooler">[docs]</a>
+<span class="k">class</span> <span class="nc">Pooler</span><span class="p">(</span><span class="n">MegatronModule</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pooler layer.</span>
+
+<span class="sd">    Pool hidden states of a specific token (for example start of the</span>
+<span class="sd">    sequence) and add a linear transformation followed by a tanh.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        hidden_size: hidden size</span>
+<span class="sd">        init_method: weight initialization method for the linear layer.</span>
+<span class="sd">            bias is set to zero.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">init_method</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Pooler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dense</span> <span class="o">=</span> <span class="n">get_linear_layer</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">init_method</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Pooler.forward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.waveform_model.Pooler.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_states</span><span class="p">,</span> <span class="n">sequence_index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># hidden_states: [b, s, h]</span>
+        <span class="c1"># sequence_index: index of the token to pool.</span>
+        <span class="n">pooled</span> <span class="o">=</span> <span class="n">hidden_states</span><span class="p">[:,</span> <span class="n">sequence_index</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">pooled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span><span class="n">pooled</span><span class="p">)</span>
+        <span class="n">pooled</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">pooled</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pooled</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Embedding">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.waveform_model.Embedding">[docs]</a>
+<span class="k">class</span> <span class="nc">Embedding</span><span class="p">(</span><span class="n">MegatronModule</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Language model embeddings.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        hidden_size: hidden size</span>
+<span class="sd">        vocab_size: vocabulary size</span>
+<span class="sd">        max_sequence_length: maximum size of sequence. This</span>
+<span class="sd">                             is used for positional embedding</span>
+<span class="sd">        embedding_dropout_prob: dropout probability for embeddings</span>
+<span class="sd">        init_method: weight initialization method</span>
+<span class="sd">        num_tokentypes: size of the token-type embeddings. 0 value</span>
+<span class="sd">                        will ignore this embedding</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">hidden_size</span><span class="p">,</span>
+        <span class="n">vocab_size</span><span class="p">,</span>
+        <span class="n">max_sequence_length</span><span class="p">,</span>
+        <span class="n">embedding_dropout_prob</span><span class="p">,</span>
+        <span class="n">init_method</span><span class="p">,</span>
+        <span class="n">num_tokentypes</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Embedding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_method</span> <span class="o">=</span> <span class="n">init_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_tokentypes</span> <span class="o">=</span> <span class="n">num_tokentypes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span> <span class="o">=</span> <span class="mi">3</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dets</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dets</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="n">max_sequence_length</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dets</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="p">),</span> <span class="s2">&quot;Error in data composition of multiple detectors.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">segs_per_det</span> <span class="o">=</span> <span class="n">max_sequence_length</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">dets</span>
+
+        <span class="c1"># Token/Word Embedding (TE/WE).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">word_embeddings</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">VocabParallelEmbedding</span><span class="p">(</span>
+            <span class="n">vocab_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">init_method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">init_method</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_word_embeddings_key</span> <span class="o">=</span> <span class="s2">&quot;word_embeddings&quot;</span>
+
+        <span class="c1"># Position embedding (PE).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position_embeddings</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span>
+            <span class="n">max_sequence_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span>
+        <span class="p">)</span>
+        <span class="c1"># self.segs_per_det, self.hidden_size)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_position_embeddings_key</span> <span class="o">=</span> <span class="s2">&quot;position_embeddings&quot;</span>
+        <span class="c1"># Initialize the position embeddings.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_method</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position_embeddings</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+
+        <span class="c1"># Conv1D embedding (CE), for local feature extraction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_embeddings</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span>
+            <span class="n">max_sequence_length</span><span class="p">,</span>
+            <span class="n">max_sequence_length</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conv_embeddings_key</span> <span class="o">=</span> <span class="s2">&quot;conv_embeddings&quot;</span>
+        <span class="c1"># Initialize the position embeddings.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_method</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv_embeddings</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_proj</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">segment_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conv_proj_key</span> <span class="o">=</span> <span class="s2">&quot;conv_proj&quot;</span>
+        <span class="c1"># Initialize the position embeddings.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_method</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv_proj</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+
+        <span class="c1"># Conv2d layer (serial), for 2D feature extraction/residual module</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_layer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dets</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dets</span><span class="p">,</span>
+            <span class="mi">7</span><span class="p">,</span>
+            <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">params_dtype</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conv_layer_key</span> <span class="o">=</span> <span class="s2">&quot;conv_layer&quot;</span>
+        <span class="c1"># Initialize the position embeddings.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_method</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv_layer</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+
+        <span class="c1"># Embeddings dropout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_dropout</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">embedding_dropout_prob</span><span class="p">)</span>
+        <span class="c1"># Embeddings activation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_activation</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">GELU</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Embedding.forward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.waveform_model.Embedding.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_ids</span><span class="p">,</span> <span class="n">position_ids</span><span class="p">,</span> <span class="n">tokentype_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Embeddings.</span>
+        <span class="n">words_embeddings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_embeddings</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+        <span class="n">position_embeddings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_embeddings</span><span class="p">(</span><span class="n">position_ids</span><span class="p">)</span>
+        <span class="n">conv_embeddings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_embeddings</span><span class="p">(</span>
+            <span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv_embeddings</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">conv_embeddings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_activation</span><span class="p">(</span><span class="n">conv_embeddings</span><span class="p">)</span>
+
+        <span class="n">conv_embeddings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_proj</span><span class="p">(</span><span class="n">conv_embeddings</span><span class="p">)</span>
+
+        <span class="n">embeddings</span> <span class="o">=</span> <span class="n">words_embeddings</span> <span class="o">+</span> <span class="n">position_embeddings</span> <span class="o">+</span> <span class="n">conv_embeddings</span>
+
+        <span class="n">conv_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_layer</span><span class="p">(</span>
+            <span class="n">embeddings</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">segs_per_det</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">embeddings</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">conv_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_activation</span><span class="p">(</span><span class="n">conv_output</span><span class="p">)</span>
+
+        <span class="c1"># residual block</span>
+        <span class="n">embeddings_output</span> <span class="o">=</span> <span class="n">embeddings</span> <span class="o">+</span> <span class="n">conv_output</span>
+
+        <span class="c1"># Dropout.</span>
+        <span class="n">embeddings_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_dropout</span><span class="p">(</span><span class="n">embeddings_output</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">embeddings_output</span></div>
+
+
+<div class="viewcode-block" id="Embedding.state_dict_for_save_checkpoint">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.waveform_model.Embedding.state_dict_for_save_checkpoint">[docs]</a>
+    <span class="k">def</span> <span class="nf">state_dict_for_save_checkpoint</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">keep_vars</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;For easy load.&quot;&quot;&quot;</span>
+
+        <span class="n">state_dict_</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">state_dict_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_word_embeddings_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_embeddings</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(</span>
+            <span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span>
+        <span class="p">)</span>
+        <span class="n">state_dict_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_position_embeddings_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">position_embeddings</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">state_dict_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_conv_embeddings_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_embeddings</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(</span>
+            <span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span>
+        <span class="p">)</span>
+        <span class="n">state_dict_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_conv_proj_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_proj</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(</span>
+            <span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span>
+        <span class="p">)</span>
+        <span class="n">state_dict_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_conv_layer_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_layer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(</span>
+            <span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">state_dict_</span></div>
+
+
+<div class="viewcode-block" id="Embedding.load_state_dict">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.waveform_model.Embedding.load_state_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Customized load.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Token embedding.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_word_embeddings_key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="p">:</span>
+            <span class="n">state_dict_</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_word_embeddings_key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># for backward compatibility.</span>
+            <span class="n">state_dict_</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s2">&quot;word_embeddings&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="n">state_dict_</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;word_embeddings.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">word_embeddings</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict_</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+
+        <span class="c1"># Position embedding.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_position_embeddings_key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="p">:</span>
+            <span class="n">state_dict_</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_position_embeddings_key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># for backward compatibility.</span>
+            <span class="n">state_dict_</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s2">&quot;position_embeddings&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="n">state_dict_</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;position_embeddings.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position_embeddings</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict_</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+
+        <span class="c1"># Conv1D embedding.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv_embeddings_key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="p">:</span>
+            <span class="n">state_dict_</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_conv_embeddings_key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># for backward compatibility.</span>
+            <span class="n">state_dict_</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s2">&quot;conv_embeddings&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="n">state_dict_</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;conv_embeddings.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_embeddings</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict_</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv_proj_key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="p">:</span>
+            <span class="n">state_dict_</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_conv_proj_key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># for backward compatibility.</span>
+            <span class="n">state_dict_</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s2">&quot;conv_proj&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="n">state_dict_</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;conv_proj.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_proj</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict_</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+
+        <span class="c1"># Conv2D layer.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv_layer_key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="p">:</span>
+            <span class="n">state_dict_</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_conv_layer_key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># for backward compatibility.</span>
+            <span class="n">state_dict_</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s2">&quot;conv_layer&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="n">state_dict_</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;conv_layer.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_layer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict_</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TransformerWaveformModel">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.waveform_model.TransformerWaveformModel">[docs]</a>
+<span class="k">class</span> <span class="nc">TransformerWaveformModel</span><span class="p">(</span><span class="n">MegatronModule</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transformer language model.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        transformer_hparams: transformer hyperparameters</span>
+<span class="sd">        vocab_size: vocabulary size</span>
+<span class="sd">        max_sequence_length: maximum size of sequence. This</span>
+<span class="sd">                             is used for positional embedding</span>
+<span class="sd">        embedding_dropout_prob: dropout probability for embeddings</span>
+<span class="sd">        num_tokentypes: size of the token-type embeddings. 0 value</span>
+<span class="sd">                        will ignore this embedding</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">init_method</span><span class="p">,</span>
+        <span class="n">output_layer_init_method</span><span class="p">,</span>
+        <span class="n">encoder_attn_mask_type</span><span class="p">,</span>
+        <span class="n">num_tokentypes</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">add_decoder</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">decoder_attn_mask_type</span><span class="o">=</span><span class="n">AttnMaskType</span><span class="o">.</span><span class="n">causal</span><span class="p">,</span>
+        <span class="n">add_pooler</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">pre_process</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">post_process</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">get_atten_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TransformerWaveformModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span> <span class="o">=</span> <span class="n">pre_process</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">post_process</span> <span class="o">=</span> <span class="n">post_process</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_tokentypes</span> <span class="o">=</span> <span class="n">num_tokentypes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_method</span> <span class="o">=</span> <span class="n">init_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_attn_mask_type</span> <span class="o">=</span> <span class="n">encoder_attn_mask_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_decoder</span> <span class="o">=</span> <span class="n">add_decoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_attn_mask_type</span> <span class="o">=</span> <span class="n">decoder_attn_mask_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_pooler</span> <span class="o">=</span> <span class="n">add_pooler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_atten_value</span> <span class="o">=</span> <span class="n">get_atten_value</span>
+
+        <span class="c1"># Embeddings.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">Embedding</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">padded_vocab_size</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">max_position_embeddings</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">hidden_dropout</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_method</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_tokentypes</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_embedding_key</span> <span class="o">=</span> <span class="s2">&quot;embedding&quot;</span>
+
+        <span class="c1"># Transformer.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">ParallelTransformer</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_method</span><span class="p">,</span>
+            <span class="n">output_layer_init_method</span><span class="p">,</span>
+            <span class="n">self_attn_mask_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">encoder_attn_mask_type</span><span class="p">,</span>
+            <span class="n">pre_process</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">,</span>
+            <span class="n">post_process</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">post_process</span><span class="p">,</span>
+            <span class="n">get_atten_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_atten_value</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoder_key</span> <span class="o">=</span> <span class="s2">&quot;encoder&quot;</span>
+
+        <span class="c1"># Decoder</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_decoder</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">pipeline_model_parallel_size</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="p">),</span> <span class="s2">&quot;pipeline parallelism is not supported in the presence of decoder&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">ParallelTransformer</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_method</span><span class="p">,</span>
+                <span class="n">output_layer_init_method</span><span class="p">,</span>
+                <span class="n">layer_type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">decoder</span><span class="p">,</span>
+                <span class="n">self_attn_mask_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">decoder_attn_mask_type</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_decoder_key</span> <span class="o">=</span> <span class="s2">&quot;decoder&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_process</span><span class="p">:</span>
+            <span class="c1"># Pooler.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_pooler</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pooler</span> <span class="o">=</span> <span class="n">Pooler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_method</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pooler_key</span> <span class="o">=</span> <span class="s2">&quot;pooler&quot;</span>
+
+<div class="viewcode-block" id="TransformerWaveformModel.set_input_tensor">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.waveform_model.TransformerWaveformModel.set_input_tensor">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_input_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_tensor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;See megatron.model.transformer.set_input_tensor()&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">set_input_tensor</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TransformerWaveformModel.forward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.waveform_model.TransformerWaveformModel.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">enc_input_ids</span><span class="p">,</span>
+        <span class="n">enc_position_ids</span><span class="p">,</span>
+        <span class="n">enc_attn_mask</span><span class="p">,</span>
+        <span class="n">dec_input_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dec_position_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dec_attn_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">enc_dec_attn_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">tokentype_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">layer_past</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">get_key_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">pooling_sequence_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">enc_hidden_states</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">output_enc_hidden</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># Embeddings.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">:</span>
+            <span class="n">embedding_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span>
+                <span class="n">enc_input_ids</span><span class="p">,</span> <span class="n">enc_position_ids</span><span class="p">,</span> <span class="n">tokentype_ids</span><span class="o">=</span><span class="n">tokentype_ids</span>
+            <span class="p">)</span>
+            <span class="n">encoder_input</span> <span class="o">=</span> <span class="n">embedding_output</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">encoder_input</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># encoder.</span>
+        <span class="k">if</span> <span class="n">enc_hidden_states</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">encoder_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span>
+                <span class="n">encoder_input</span><span class="p">,</span>
+                <span class="n">enc_attn_mask</span><span class="p">,</span>
+                <span class="n">layer_past</span><span class="o">=</span><span class="n">layer_past</span><span class="p">,</span>
+                <span class="n">get_key_value</span><span class="o">=</span><span class="n">get_key_value</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># encoder_output = encoder_output + encoder_input</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">encoder_output</span> <span class="o">=</span> <span class="n">enc_hidden_states</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">encoder_input</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_process</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_pooler</span><span class="p">:</span>
+                <span class="n">pooled_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pooler</span><span class="p">(</span><span class="n">encoder_output</span><span class="p">,</span> <span class="n">pooling_sequence_index</span><span class="p">)</span>
+
+        <span class="c1"># output_enc_hidden refers to when we just need the encoder&#39;s</span>
+        <span class="c1"># output. For example, it is helpful to compute</span>
+        <span class="c1"># similarity between two sequences by average pooling</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_decoder</span> <span class="ow">or</span> <span class="n">output_enc_hidden</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_pooler</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_process</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">encoder_output</span><span class="p">,</span> <span class="n">pooled_output</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">encoder_output</span></div>
+
+
+<div class="viewcode-block" id="TransformerWaveformModel.state_dict_for_save_checkpoint">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.waveform_model.TransformerWaveformModel.state_dict_for_save_checkpoint">[docs]</a>
+    <span class="k">def</span> <span class="nf">state_dict_for_save_checkpoint</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">keep_vars</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;For easy load.&quot;&quot;&quot;</span>
+
+        <span class="n">state_dict_</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">:</span>
+            <span class="n">state_dict_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_embedding_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">state_dict_for_save_checkpoint</span><span class="p">(</span>
+                    <span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">state_dict_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoder_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">state_dict_for_save_checkpoint</span><span class="p">(</span>
+            <span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_process</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_pooler</span><span class="p">:</span>
+                <span class="n">state_dict_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pooler_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pooler</span><span class="o">.</span><span class="n">state_dict_for_save_checkpoint</span><span class="p">(</span>
+                        <span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_decoder</span><span class="p">:</span>
+            <span class="n">state_dict_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_decoder_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">state_dict_for_save_checkpoint</span><span class="p">(</span>
+                    <span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">state_dict_</span></div>
+
+
+<div class="viewcode-block" id="TransformerWaveformModel.load_state_dict">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.waveform_model.TransformerWaveformModel.load_state_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Customized load.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Embedding.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_embedding_key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="p">:</span>
+                <span class="n">state_dict_</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_embedding_key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># for backward compatibility.</span>
+                <span class="n">state_dict_</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="s2">&quot;_embeddings&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                        <span class="n">state_dict_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict_</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+
+        <span class="c1"># Encoder.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder_key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="p">:</span>
+            <span class="n">state_dict_</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoder_key</span><span class="p">]</span>
+        <span class="c1"># for backward compatibility.</span>
+        <span class="k">elif</span> <span class="s2">&quot;transformer&quot;</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="p">:</span>
+            <span class="n">state_dict_</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;transformer&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># for backward compatibility.</span>
+            <span class="n">state_dict_</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s2">&quot;transformer.&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="n">state_dict_</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;transformer.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="c1"># for backward compatibility.</span>
+        <span class="n">state_dict_self_attention</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">state_dict_</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s2">&quot;.attention.&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                <span class="n">state_dict_self_attention</span><span class="p">[</span>
+                    <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.attention.&quot;</span><span class="p">,</span> <span class="s2">&quot;.self_attention.&quot;</span><span class="p">)</span>
+                <span class="p">]</span> <span class="o">=</span> <span class="n">state_dict_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">state_dict_self_attention</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">state_dict_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">state_dict_</span> <span class="o">=</span> <span class="n">state_dict_self_attention</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict_</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_process</span><span class="p">:</span>
+            <span class="c1"># pooler</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_pooler</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="p">(</span>
+                    <span class="s2">&quot;pooler&quot;</span> <span class="ow">in</span> <span class="n">state_dict</span>
+                <span class="p">),</span> <span class="s2">&quot;could not find data for pooler in the checkpoint&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pooler</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pooler_key</span><span class="p">],</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+        <span class="c1"># decoder</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_decoder</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="s2">&quot;decoder&quot;</span> <span class="ow">in</span> <span class="n">state_dict</span>
+            <span class="p">),</span> <span class="s2">&quot;could not find data for pooler in the checkpoint&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_decoder_key</span><span class="p">],</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yue Zhou, Tianyu Zhao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

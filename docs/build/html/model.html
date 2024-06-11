@@ -1,92 +1,49 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>model package &mdash; GWAI  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
   
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="model.classify package" href="model.classify.html" />
     <link rel="prev" title="eval package" href="eval.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="index.html" class="icon icon-home"> GWAI
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            GWAI
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="about_gwai.html">About GWAI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
@@ -101,7 +58,10 @@
 <li class="toctree-l4"><a class="reference internal" href="model.detection.html">model.detection package</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-model">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-model">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#model.get_version"><code class="docutils literal notranslate"><span class="pre">get_version()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html">utils package</a></li>
@@ -110,85 +70,70 @@
 <li class="toctree-l1"><a class="reference internal" href="citations.html">Citations</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">GWAI</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="modules.html">src</a> &raquo;</li>
-        
-      <li>model package</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+      <li class="breadcrumb-item active">model package</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/model.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="model-package">
-<h1>model package<a class="headerlink" href="#model-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="model-package">
+<h1>model package<a class="headerlink" href="#model-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="model.classify.html">model.classify package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="model.classify.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.classify.html#module-model.classify.dataloader">model.classify.dataloader module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.classify.html#module-model.classify.tcn">model.classify.tcn module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.classify.html#module-model.classify.trainer">model.classify.trainer module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.classify.html#module-model.classify">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.classify.html#model-classify-dataloader-module">model.classify.dataloader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.classify.html#module-model.classify.tcn">model.classify.tcn module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.classify.html#model.classify.tcn.Chomp1d"><code class="docutils literal notranslate"><span class="pre">Chomp1d</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.classify.html#model.classify.tcn.Chomp1d.forward"><code class="docutils literal notranslate"><span class="pre">Chomp1d.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.classify.html#model.classify.tcn.TCN"><code class="docutils literal notranslate"><span class="pre">TCN</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.classify.html#model.classify.tcn.TCN.clear_activation_maps"><code class="docutils literal notranslate"><span class="pre">TCN.clear_activation_maps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.classify.html#model.classify.tcn.TCN.forward"><code class="docutils literal notranslate"><span class="pre">TCN.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.classify.html#model.classify.tcn.TCN.get_activation_maps"><code class="docutils literal notranslate"><span class="pre">TCN.get_activation_maps()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.classify.html#model.classify.tcn.TemporalBlock"><code class="docutils literal notranslate"><span class="pre">TemporalBlock</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.classify.html#model.classify.tcn.TemporalBlock.forward"><code class="docutils literal notranslate"><span class="pre">TemporalBlock.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.classify.html#model.classify.tcn.TemporalBlock.init_weights"><code class="docutils literal notranslate"><span class="pre">TemporalBlock.init_weights()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.classify.html#model.classify.tcn.TemporalConvNet"><code class="docutils literal notranslate"><span class="pre">TemporalConvNet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.classify.html#model.classify.tcn.TemporalConvNet.clear_activation_maps"><code class="docutils literal notranslate"><span class="pre">TemporalConvNet.clear_activation_maps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.classify.html#model.classify.tcn.TemporalConvNet.forward"><code class="docutils literal notranslate"><span class="pre">TemporalConvNet.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.classify.html#model.classify.tcn.TemporalConvNet.get_activation_maps"><code class="docutils literal notranslate"><span class="pre">TemporalConvNet.get_activation_maps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.classify.html#model.classify.tcn.TemporalConvNet.hook_fn"><code class="docutils literal notranslate"><span class="pre">TemporalConvNet.hook_fn()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="model.classify.html#model-classify-trainer-module">model.classify.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.classify.html#module-model.classify">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.classify.html#model.classify.get_version"><code class="docutils literal notranslate"><span class="pre">get_version()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="model.denoising.html">model.denoising package</a><ul>
@@ -196,8 +141,8 @@
 <li class="toctree-l3"><a class="reference internal" href="model.denoising.data.html">model.denoising.data package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="model.denoising.data.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="model.denoising.data.html#module-model.denoising.data.data_samplers">model.denoising.data.data_samplers module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="model.denoising.data.html#module-model.denoising.data.dataset_utils">model.denoising.data.dataset_utils module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="model.denoising.data.html#module-model.denoising.data.gw_dataset">model.denoising.data.gw_dataset module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.data.html#model-denoising-data-dataset-utils-module">model.denoising.data.dataset_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.data.html#model-denoising-data-gw-dataset-module">model.denoising.data.gw_dataset module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="model.denoising.data.html#module-model.denoising.data">Module contents</a></li>
 </ul>
 </li>
@@ -233,96 +178,164 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="model.denoising.optimizer.html">model.denoising.optimizer package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#module-model.denoising.optimizer.clip_grads">model.denoising.optimizer.clip_grads module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#module-model.denoising.optimizer.grad_scaler">model.denoising.optimizer.grad_scaler module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#module-model.denoising.optimizer.optimizer">model.denoising.optimizer.optimizer module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#module-model.denoising.optimizer">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#model-denoising-optimizer-clip-grads-module">model.denoising.optimizer.clip_grads module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#model-denoising-optimizer-grad-scaler-module">model.denoising.optimizer.grad_scaler module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#model-denoising-optimizer-optimizer-module">model.denoising.optimizer.optimizer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.optimizer.html#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="model.denoising.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.arguments">model.denoising.arguments module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.checkpointing">model.denoising.checkpointing module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.global_vars">model.denoising.global_vars module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.initialize">model.denoising.initialize module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.learning_rates">model.denoising.learning_rates module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.memory">model.denoising.memory module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.microbatches">model.denoising.microbatches module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.p2p_communication">model.denoising.p2p_communication module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.arguments">model.denoising.arguments module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.arguments.parse_args"><code class="docutils literal notranslate"><span class="pre">parse_args()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#model-denoising-checkpointing-module">model.denoising.checkpointing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.global_vars">model.denoising.global_vars module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.global_vars.Timers"><code class="docutils literal notranslate"><span class="pre">Timers</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.global_vars.Timers.log"><code class="docutils literal notranslate"><span class="pre">Timers.log()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.global_vars.Timers.write"><code class="docutils literal notranslate"><span class="pre">Timers.write()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.global_vars.get_adlr_autoresume"><code class="docutils literal notranslate"><span class="pre">get_adlr_autoresume()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.global_vars.get_args"><code class="docutils literal notranslate"><span class="pre">get_args()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.global_vars.get_current_global_batch_size"><code class="docutils literal notranslate"><span class="pre">get_current_global_batch_size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.global_vars.get_num_microbatches"><code class="docutils literal notranslate"><span class="pre">get_num_microbatches()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.global_vars.get_tensorboard_writer"><code class="docutils literal notranslate"><span class="pre">get_tensorboard_writer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.global_vars.get_timers"><code class="docutils literal notranslate"><span class="pre">get_timers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.global_vars.get_tokenizer"><code class="docutils literal notranslate"><span class="pre">get_tokenizer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.global_vars.set_global_variables"><code class="docutils literal notranslate"><span class="pre">set_global_variables()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.global_vars.update_num_microbatches"><code class="docutils literal notranslate"><span class="pre">update_num_microbatches()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.initialize">model.denoising.initialize module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.initialize.initialize_megatron"><code class="docutils literal notranslate"><span class="pre">initialize_megatron()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.initialize.write_args_to_tensorboard"><code class="docutils literal notranslate"><span class="pre">write_args_to_tensorboard()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.learning_rates">model.denoising.learning_rates module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.learning_rates.AnnealingLR"><code class="docutils literal notranslate"><span class="pre">AnnealingLR</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.learning_rates.AnnealingLR.get_lr"><code class="docutils literal notranslate"><span class="pre">AnnealingLR.get_lr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.learning_rates.AnnealingLR.load_state_dict"><code class="docutils literal notranslate"><span class="pre">AnnealingLR.load_state_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.learning_rates.AnnealingLR.state_dict"><code class="docutils literal notranslate"><span class="pre">AnnealingLR.state_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.learning_rates.AnnealingLR.step"><code class="docutils literal notranslate"><span class="pre">AnnealingLR.step()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.memory">model.denoising.memory module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.memory.MemoryBuffer"><code class="docutils literal notranslate"><span class="pre">MemoryBuffer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.memory.MemoryBuffer.add"><code class="docutils literal notranslate"><span class="pre">MemoryBuffer.add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.memory.MemoryBuffer.get_data"><code class="docutils literal notranslate"><span class="pre">MemoryBuffer.get_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.memory.MemoryBuffer.is_in_use"><code class="docutils literal notranslate"><span class="pre">MemoryBuffer.is_in_use()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.memory.MemoryBuffer.numel_in_use"><code class="docutils literal notranslate"><span class="pre">MemoryBuffer.numel_in_use()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.memory.MemoryBuffer.print_average_usage"><code class="docutils literal notranslate"><span class="pre">MemoryBuffer.print_average_usage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.memory.MemoryBuffer.reset"><code class="docutils literal notranslate"><span class="pre">MemoryBuffer.reset()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.memory.RingMemBuffer"><code class="docutils literal notranslate"><span class="pre">RingMemBuffer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.memory.RingMemBuffer.get_next_buffer"><code class="docutils literal notranslate"><span class="pre">RingMemBuffer.get_next_buffer()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.memory.allocate_mem_buff"><code class="docutils literal notranslate"><span class="pre">allocate_mem_buff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.memory.get_mem_buff"><code class="docutils literal notranslate"><span class="pre">get_mem_buff()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.microbatches">model.denoising.microbatches module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.microbatches.ConstantNumMicroBatches"><code class="docutils literal notranslate"><span class="pre">ConstantNumMicroBatches</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.microbatches.ConstantNumMicroBatches.update"><code class="docutils literal notranslate"><span class="pre">ConstantNumMicroBatches.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.microbatches.NumMicroBatchesCalculator"><code class="docutils literal notranslate"><span class="pre">NumMicroBatchesCalculator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.microbatches.NumMicroBatchesCalculator.get"><code class="docutils literal notranslate"><span class="pre">NumMicroBatchesCalculator.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.microbatches.NumMicroBatchesCalculator.get_current_global_batch_size"><code class="docutils literal notranslate"><span class="pre">NumMicroBatchesCalculator.get_current_global_batch_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.microbatches.NumMicroBatchesCalculator.update"><code class="docutils literal notranslate"><span class="pre">NumMicroBatchesCalculator.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.microbatches.RampupBatchsizeNumMicroBatches"><code class="docutils literal notranslate"><span class="pre">RampupBatchsizeNumMicroBatches</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.denoising.html#model.denoising.microbatches.RampupBatchsizeNumMicroBatches.update"><code class="docutils literal notranslate"><span class="pre">RampupBatchsizeNumMicroBatches.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.microbatches.build_num_microbatches_calculator"><code class="docutils literal notranslate"><span class="pre">build_num_microbatches_calculator()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.p2p_communication">model.denoising.p2p_communication module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.p2p_communication.recv_backward"><code class="docutils literal notranslate"><span class="pre">recv_backward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.p2p_communication.recv_forward"><code class="docutils literal notranslate"><span class="pre">recv_forward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.p2p_communication.send_backward"><code class="docutils literal notranslate"><span class="pre">send_backward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.p2p_communication.send_backward_recv_backward"><code class="docutils literal notranslate"><span class="pre">send_backward_recv_backward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.p2p_communication.send_backward_recv_forward"><code class="docutils literal notranslate"><span class="pre">send_backward_recv_forward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.p2p_communication.send_forward"><code class="docutils literal notranslate"><span class="pre">send_forward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.p2p_communication.send_forward_backward_recv_forward_backward"><code class="docutils literal notranslate"><span class="pre">send_forward_backward_recv_forward_backward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.p2p_communication.send_forward_recv_backward"><code class="docutils literal notranslate"><span class="pre">send_forward_recv_backward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.p2p_communication.send_forward_recv_forward"><code class="docutils literal notranslate"><span class="pre">send_forward_recv_forward()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.package_info">model.denoising.package_info module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.schedules">model.denoising.schedules module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.training">model.denoising.training module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising.utils">model.denoising.utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#model-denoising-schedules-module">model.denoising.schedules module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#model-denoising-training-module">model.denoising.training module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#model-denoising-utils-module">model.denoising.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.denoising.html#module-model.denoising">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.is_last_rank"><code class="docutils literal notranslate"><span class="pre">is_last_rank()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.print_rank_0"><code class="docutils literal notranslate"><span class="pre">print_rank_0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.denoising.html#model.denoising.print_rank_last"><code class="docutils literal notranslate"><span class="pre">print_rank_last()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="model.detection.html">model.detection package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="model.detection.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.detection.html#module-model.detection.dataloader">model.detection.dataloader module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.detection.html#module-model.detection">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.detection.html#model-detection-dataloader-module">model.detection.dataloader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.detection.html#module-model.detection">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.detection.html#model.detection.get_version"><code class="docutils literal notranslate"><span class="pre">get_version()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="module-model">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-model" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-model">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-model" title="Link to this heading"></a></h2>
 <p>Detect EMRI signal using DNN</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.get_version">
-<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#model.get_version" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.</span></span><span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#model.get_version" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="model.classify.html" class="btn btn-neutral float-right" title="model.classify package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="eval.html" class="btn btn-neutral float-left" title="eval package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="model.classify.html" class="btn btn-neutral float-right" title="model.classify package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2024, Yue Zhou, Tianyu Zhao.
-
-    </p>
+    <p>&#169; Copyright 2024, Yue Zhou, Tianyu Zhao.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

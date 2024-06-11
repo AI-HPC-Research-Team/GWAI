@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>model.denoising.mpu.random &mdash; GWAI  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            GWAI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about_gwai.html">About GWAI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Main Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../citations.html">Citations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">GWAI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../model.html">model</a></li>
+          <li class="breadcrumb-item"><a href="../../denoising.html">model.denoising</a></li>
+      <li class="breadcrumb-item active">model.denoising.mpu.random</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for model.denoising.mpu.random</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="c1"># Copyright (c) 2020, NVIDIA CORPORATION.  All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+
+<span class="c1"># Parts of the code here are adapted from PyTorch</span>
+<span class="c1"># repo: https://github.com/pytorch/pytorch</span>
+
+<span class="kn">import</span> <span class="nn">contextlib</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">_C</span>
+<span class="kn">from</span> <span class="nn">torch.cuda</span> <span class="kn">import</span> <span class="n">_lazy_call</span>
+<span class="kn">from</span> <span class="nn">torch.cuda</span> <span class="kn">import</span> <span class="n">device</span> <span class="k">as</span> <span class="n">device_ctx_manager</span>
+<span class="kn">from</span> <span class="nn">torch.utils.checkpoint</span> <span class="kn">import</span> <span class="n">detach_variable</span>
+
+<span class="kn">from</span> <span class="nn">src.model.denoising</span> <span class="kn">import</span> <span class="n">get_args</span>
+<span class="kn">from</span> <span class="nn">src.model.denoising.memory</span> <span class="kn">import</span> <span class="n">allocate_mem_buff</span>
+
+<span class="kn">from</span> <span class="nn">.initialize</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_data_parallel_rank</span><span class="p">,</span>
+    <span class="n">get_tensor_model_parallel_group</span><span class="p">,</span>
+    <span class="n">get_tensor_model_parallel_rank</span><span class="p">,</span>
+    <span class="n">get_tensor_model_parallel_world_size</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Default name for the model parallel rng tracker.</span>
+<span class="n">_MODEL_PARALLEL_RNG_TRACKER_NAME</span> <span class="o">=</span> <span class="s2">&quot;model-parallel-rng&quot;</span>
+
+
+<span class="c1"># Whether apply model parallelsim to checkpointed hidden states.</span>
+<span class="n">_CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="init_checkpointed_activations_memory_buffer">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.init_checkpointed_activations_memory_buffer">[docs]</a>
+<span class="k">def</span> <span class="nf">init_checkpointed_activations_memory_buffer</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializ the memory buffer for the checkpointed activations.&quot;&quot;&quot;</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+
+    <span class="n">per_layer</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">micro_batch_size</span>
+        <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">max_position_embeddings</span>
+        <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span>
+        <span class="o">//</span> <span class="n">args</span><span class="o">.</span><span class="n">tensor_model_parallel_size</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">checkpoint_num_layers</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="p">),</span> <span class="s2">&quot;number of layers is not divisible by checkpoint-num-layers&quot;</span>
+    <span class="n">num_checkpointer_layers</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">//</span> <span class="n">args</span><span class="o">.</span><span class="n">checkpoint_num_layers</span>
+    <span class="n">numel</span> <span class="o">=</span> <span class="n">per_layer</span> <span class="o">*</span> <span class="n">num_checkpointer_layers</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">half</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">fp16</span><span class="p">:</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float</span>
+
+    <span class="k">global</span> <span class="n">_CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">_CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="p">),</span> <span class="s2">&quot;checkpointed activations memory buffer is already allocated.&quot;</span>
+    <span class="n">_CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER</span> <span class="o">=</span> <span class="n">allocate_mem_buff</span><span class="p">(</span>
+        <span class="s2">&quot;checkpointed activations&quot;</span><span class="p">,</span> <span class="n">numel</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">track_usage</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="reset_checkpointed_activations_memory_buffer">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.reset_checkpointed_activations_memory_buffer">[docs]</a>
+<span class="k">def</span> <span class="nf">reset_checkpointed_activations_memory_buffer</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reset the memory used for checkpointing.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">_CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_set_cuda_rng_state</span><span class="p">(</span><span class="n">new_state</span><span class="p">,</span> <span class="n">device</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the random number generator state of the current GPU.</span>
+
+<span class="sd">    Argumentss:</span>
+<span class="sd">        new_state (torch.ByteTensor): The desired state</span>
+<span class="sd">    This function is adapted from PyTorch repo (torch.cuda.set_rng_state)</span>
+<span class="sd">    with a single change: the input state is not cloned. Cloning caused</span>
+<span class="sd">    major performance issues for +4 GPU cases.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">_C</span><span class="p">,</span> <span class="s2">&quot;_cuda_setRNGState&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="n">_C</span><span class="o">.</span><span class="n">_cuda_setRNGState</span><span class="p">):</span>
+        <span class="c1"># older PyTorch</span>
+        <span class="k">def</span> <span class="nf">cb</span><span class="p">():</span>
+            <span class="k">with</span> <span class="n">device_ctx_manager</span><span class="p">(</span><span class="n">device</span><span class="p">):</span>
+                <span class="n">_C</span><span class="o">.</span><span class="n">_cuda_setRNGState</span><span class="p">(</span><span class="n">new_state</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># newer PyTorch</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">cb</span><span class="p">():</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">index</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">current_device</span><span class="p">()</span>
+            <span class="n">default_generator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">default_generators</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">default_generator</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">new_state</span><span class="p">)</span>
+
+    <span class="n">_lazy_call</span><span class="p">(</span><span class="n">cb</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="split_tensor_into_1d_equal_chunks">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.split_tensor_into_1d_equal_chunks">[docs]</a>
+<span class="k">def</span> <span class="nf">split_tensor_into_1d_equal_chunks</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Break a tensor into equal 1D chunks.&quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">partition_size</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">numel</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">//</span> <span class="n">get_tensor_model_parallel_world_size</span><span class="p">()</span>
+    <span class="n">start_index</span> <span class="o">=</span> <span class="n">partition_size</span> <span class="o">*</span> <span class="n">get_tensor_model_parallel_rank</span><span class="p">()</span>
+    <span class="n">end_index</span> <span class="o">=</span> <span class="n">start_index</span> <span class="o">+</span> <span class="n">partition_size</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="gather_split_1d_tensor">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.gather_split_1d_tensor">[docs]</a>
+<span class="k">def</span> <span class="nf">gather_split_1d_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Opposite of above function, gather values from model parallel ranks.&quot;&quot;&quot;</span>
+    <span class="n">world_size</span> <span class="o">=</span> <span class="n">get_tensor_model_parallel_world_size</span><span class="p">()</span>
+    <span class="n">numel</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">numel</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
+    <span class="n">numel_gathered</span> <span class="o">=</span> <span class="n">world_size</span> <span class="o">*</span> <span class="n">numel</span>
+    <span class="n">gathered</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+        <span class="n">numel_gathered</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">tensor</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">current_device</span><span class="p">(),</span>
+        <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="p">[</span><span class="n">gathered</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">numel</span> <span class="p">:</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">numel</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">world_size</span><span class="p">)]</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">all_gather</span><span class="p">(</span>
+        <span class="n">chunks</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">get_tensor_model_parallel_group</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">gathered</span></div>
+
+
+
+<div class="viewcode-block" id="CudaRNGStatesTracker">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.CudaRNGStatesTracker">[docs]</a>
+<span class="k">class</span> <span class="nc">CudaRNGStatesTracker</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracker for the cuda RNG states.</span>
+
+<span class="sd">    Using the `add` method, a cuda rng state is initialized based on</span>
+<span class="sd">    the input `seed` and is assigned to `name`. Later, by forking the</span>
+<span class="sd">    rng state, we can perform operations and return to our starting</span>
+<span class="sd">    cuda state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Map from a string name to the cuda rng state.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states_</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Seeds are just for book keeping and ensure no seed is set twice.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seeds_</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CudaRNGStatesTracker.reset">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.CudaRNGStatesTracker.reset">[docs]</a>
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set to the initial state (no tracker).&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states_</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seeds_</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CudaRNGStatesTracker.get_states">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.CudaRNGStatesTracker.get_states">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get rng states. Copy the dictionary so we have direct</span>
+<span class="sd">        pointers to the states, not just a pointer to the dictionary.&quot;&quot;&quot;</span>
+        <span class="n">states</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states_</span><span class="p">:</span>
+            <span class="n">states</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states_</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">states</span></div>
+
+
+<div class="viewcode-block" id="CudaRNGStatesTracker.set_states">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.CudaRNGStatesTracker.set_states">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_states</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">states</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the rng states. For efficiency purposes, we do not check</span>
+<span class="sd">        the size of seed for compatibility.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states_</span> <span class="o">=</span> <span class="n">states</span></div>
+
+
+<div class="viewcode-block" id="CudaRNGStatesTracker.add">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.CudaRNGStatesTracker.add">[docs]</a>
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Track the rng state.&quot;&quot;&quot;</span>
+        <span class="c1"># Check seed is not already used.</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">seeds_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;seed </span><span class="si">{}</span><span class="s2"> already exists&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">seed</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seeds_</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="c1"># Check that state is not already defined.</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;cuda rng state </span><span class="si">{}</span><span class="s2"> already exists&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="c1"># Get the current rng state.</span>
+        <span class="n">orig_rng_state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_rng_state</span><span class="p">()</span>
+        <span class="c1"># Set the new state and store it.</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states_</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_rng_state</span><span class="p">()</span>
+        <span class="c1"># Reset rng state to what it was.</span>
+        <span class="n">_set_cuda_rng_state</span><span class="p">(</span><span class="n">orig_rng_state</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CudaRNGStatesTracker.fork">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.CudaRNGStatesTracker.fork">[docs]</a>
+    <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+    <span class="k">def</span> <span class="nf">fork</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">_MODEL_PARALLEL_RNG_TRACKER_NAME</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fork the cuda rng state, perform operations, and exit with</span>
+<span class="sd">        the original state.&quot;&quot;&quot;</span>
+        <span class="c1"># Check if we have added the state</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;cuda rng state </span><span class="si">{}</span><span class="s2"> is not added&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="c1"># Store current rng state.</span>
+        <span class="n">orig_cuda_rng_state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_rng_state</span><span class="p">()</span>
+        <span class="c1"># Set rng state to the desired one</span>
+        <span class="n">_set_cuda_rng_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states_</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="c1"># Do the stuff we wanted to do.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="c1"># Update the current rng state for later use.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">states_</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_rng_state</span><span class="p">()</span>
+            <span class="c1"># And set the state to the original state we started with.</span>
+            <span class="n">_set_cuda_rng_state</span><span class="p">(</span><span class="n">orig_cuda_rng_state</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># RNG tracker object.</span>
+<span class="n">_CUDA_RNG_STATE_TRACKER</span> <span class="o">=</span> <span class="n">CudaRNGStatesTracker</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="get_cuda_rng_tracker">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.get_cuda_rng_tracker">[docs]</a>
+<span class="k">def</span> <span class="nf">get_cuda_rng_tracker</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get cuda rng tracker.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_CUDA_RNG_STATE_TRACKER</span></div>
+
+
+
+<div class="viewcode-block" id="model_parallel_cuda_manual_seed">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.model_parallel_cuda_manual_seed">[docs]</a>
+<span class="k">def</span> <span class="nf">model_parallel_cuda_manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize model parallel cuda seed.</span>
+
+<span class="sd">    This function should be called after the model parallel is</span>
+<span class="sd">    initialized. Also, no torch.cuda.manual_seed should be called</span>
+<span class="sd">    after this function. Basically, this is replacement for that</span>
+<span class="sd">    function.</span>
+<span class="sd">    Two set of RNG states are tracked:</span>
+<span class="sd">        default state: This is for data parallelism and is the same among a</span>
+<span class="sd">                       set of model parallel GPUs but different across</span>
+<span class="sd">                       different model paralle groups. This is used for</span>
+<span class="sd">                       example for dropout in the non-tensor-model-parallel regions.</span>
+<span class="sd">        tensor-model-parallel state: This state is different among a set of model</span>
+<span class="sd">                              parallel GPUs, but the same across data parallel</span>
+<span class="sd">                              groups. This is used for example for dropout in</span>
+<span class="sd">                              model parallel regions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 2718 is just for fun and any POSITIVE value will work.</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">seed</span> <span class="o">+</span> <span class="mi">2718</span>
+    <span class="n">tensor_model_parallel_seed</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">get_tensor_model_parallel_rank</span><span class="p">()</span>
+    <span class="c1"># Data parallel gets the original seed.</span>
+    <span class="n">data_parallel_seed</span> <span class="o">=</span> <span class="n">seed</span>
+
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;&gt; initializing model parallel cuda seeds on global rank </span><span class="si">{}</span><span class="s2">, &quot;</span>
+            <span class="s2">&quot;model parallel rank </span><span class="si">{}</span><span class="s2">, and data parallel rank </span><span class="si">{}</span><span class="s2"> with &quot;</span>
+            <span class="s2">&quot;model parallel seed: </span><span class="si">{}</span><span class="s2"> and data parallel seed: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_rank</span><span class="p">(),</span>
+                <span class="n">get_tensor_model_parallel_rank</span><span class="p">(),</span>
+                <span class="n">get_data_parallel_rank</span><span class="p">(),</span>
+                <span class="n">tensor_model_parallel_seed</span><span class="p">,</span>
+                <span class="n">data_parallel_seed</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">_CUDA_RNG_STATE_TRACKER</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+    <span class="c1"># Set the default state.</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">data_parallel_seed</span><span class="p">)</span>
+    <span class="c1"># and model parallel state.</span>
+    <span class="n">_CUDA_RNG_STATE_TRACKER</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="n">_MODEL_PARALLEL_RNG_TRACKER_NAME</span><span class="p">,</span> <span class="n">tensor_model_parallel_seed</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CheckpointFunction">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.CheckpointFunction">[docs]</a>
+<span class="k">class</span> <span class="nc">CheckpointFunction</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is adapted from torch.utils.checkpoint with</span>
+<span class="sd">    two main changes:</span>
+<span class="sd">        1) torch.cuda.set_rng_state is replaced with `_set_cuda_rng_state`</span>
+<span class="sd">        2) the states in the model parallel tracker are also properly</span>
+<span class="sd">           tracked/set/reset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CheckpointFunction.forward">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.CheckpointFunction.forward">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">run_function</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">run_function</span> <span class="o">=</span> <span class="n">run_function</span>
+
+        <span class="c1"># Copy the rng states.</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">fwd_cpu_rng_state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">get_rng_state</span><span class="p">()</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">fwd_cuda_rng_state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_rng_state</span><span class="p">()</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">fwd_cuda_rng_state_tracker</span> <span class="o">=</span> <span class="n">get_cuda_rng_tracker</span><span class="p">()</span><span class="o">.</span><span class="n">get_states</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">run_function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+        <span class="c1"># Divide hidden states across model parallel group and only keep</span>
+        <span class="c1"># the chunk corresponding to the current rank.</span>
+        <span class="k">if</span> <span class="n">_CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ctx</span><span class="o">.</span><span class="n">input_0_shape</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">split_tensor_into_1d_equal_chunks</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">_CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="c1"># Store everything.</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">save_for_backward</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">outputs</span></div>
+
+
+<div class="viewcode-block" id="CheckpointFunction.backward">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.CheckpointFunction.backward">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">_is_checkpoint_valid</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Checkpointing is not compatible with .grad(), &quot;</span>
+                <span class="s2">&quot;please use .backward() if possible&quot;</span>
+            <span class="p">)</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_tensors</span>
+        <span class="k">if</span> <span class="n">_CHECKPOINTED_ACTIVATIONS_MEMORY_BUFFER</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">gather_split_1d_tensor</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">input_0_shape</span><span class="p">)</span>
+
+        <span class="c1"># Store the current states.</span>
+        <span class="n">bwd_cpu_rng_state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">get_rng_state</span><span class="p">()</span>
+        <span class="n">bwd_cuda_rng_state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_rng_state</span><span class="p">()</span>
+        <span class="n">bwd_cuda_rng_state_tracker</span> <span class="o">=</span> <span class="n">get_cuda_rng_tracker</span><span class="p">()</span><span class="o">.</span><span class="n">get_states</span><span class="p">()</span>
+
+        <span class="c1"># Set the states to what it used to be before the forward pass.</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">set_rng_state</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">fwd_cpu_rng_state</span><span class="p">)</span>
+        <span class="n">_set_cuda_rng_state</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">fwd_cuda_rng_state</span><span class="p">)</span>
+        <span class="n">get_cuda_rng_tracker</span><span class="p">()</span><span class="o">.</span><span class="n">set_states</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">fwd_cuda_rng_state_tracker</span><span class="p">)</span>
+
+        <span class="c1"># Compute the forward pass.</span>
+        <span class="n">detached_inputs</span> <span class="o">=</span> <span class="n">detach_variable</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">():</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">run_function</span><span class="p">(</span><span class="o">*</span><span class="n">detached_inputs</span><span class="p">)</span>
+
+        <span class="c1"># Set the states back to what it was at the start of this function.</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">set_rng_state</span><span class="p">(</span><span class="n">bwd_cpu_rng_state</span><span class="p">)</span>
+        <span class="n">_set_cuda_rng_state</span><span class="p">(</span><span class="n">bwd_cuda_rng_state</span><span class="p">)</span>
+        <span class="n">get_cuda_rng_tracker</span><span class="p">()</span><span class="o">.</span><span class="n">set_states</span><span class="p">(</span><span class="n">bwd_cuda_rng_state_tracker</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="p">(</span><span class="n">outputs</span><span class="p">,)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+        <span class="n">grads</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="n">inp</span><span class="o">.</span><span class="n">grad</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="k">else</span> <span class="n">inp</span>
+            <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">detached_inputs</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">+</span> <span class="n">grads</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="checkpoint">
+<a class="viewcode-back" href="../../../../model.denoising.mpu.html#model.denoising.mpu.random.checkpoint">[docs]</a>
+<span class="k">def</span> <span class="nf">checkpoint</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checkpoint a model or part of the model.</span>
+<span class="sd">    This has been directly copied from torch.utils.checkpoint.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">CheckpointFunction</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yue Zhou, Tianyu Zhao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

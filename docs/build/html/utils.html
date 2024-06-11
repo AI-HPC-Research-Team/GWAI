@@ -1,92 +1,49 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>utils package &mdash; GWAI  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
   
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="utils.io package" href="utils.io.html" />
     <link rel="prev" title="model.detection package" href="model.detection.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="index.html" class="icon icon-home"> GWAI
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            GWAI
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="about_gwai.html">About GWAI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
@@ -102,9 +59,23 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-utils.log_utils">utils.log_utils module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-utils.logger">utils.logger module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-utils.utils_wf">utils.utils_wf module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-utils.log_utils">utils.log_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#utils.log_utils.MyLogger"><code class="docutils literal notranslate"><span class="pre">MyLogger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#utils.log_utils.TimerLog"><code class="docutils literal notranslate"><span class="pre">TimerLog</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-utils.logger">utils.logger module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#utils.logger.MyLogger"><code class="docutils literal notranslate"><span class="pre">MyLogger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#utils.logger.Timer"><code class="docutils literal notranslate"><span class="pre">Timer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-utils.utils_wf">utils.utils_wf module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#utils.utils_wf.AET"><code class="docutils literal notranslate"><span class="pre">AET()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#utils.utils_wf.XYZ"><code class="docutils literal notranslate"><span class="pre">XYZ()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#utils.utils_wf.m1_m2_from_M_Chirp_q"><code class="docutils literal notranslate"><span class="pre">m1_m2_from_M_Chirp_q()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#utils.utils_wf.m1_m2_from_M_q"><code class="docutils literal notranslate"><span class="pre">m1_m2_from_M_q()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-utils">Module contents</a></li>
 </ul>
 </li>
@@ -113,149 +84,168 @@
 <li class="toctree-l1"><a class="reference internal" href="citations.html">Citations</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">GWAI</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="modules.html">src</a> &raquo;</li>
-        
-      <li>utils package</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+      <li class="breadcrumb-item active">utils package</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/utils.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="utils-package">
-<h1>utils package<a class="headerlink" href="#utils-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="utils-package">
+<h1>utils package<a class="headerlink" href="#utils-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="utils.io.html">utils.io package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="utils.io.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.io.html#module-utils.io.hdf5_wfd">utils.io.hdf5_wfd module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.io.html#utils-io-hdf5-wfd-module">utils.io.hdf5_wfd module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.io.html#module-utils.io">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utils.lisa.html">utils.lisa package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="utils.lisa.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.lisa.html#module-utils.lisa.LISACommonFunctions">utils.lisa.LISACommonFunctions module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.lisa.html#module-utils.lisa.constant">utils.lisa.constant module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.lisa.html#module-utils.lisa.cosmology">utils.lisa.cosmology module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.lisa.html#module-utils.lisa.link_utils">utils.lisa.link_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.lisa.html#module-utils.lisa.LISACommonFunctions">utils.lisa.LISACommonFunctions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.LISACommonFunctions.AziPolAngleL2PsiIncl"><code class="docutils literal notranslate"><span class="pre">AziPolAngleL2PsiIncl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.LISACommonFunctions.FormatNpArray"><code class="docutils literal notranslate"><span class="pre">FormatNpArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.LISACommonFunctions.FourierTransformData"><code class="docutils literal notranslate"><span class="pre">FourierTransformData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.LISACommonFunctions.GetStrCodeGitCmd"><code class="docutils literal notranslate"><span class="pre">GetStrCodeGitCmd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.LISACommonFunctions.LoadFileNpStruct"><code class="docutils literal notranslate"><span class="pre">LoadFileNpStruct()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.LISACommonFunctions.Window"><code class="docutils literal notranslate"><span class="pre">Window()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.LISACommonFunctions.makefromtemplate"><code class="docutils literal notranslate"><span class="pre">makefromtemplate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.LISACommonFunctions.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.lisa.html#module-utils.lisa.constant">utils.lisa.constant module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant"><code class="docutils literal notranslate"><span class="pre">Constant</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.AU_SI"><code class="docutils literal notranslate"><span class="pre">Constant.AU_SI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.C_SI"><code class="docutils literal notranslate"><span class="pre">Constant.C_SI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.EPS"><code class="docutils literal notranslate"><span class="pre">Constant.EPS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.F0"><code class="docutils literal notranslate"><span class="pre">Constant.F0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.GAMMA"><code class="docutils literal notranslate"><span class="pre">Constant.GAMMA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.GMSUN"><code class="docutils literal notranslate"><span class="pre">Constant.GMSUN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.G_SI"><code class="docutils literal notranslate"><span class="pre">Constant.G_SI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.H0"><code class="docutils literal notranslate"><span class="pre">Constant.H0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.H0_SI"><code class="docutils literal notranslate"><span class="pre">Constant.H0_SI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.INVSQRT2"><code class="docutils literal notranslate"><span class="pre">Constant.INVSQRT2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.INVSQRT3"><code class="docutils literal notranslate"><span class="pre">Constant.INVSQRT3</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.INVSQRT6"><code class="docutils literal notranslate"><span class="pre">Constant.INVSQRT6</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.INVSQRTPI"><code class="docutils literal notranslate"><span class="pre">Constant.INVSQRTPI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.INVSQRTTWOPI"><code class="docutils literal notranslate"><span class="pre">Constant.INVSQRTTWOPI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.MRSUN_SI"><code class="docutils literal notranslate"><span class="pre">Constant.MRSUN_SI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.MSUN_SI"><code class="docutils literal notranslate"><span class="pre">Constant.MSUN_SI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.MTSUN_SI"><code class="docutils literal notranslate"><span class="pre">Constant.MTSUN_SI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.Omega0"><code class="docutils literal notranslate"><span class="pre">Constant.Omega0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.Omegalam"><code class="docutils literal notranslate"><span class="pre">Constant.Omegalam</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.Omegam"><code class="docutils literal notranslate"><span class="pre">Constant.Omegam</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.PC_SI"><code class="docutils literal notranslate"><span class="pre">Constant.PC_SI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.PI"><code class="docutils literal notranslate"><span class="pre">Constant.PI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.PI_2"><code class="docutils literal notranslate"><span class="pre">Constant.PI_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.PI_3"><code class="docutils literal notranslate"><span class="pre">Constant.PI_3</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.PI_4"><code class="docutils literal notranslate"><span class="pre">Constant.PI_4</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.SQRT2"><code class="docutils literal notranslate"><span class="pre">Constant.SQRT2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.SQRT3"><code class="docutils literal notranslate"><span class="pre">Constant.SQRT3</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.SQRT6"><code class="docutils literal notranslate"><span class="pre">Constant.SQRT6</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.SQRTPI"><code class="docutils literal notranslate"><span class="pre">Constant.SQRTPI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.SQRTTWOPI"><code class="docutils literal notranslate"><span class="pre">Constant.SQRTTWOPI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.constant.Constant.YRSID_SI"><code class="docutils literal notranslate"><span class="pre">Constant.YRSID_SI</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.lisa.html#module-utils.lisa.cosmology">utils.lisa.cosmology module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.cosmology.Cosmology"><code class="docutils literal notranslate"><span class="pre">Cosmology</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.cosmology.Cosmology.DL"><code class="docutils literal notranslate"><span class="pre">Cosmology.DL()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.cosmology.Cosmology.H"><code class="docutils literal notranslate"><span class="pre">Cosmology.H()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.cosmology.Cosmology.findz"><code class="docutils literal notranslate"><span class="pre">Cosmology.findz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.lisa.html#utils.lisa.cosmology.Cosmology.zofDl"><code class="docutils literal notranslate"><span class="pre">Cosmology.zofDl()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.lisa.html#module-utils.lisa.link_utils">utils.lisa.link_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.link_utils.arrayindex"><code class="docutils literal notranslate"><span class="pre">arrayindex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.link_utils.atleast_2d"><code class="docutils literal notranslate"><span class="pre">atleast_2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.link_utils.dot"><code class="docutils literal notranslate"><span class="pre">dot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.lisa.html#utils.lisa.link_utils.norm"><code class="docutils literal notranslate"><span class="pre">norm()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="utils.lisa.html#module-utils.lisa">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-utils.log_utils">
-<span id="utils-log-utils-module"></span><h2>utils.log_utils module<a class="headerlink" href="#module-utils.log_utils" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-utils.log_utils">
+<span id="utils-log-utils-module"></span><h2>utils.log_utils module<a class="headerlink" href="#module-utils.log_utils" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="utils.log_utils.MyLogger">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">utils.log_utils.</span></span><span class="sig-name descname"><span class="pre">MyLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.log_utils.MyLogger" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">utils.log_utils.</span></span><span class="sig-name descname"><span class="pre">MyLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.log_utils.MyLogger" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py property">
 <dt class="sig sig-object py" id="utils.log_utils.MyLogger.logger">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#utils.log_utils.MyLogger.logger" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#utils.log_utils.MyLogger.logger" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="utils.log_utils.TimerLog">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">utils.log_utils.</span></span><span class="sig-name descname"><span class="pre">TimerLog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.log_utils.TimerLog" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">utils.log_utils.</span></span><span class="sig-name descname"><span class="pre">TimerLog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.log_utils.TimerLog" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-utils.logger">
-<span id="utils-logger-module"></span><h2>utils.logger module<a class="headerlink" href="#module-utils.logger" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-utils.logger">
+<span id="utils-logger-module"></span><h2>utils.logger module<a class="headerlink" href="#module-utils.logger" title="Link to this heading"></a></h2>
 <p>Logging utilities</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="utils.logger.MyLogger">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">utils.logger.</span></span><span class="sig-name descname"><span class="pre">MyLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.logger.MyLogger" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">utils.logger.</span></span><span class="sig-name descname"><span class="pre">MyLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.logger.MyLogger" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py property">
 <dt class="sig sig-object py" id="utils.logger.MyLogger.logger">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#utils.logger.MyLogger.logger" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#utils.logger.MyLogger.logger" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="utils.logger.Timer">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">utils.logger.</span></span><span class="sig-name descname"><span class="pre">Timer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.logger.Timer" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">utils.logger.</span></span><span class="sig-name descname"><span class="pre">Timer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.logger.Timer" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-utils.utils_wf">
-<span id="utils-utils-wf-module"></span><h2>utils.utils_wf module<a class="headerlink" href="#module-utils.utils_wf" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-utils.utils_wf">
+<span id="utils-utils-wf-module"></span><h2>utils.utils_wf module<a class="headerlink" href="#module-utils.utils_wf" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.utils_wf.AET">
-<span class="sig-prename descclassname"><span class="pre">utils.utils_wf.</span></span><span class="sig-name descname"><span class="pre">AET</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.utils_wf.AET" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.utils_wf.</span></span><span class="sig-name descname"><span class="pre">AET</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.utils_wf.AET" title="Link to this definition"></a></dt>
 <dd><p>Convert the TDI variables to the AET from XYZ.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>X</strong> (<em>float</em>) – X variable</p></li>
 <li><p><strong>Y</strong> (<em>float</em>) – Y variable</p></li>
@@ -267,10 +257,10 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.utils_wf.XYZ">
-<span class="sig-prename descclassname"><span class="pre">utils.utils_wf.</span></span><span class="sig-name descname"><span class="pre">XYZ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.utils_wf.XYZ" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.utils_wf.</span></span><span class="sig-name descname"><span class="pre">XYZ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.utils_wf.XYZ" title="Link to this definition"></a></dt>
 <dd><p>Convert the AET variables to the XYZ from AET.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>A</strong> (<em>float</em>) – A variable</p></li>
 <li><p><strong>E</strong> (<em>float</em>) – E variable</p></li>
@@ -282,16 +272,16 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.utils_wf.m1_m2_from_M_Chirp_q">
-<span class="sig-prename descclassname"><span class="pre">utils.utils_wf.</span></span><span class="sig-name descname"><span class="pre">m1_m2_from_M_Chirp_q</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M_Chirp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.utils_wf.m1_m2_from_M_Chirp_q" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.utils_wf.</span></span><span class="sig-name descname"><span class="pre">m1_m2_from_M_Chirp_q</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M_Chirp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.utils_wf.m1_m2_from_M_Chirp_q" title="Link to this definition"></a></dt>
 <dd><p>Compute individual masses from chirp mass and mass ratio.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>M_Chirp</strong> (<em>float</em>) – chirp mass</p></li>
 <li><p><strong>q</strong> (<em>float</em>) – mass ratio, 0.0&lt; q &lt;= 1.0</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>(float, float) – (mass_1, mass_2)</p>
 </dd>
 </dl>
@@ -299,75 +289,58 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.utils_wf.m1_m2_from_M_q">
-<span class="sig-prename descclassname"><span class="pre">utils.utils_wf.</span></span><span class="sig-name descname"><span class="pre">m1_m2_from_M_q</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.utils_wf.m1_m2_from_M_q" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.utils_wf.</span></span><span class="sig-name descname"><span class="pre">m1_m2_from_M_q</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.utils_wf.m1_m2_from_M_q" title="Link to this definition"></a></dt>
 <dd><p>Compute individual masses from total mass and mass ratio.</p>
 <p>Choose m1 &gt;= m2.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mass</strong> (<em>M {float} -- total</em>) – </p></li>
-<li><p><strong>ratio</strong> (<em>q {mass ratio} -- mass</em>) – </p></li>
-<li><p><strong>1.0</strong> (<em>0.0&lt; q &lt;=</em>) – </p></li>
+<li><p><strong>mass</strong> (<em>M {float} -- total</em>)</p></li>
+<li><p><strong>ratio</strong> (<em>q {mass ratio} -- mass</em>)</p></li>
+<li><p><strong>1.0</strong> (<em>0.0&lt; q &lt;=</em>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>(float, float) – (mass_1, mass_2)</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-utils">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-utils" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+<section id="module-utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-utils" title="Link to this heading"></a></h2>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="utils.io.html" class="btn btn-neutral float-right" title="utils.io package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="model.detection.html" class="btn btn-neutral float-left" title="model.detection package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="utils.io.html" class="btn btn-neutral float-right" title="utils.io package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2024, Yue Zhou, Tianyu Zhao.
-
-    </p>
+    <p>&#169; Copyright 2024, Yue Zhou, Tianyu Zhao.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

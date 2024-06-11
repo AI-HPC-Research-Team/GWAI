@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>utils.lisa.LISACommonFunctions &mdash; GWAI  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            GWAI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../about_gwai.html">About GWAI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Main Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../citations.html">Citations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">GWAI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">utils.lisa.LISACommonFunctions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for utils.lisa.LISACommonFunctions</h1><div class="highlight"><pre>
+<span></span><span class="c1"># mypy: ignore-errors</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Copyright (C) 2017 Stas Babak, Antoine Petiteau for the LDC team</span>
+
+<span class="sd">This file is part of LISA Data Challenge.</span>
+
+<span class="sd">LISA Data Challenge is free software: you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU General Public License as published by</span>
+<span class="sd">the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">Foobar is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU General Public License</span>
+<span class="sd">along with Foobar.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1">##################################################</span>
+<span class="c1">#                                                #</span>
+<span class="c1">#            LISA common functions               #</span>
+<span class="c1">#                 version 1.0                    #</span>
+<span class="c1">#                                                #</span>
+<span class="c1">#         A. Petiteau, ...                       #</span>
+<span class="c1">#      for the LISA Data Challenge team          #</span>
+<span class="c1">#                                                #</span>
+<span class="c1">##################################################</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># import subprocess</span>
+<span class="kn">import</span> <span class="nn">pyfftw</span>
+
+
+<div class="viewcode-block" id="run">
+<a class="viewcode-back" href="../../../utils.lisa.html#utils.lisa.LISACommonFunctions.run">[docs]</a>
+<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">NoExit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run system command</span>
+<span class="sd">    @param command is a string to run as a system command</span>
+<span class="sd">    @param disp is true to display the command</span>
+<span class="sd">    @param is true to continue if the command failed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">commandline</span> <span class="o">=</span> <span class="n">command</span> <span class="o">%</span> <span class="nb">globals</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">disp</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;----&gt; </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">commandline</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">commandline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Script </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> failed at the sytem command &quot;</span><span class="si">{</span><span class="n">commandline</span><span class="si">}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">NoExit</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;continue anyway ...&quot;</span><span class="p">)</span>
+        <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="makefromtemplate">
+<a class="viewcode-back" href="../../../utils.lisa.html#utils.lisa.LISACommonFunctions.makefromtemplate">[docs]</a>
+<span class="k">def</span> <span class="nf">makefromtemplate</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">keyChar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create an output file identical to the template file with the string</span>
+<span class="sd">    between the key character KeyChar and corresponding to a keyword in kwargs</span>
+<span class="sd">    replaced by the argument of the keyword</span>
+<span class="sd">    @param output is the output file</span>
+<span class="sd">    @param template is the template file</span>
+<span class="sd">    @param keyChar is the key character surrounding keywords</span>
+<span class="sd">    @param kwargs are keywords and corresponding arguments</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fi</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
+    <span class="n">fo</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fi</span><span class="p">:</span>
+        <span class="n">repline</span> <span class="o">=</span> <span class="n">line</span>
+        <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">repline</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">keyChar</span> <span class="o">+</span> <span class="n">kw</span> <span class="o">+</span> <span class="n">keyChar</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">kw</span><span class="p">]),</span> <span class="n">repline</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">repline</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">fo</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="LoadFileNpStruct">
+<a class="viewcode-back" href="../../../utils.lisa.html#utils.lisa.LISACommonFunctions.LoadFileNpStruct">[docs]</a>
+<span class="k">def</span> <span class="nf">LoadFileNpStruct</span><span class="p">(</span><span class="n">FileName</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load txt file of data and return a structured numpy array</span>
+<span class="sd">    @param filename with one column per record and title of the record on the first line &quot;#rec1 rec1 ...&quot;</span>
+<span class="sd">    @return structured numpy array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fIn</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">FileName</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">fIn</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="n">fIn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">dty</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">dty</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">))</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">FileName</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dty</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d</span></div>
+
+
+
+<div class="viewcode-block" id="GetStrCodeGitCmd">
+<a class="viewcode-back" href="../../../utils.lisa.html#utils.lisa.LISACommonFunctions.GetStrCodeGitCmd">[docs]</a>
+<span class="k">def</span> <span class="nf">GetStrCodeGitCmd</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get script history and running informations:</span>
+<span class="sd">    @param filepath is file path : os.path.realpath(__file__)</span>
+<span class="sd">    @param options is the dictionary of options : vars(options)</span>
+<span class="sd">    @param args is the list of arguments : args</span>
+<span class="sd">    @return string with informations: script, git hash, git branch, commandline</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dirCurrent</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+    <span class="n">dirScript</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+    <span class="c1"># nameScript = os.path.basename(filepath)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">dirScript</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">dirCurrent</span> <span class="o">+</span> <span class="s2">&quot;/tmp_GetStrCodeGitCmd.txt&quot;</span>
+    <span class="n">run</span><span class="p">(</span>
+        <span class="s2">&quot;cd &quot;</span> <span class="o">+</span> <span class="n">dirScript</span> <span class="o">+</span> <span class="s2">&quot;; git rev-parse HEAD &gt; &quot;</span> <span class="o">+</span> <span class="n">tmp</span> <span class="o">+</span> <span class="s2">&quot; ; git branch &gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">tmp</span><span class="p">,</span>
+        <span class="n">disp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">NoExit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">run</span><span class="p">(</span><span class="s2">&quot;cd &quot;</span> <span class="o">+</span> <span class="n">dirCurrent</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">NoExit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">gitHash</span> <span class="o">=</span> <span class="s2">&quot;git hash not found&quot;</span>
+    <span class="n">gitBranch</span> <span class="o">=</span> <span class="s2">&quot;git branch not found&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">fIn</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">fIn</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+        <span class="n">fIn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1">### For docker</span>
+            <span class="n">tmp2</span> <span class="o">=</span> <span class="s2">&quot;/codes/LDC/default_GetStrCodeGitCmd.txt&quot;</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">tmp2</span><span class="p">):</span>
+                <span class="n">fIn</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp2</span><span class="p">)</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">fIn</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+                <span class="n">fIn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">gitHash</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;*&quot;</span><span class="p">:</span>
+                    <span class="n">gitBranch</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">tmp</span><span class="p">):</span>
+            <span class="n">run</span><span class="p">(</span><span class="s2">&quot;rm &quot;</span> <span class="o">+</span> <span class="n">tmp</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING in GetStrCodeGitCmd: cannot recover script informations&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">dirCurrent</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;#</span><span class="si">{</span><span class="n">gitHash</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">gitBranch</span><span class="si">}</span><span class="s2">): python3 </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="s2">&quot; --&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">options</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">r</span></div>
+
+
+
+<div class="viewcode-block" id="AziPolAngleL2PsiIncl">
+<a class="viewcode-back" href="../../../utils.lisa.html#utils.lisa.LISACommonFunctions.AziPolAngleL2PsiIncl">[docs]</a>
+<span class="k">def</span> <span class="nf">AziPolAngleL2PsiIncl</span><span class="p">(</span><span class="n">bet</span><span class="p">,</span> <span class="n">lam</span><span class="p">,</span> <span class="n">theL</span><span class="p">,</span> <span class="n">phiL</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert Polar and Azimuthal angles of zS (typically orbital angular momentum L)</span>
+<span class="sd">    to polarisation and inclination (see doc)</span>
+<span class="sd">    @param bet is the ecliptic latitude of the source in sky [rad]</span>
+<span class="sd">    @param lam is the ecliptic longitude of the source in sky [rad]</span>
+<span class="sd">    @param theL is the polar angle of zS [rad]</span>
+<span class="sd">    @param phiL is the azimuthal angle of zS [rad]</span>
+<span class="sd">    @return polarisation and inclination</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># inc = np.arccos( np.cos(theL)*np.sin(bet) + np.cos(bet)*np.sin(theL)*np.cos(lam - phiL) )</span>
+    <span class="c1"># up_psi = np.cos(theL)*np.cos(bet) - np.sin(bet)*np.sin(theL)*np.cos(lam - phiL)</span>
+    <span class="c1"># down_psi = np.sin(theL)*np.sin(lam - phiL)</span>
+    <span class="c1"># psi = np.arctan2(up_psi, down_psi)</span>
+
+    <span class="n">inc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span>
+        <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theL</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">bet</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">bet</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theL</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lam</span> <span class="o">-</span> <span class="n">phiL</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">down_psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theL</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lam</span> <span class="o">-</span> <span class="n">phiL</span><span class="p">)</span>
+    <span class="n">up_psi</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">bet</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theL</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lam</span> <span class="o">-</span> <span class="n">phiL</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theL</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span>
+        <span class="n">bet</span>
+    <span class="p">)</span>
+    <span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">up_psi</span><span class="p">,</span> <span class="n">down_psi</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">psi</span><span class="p">,</span> <span class="n">inc</span></div>
+
+
+
+<div class="viewcode-block" id="Window">
+<a class="viewcode-back" href="../../../utils.lisa.html#utils.lisa.LISACommonFunctions.Window">[docs]</a>
+<span class="k">def</span> <span class="nf">Window</span><span class="p">(</span><span class="n">tm</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply window ...</span>
+<span class="sd">    @param tm is the time array</span>
+<span class="sd">    @return the window array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO Need details about the window</span>
+    <span class="n">xl</span> <span class="o">=</span> <span class="mf">1000.0</span>
+    <span class="n">ind_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">tm</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">tm</span> <span class="o">&lt;=</span> <span class="mf">1000.0</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">xr</span> <span class="o">=</span> <span class="n">tm</span><span class="p">[</span><span class="n">ind_r</span><span class="p">]</span>
+    <span class="n">kap</span> <span class="o">=</span> <span class="mf">0.005</span>
+    <span class="n">winl</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">kap</span> <span class="o">*</span> <span class="p">(</span><span class="n">tm</span> <span class="o">-</span> <span class="n">xl</span><span class="p">)))</span>
+    <span class="n">winr</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">kap</span> <span class="o">*</span> <span class="p">(</span><span class="n">tm</span> <span class="o">-</span> <span class="n">xr</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">winl</span> <span class="o">*</span> <span class="n">winr</span></div>
+
+
+
+<div class="viewcode-block" id="FourierTransformData">
+<a class="viewcode-back" href="../../../utils.lisa.html#utils.lisa.LISACommonFunctions.FourierTransformData">[docs]</a>
+<span class="k">def</span> <span class="nf">FourierTransformData</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">wis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fourier transform data</span>
+<span class="sd">    @param x is the input data</span>
+<span class="sd">    @param dt is the step in the reference array</span>
+<span class="sd">    @return x transform of the data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pyfftw.import_wisdom(ws)</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">yt</span> <span class="o">=</span> <span class="n">pyfftw</span><span class="o">.</span><span class="n">empty_aligned</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+    <span class="n">yf</span> <span class="o">=</span> <span class="n">pyfftw</span><span class="o">.</span><span class="n">empty_aligned</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">N</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;complex128&quot;</span><span class="p">)</span>
+    <span class="n">fft_object</span> <span class="o">=</span> <span class="n">pyfftw</span><span class="o">.</span><span class="n">FFTW</span><span class="p">(</span><span class="n">yt</span><span class="p">,</span> <span class="n">yf</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;FFTW_ESTIMATE&quot;</span><span class="p">,))</span>
+    <span class="c1"># fft_object = pyfftw.FFTW(yt, yf)</span>
+    <span class="n">yt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">yf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">fft_object</span><span class="p">(</span><span class="n">yt</span> <span class="o">*</span> <span class="n">dt</span><span class="p">))</span>
+    <span class="c1"># wis = pyfftw.export_wisdom()</span>
+    <span class="c1"># print (&quot;wis = &quot;, wis)</span>
+    <span class="k">return</span> <span class="n">yf</span></div>
+
+
+
+<div class="viewcode-block" id="FormatNpArray">
+<a class="viewcode-back" href="../../../utils.lisa.html#utils.lisa.LISACommonFunctions.FormatNpArray">[docs]</a>
+<span class="k">def</span> <span class="nf">FormatNpArray</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make sure the result is list format even if it is a single value</span>
+<span class="sd">    @param input variable or list</span>
+<span class="sd">    @return list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yue Zhou, Tianyu Zhao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

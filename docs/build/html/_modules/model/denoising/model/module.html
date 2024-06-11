@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>model.denoising.model.module &mdash; GWAI  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            GWAI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about_gwai.html">About GWAI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Main Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../citations.html">Citations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">GWAI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../model.html">model</a></li>
+          <li class="breadcrumb-item"><a href="../../denoising.html">model.denoising</a></li>
+      <li class="breadcrumb-item active">model.denoising.model.module</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for model.denoising.model.module</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="c1"># Copyright (c) 2022, PengCheng Laboratory.  All rights reserved.</span>
+<span class="c1"># Copyright (c) 2020, NVIDIA CORPORATION.  All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="c1"># Most of the code here has been copied from:</span>
+<span class="c1">#   https://github.com/NVIDIA/Megatron-LM/blob/v2.5/megatron/model/module.py</span>
+<span class="c1"># with some modifications.</span>
+
+<span class="sd">&quot;&quot;&quot;Megatron Module&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="kn">from</span> <span class="nn">torch.nn.parameter</span> <span class="kn">import</span> <span class="n">Parameter</span>
+
+<span class="kn">from</span> <span class="nn">src.model.denoising</span> <span class="kn">import</span> <span class="n">get_args</span><span class="p">,</span> <span class="n">mpu</span>
+
+<span class="n">_FLOAT_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">)</span>
+<span class="n">_HALF_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">HalfTensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">HalfTensor</span><span class="p">)</span>
+<span class="n">_BF16_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">BFloat16Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">BFloat16Tensor</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="param_is_not_shared">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.module.param_is_not_shared">[docs]</a>
+<span class="k">def</span> <span class="nf">param_is_not_shared</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="s2">&quot;shared&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">param</span><span class="o">.</span><span class="n">shared</span></div>
+
+
+
+<div class="viewcode-block" id="MegatronModule">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.module.MegatronModule">[docs]</a>
+<span class="k">class</span> <span class="nc">MegatronModule</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Megatron specific extensions of torch Module with support</span>
+<span class="sd">    for pipelining.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">share_word_embeddings</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MegatronModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">share_word_embeddings</span> <span class="o">=</span> <span class="n">share_word_embeddings</span>
+
+<div class="viewcode-block" id="MegatronModule.state_dict_for_save_checkpoint">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.module.MegatronModule.state_dict_for_save_checkpoint">[docs]</a>
+    <span class="k">def</span> <span class="nf">state_dict_for_save_checkpoint</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">keep_vars</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Use this function to override the state dict for</span>
+<span class="sd">        saving checkpoints.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MegatronModule.word_embeddings_weight">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.module.MegatronModule.word_embeddings_weight">[docs]</a>
+    <span class="k">def</span> <span class="nf">word_embeddings_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">mpu</span><span class="o">.</span><span class="n">is_pipeline_first_stage</span><span class="p">(</span><span class="n">ignore_virtual</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gw_model</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">word_embeddings</span><span class="o">.</span><span class="n">weight</span>
+        <span class="k">if</span> <span class="n">mpu</span><span class="o">.</span><span class="n">is_pipeline_last_stage</span><span class="p">(</span><span class="n">ignore_virtual</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">share_word_embeddings</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="s2">&quot;word_embeddings_weight() called for last &quot;</span>
+                    <span class="s2">&quot;stage, but share_word_embeddings is false&quot;</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_embeddings</span><span class="o">.</span><span class="n">weight</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s2">&quot;word_embeddings_weight() should be &quot;</span> <span class="s2">&quot;called for first and last stage only&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MegatronModule.initialize_word_embeddings">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.module.MegatronModule.initialize_word_embeddings">[docs]</a>
+    <span class="k">def</span> <span class="nf">initialize_word_embeddings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_method_normal</span><span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">share_word_embeddings</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;initialize_word_embeddings() was called but &quot;</span>
+                <span class="s2">&quot;share_word_embeddings is false&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># This function just initializes the word embeddings in the final stage</span>
+        <span class="c1"># when we are using pipeline parallelism. If we aren&#39;t using pipeline</span>
+        <span class="c1"># parallelism there is nothing to do.</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">pipeline_model_parallel_size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Parameters are shared between the word embeddings layer, and the</span>
+        <span class="c1"># heads at the end of the model. In a pipelined setup with more than</span>
+        <span class="c1"># one stage, the initial embedding layer and the head are on different</span>
+        <span class="c1"># workers, so we do the following:</span>
+        <span class="c1"># 1. Create a second copy of word_embeddings on the last stage, with</span>
+        <span class="c1">#    initial parameters of 0.0.</span>
+        <span class="c1"># 2. Do an all-reduce between the first and last stage to ensure that</span>
+        <span class="c1">#    the two copies of word_embeddings start off with the same</span>
+        <span class="c1">#    parameter values.</span>
+        <span class="c1"># 3. In the training loop, before an all-reduce between the grads of</span>
+        <span class="c1">#    the two word_embeddings layers to ensure that every applied weight</span>
+        <span class="c1">#    update is the same on both stages.</span>
+        <span class="k">if</span> <span class="n">mpu</span><span class="o">.</span><span class="n">is_pipeline_last_stage</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">mpu</span><span class="o">.</span><span class="n">is_pipeline_first_stage</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_word_embeddings_for_head_key</span> <span class="o">=</span> <span class="s2">&quot;word_embeddings_for_head&quot;</span>
+            <span class="c1"># set word_embeddings weights to 0 here, then copy first</span>
+            <span class="c1"># stage&#39;s weights using all_reduce below.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">word_embeddings</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">VocabParallelEmbedding</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">padded_vocab_size</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
+                <span class="n">init_method</span><span class="o">=</span><span class="n">init_method_normal</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">init_method_std</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">word_embeddings</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">fill_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">word_embeddings</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">shared</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Ensure that first and last stages have the same initial parameter</span>
+        <span class="c1"># values.</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">mpu</span><span class="o">.</span><span class="n">is_pipeline_first_stage</span><span class="p">()</span> <span class="ow">or</span> <span class="n">mpu</span><span class="o">.</span><span class="n">is_pipeline_last_stage</span><span class="p">():</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">word_embeddings_weight</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">mpu</span><span class="o">.</span><span class="n">get_embedding_group</span><span class="p">()</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;WARNING! Distributed processes aren&#39;t initialized, so &quot;</span>
+                <span class="s2">&quot;word embeddings in the last layer are not initialized. &quot;</span>
+                <span class="s2">&quot;If you are just manipulating a model this is fine, but &quot;</span>
+                <span class="s2">&quot;this needs to be handled manually. If you are training &quot;</span>
+                <span class="s2">&quot;something is definitely wrong.&quot;</span>
+            <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="conversion_helper">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.module.conversion_helper">[docs]</a>
+<span class="k">def</span> <span class="nf">conversion_helper</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">conversion</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply conversion to val. Recursively apply conversion if `val`</span>
+<span class="sd">    #is a nested tuple/list structure.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">conversion</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="n">rtn</span> <span class="o">=</span> <span class="p">[</span><span class="n">conversion_helper</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">conversion</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">rtn</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">rtn</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rtn</span></div>
+
+
+
+<div class="viewcode-block" id="fp32_to_float16">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.module.fp32_to_float16">[docs]</a>
+<span class="k">def</span> <span class="nf">fp32_to_float16</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">float16_convertor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert fp32 `val` to fp16/bf16&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">half_conversion</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+        <span class="n">val_typecheck</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val_typecheck</span><span class="p">,</span> <span class="p">(</span><span class="n">Parameter</span><span class="p">,</span> <span class="n">Variable</span><span class="p">)):</span>
+            <span class="n">val_typecheck</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val_typecheck</span><span class="p">,</span> <span class="n">_FLOAT_TYPES</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">float16_convertor</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    <span class="k">return</span> <span class="n">conversion_helper</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">half_conversion</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="float16_to_fp32">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.module.float16_to_fp32">[docs]</a>
+<span class="k">def</span> <span class="nf">float16_to_fp32</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert fp16/bf16 `val` to fp32&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">float_conversion</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+        <span class="n">val_typecheck</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val_typecheck</span><span class="p">,</span> <span class="p">(</span><span class="n">Parameter</span><span class="p">,</span> <span class="n">Variable</span><span class="p">)):</span>
+            <span class="n">val_typecheck</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val_typecheck</span><span class="p">,</span> <span class="p">(</span><span class="n">_BF16_TYPES</span><span class="p">,</span> <span class="n">_HALF_TYPES</span><span class="p">)):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    <span class="k">return</span> <span class="n">conversion_helper</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">float_conversion</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Float16Module">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.module.Float16Module">[docs]</a>
+<span class="k">class</span> <span class="nc">Float16Module</span><span class="p">(</span><span class="n">MegatronModule</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Float16Module</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">fp16</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span><span class="s2">&quot;module&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="n">half</span><span class="p">())</span>
+
+            <span class="k">def</span> <span class="nf">float16_convertor</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">half</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">bf16</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span><span class="s2">&quot;module&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">())</span>
+
+            <span class="k">def</span> <span class="nf">float16_convertor</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">()</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;should not be here&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">float16_convertor</span> <span class="o">=</span> <span class="n">float16_convertor</span>
+
+<div class="viewcode-block" id="Float16Module.forward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.module.Float16Module.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">mpu</span><span class="o">.</span><span class="n">is_pipeline_first_stage</span><span class="p">():</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="n">fp32_to_float16</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">float16_convertor</span><span class="p">)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mpu</span><span class="o">.</span><span class="n">is_pipeline_last_stage</span><span class="p">():</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">float16_to_fp32</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outputs</span></div>
+
+
+<div class="viewcode-block" id="Float16Module.state_dict">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.module.Float16Module.state_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">keep_vars</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Float16Module.state_dict_for_save_checkpoint">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.module.Float16Module.state_dict_for_save_checkpoint">[docs]</a>
+    <span class="k">def</span> <span class="nf">state_dict_for_save_checkpoint</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">keep_vars</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">state_dict_for_save_checkpoint</span><span class="p">(</span>
+            <span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Float16Module.load_state_dict">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.module.Float16Module.load_state_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yue Zhou, Tianyu Zhao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

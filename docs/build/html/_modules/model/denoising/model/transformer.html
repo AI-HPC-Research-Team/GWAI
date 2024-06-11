@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>model.denoising.model.transformer &mdash; GWAI  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            GWAI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about_gwai.html">About GWAI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Main Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../citations.html">Citations</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">GWAI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../model.html">model</a></li>
+          <li class="breadcrumb-item"><a href="../../denoising.html">model.denoising</a></li>
+      <li class="breadcrumb-item active">model.denoising.model.transformer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for model.denoising.model.transformer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="c1"># Copyright (c) 2022, PengCheng Laboratory.  All rights reserved.</span>
+<span class="c1"># Copyright (c) 2020, NVIDIA CORPORATION.  All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Most of the code here has been copied from:</span>
+<span class="c1">#   https://github.com/NVIDIA/Megatron-LM/blob/v2.5/megatron/model/transformer.py</span>
+<span class="c1"># with some modifications.</span>
+
+<span class="sd">&quot;&quot;&quot;Transformer.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+
+<span class="kn">from</span> <span class="nn">src.model.denoising</span> <span class="kn">import</span> <span class="n">get_args</span><span class="p">,</span> <span class="n">mpu</span>
+<span class="kn">from</span> <span class="nn">src.model.denoising.model</span> <span class="kn">import</span> <span class="n">LayerNorm</span>
+<span class="kn">from</span> <span class="nn">src.model.denoising.model.enums</span> <span class="kn">import</span> <span class="n">AttnMaskType</span><span class="p">,</span> <span class="n">AttnType</span><span class="p">,</span> <span class="n">LayerType</span>
+<span class="kn">from</span> <span class="nn">src.model.denoising.model.fused_softmax</span> <span class="kn">import</span> <span class="n">FusedScaleMaskSoftmax</span>
+<span class="kn">from</span> <span class="nn">src.model.denoising.model.utils</span> <span class="kn">import</span> <span class="n">attention_mask_func</span><span class="p">,</span> <span class="n">erf_gelu</span><span class="p">,</span> <span class="n">openai_gelu</span>
+
+<span class="kn">from</span> <span class="nn">.module</span> <span class="kn">import</span> <span class="n">MegatronModule</span>
+
+<span class="c1"># flags required to enable jit fusion kernels</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">_jit_set_profiling_mode</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">_jit_set_profiling_executor</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">_jit_override_can_fuse_on_cpu</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">_jit_override_can_fuse_on_gpu</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="sd">&quot;&quot;&quot; We use the following notation throughout this file:</span>
+<span class="sd">     h: hidden size</span>
+<span class="sd">     n: number of attention heads</span>
+<span class="sd">     p: number of model parallel partitions</span>
+<span class="sd">     np: n/p</span>
+<span class="sd">     hp: h/p</span>
+<span class="sd">     hn: h/n</span>
+<span class="sd">     b: batch size</span>
+<span class="sd">     s: sequence length</span>
+<span class="sd">     l: number of layers</span>
+<span class="sd">    Transformer takes input of size [s, b, h] and returns a</span>
+<span class="sd">    tensor of the same size. We use the following arguments:</span>
+<span class="sd">        hyperparameters: transformer hyperparameters</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="c1"># define SwiGLU activation</span>
+<div class="viewcode-block" id="SwiGLU">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.transformer.SwiGLU">[docs]</a>
+<span class="k">class</span> <span class="nc">SwiGLU</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="SwiGLU.forward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.transformer.SwiGLU.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">gate</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">silu</span><span class="p">(</span><span class="n">gate</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ParallelMLP">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.transformer.ParallelMLP">[docs]</a>
+<span class="k">class</span> <span class="nc">ParallelMLP</span><span class="p">(</span><span class="n">MegatronModule</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;MLP.</span>
+
+<span class="sd">    MLP will take the input with h hidden state, project it to 4*h</span>
+<span class="sd">    hidden dimension, perform nonlinear transformation, and project the</span>
+<span class="sd">    state back into h hidden dimension. At the end, dropout is also</span>
+<span class="sd">    applied.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_method</span><span class="p">,</span> <span class="n">output_layer_init_method</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ParallelMLP</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+
+        <span class="c1"># Project to 6h.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dense_h_to_4h</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">ColumnParallelLinear</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">ffn_hidden_size</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">gather_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">init_method</span><span class="o">=</span><span class="n">init_method</span><span class="p">,</span>
+            <span class="n">skip_bias_add</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bias_gelu_fusion</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">bias_gelu_fusion</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_func</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">gelu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">swiglu</span> <span class="o">=</span> <span class="n">SwiGLU</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">openai_gelu</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation_func</span> <span class="o">=</span> <span class="n">openai_gelu</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">onnx_safe</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation_func</span> <span class="o">=</span> <span class="n">erf_gelu</span>
+
+        <span class="c1"># Project back to h.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dense_4h_to_h</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">RowParallelLinear</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">ffn_hidden_size</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">//</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
+            <span class="n">input_is_parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">init_method</span><span class="o">=</span><span class="n">output_layer_init_method</span><span class="p">,</span>
+            <span class="n">skip_bias_add</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="ParallelMLP.forward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.transformer.ParallelMLP.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_states</span><span class="p">):</span>
+        <span class="c1"># [s, b, 4hp]</span>
+        <span class="n">intermediate_parallel</span><span class="p">,</span> <span class="n">bias_parallel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dense_h_to_4h</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+
+        <span class="n">intermediate_parallel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">swiglu</span><span class="p">(</span><span class="n">intermediate_parallel</span> <span class="o">+</span> <span class="n">bias_parallel</span><span class="p">)</span>
+        <span class="c1"># [s, b, h]</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">output_bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dense_4h_to_h</span><span class="p">(</span><span class="n">intermediate_parallel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">output_bias</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ParallelAttention">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.transformer.ParallelAttention">[docs]</a>
+<span class="k">class</span> <span class="nc">ParallelAttention</span><span class="p">(</span><span class="n">MegatronModule</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parallel self-attention layer abstract class.</span>
+
+<span class="sd">    Self-attention layer takes input with size [b, s, h]</span>
+<span class="sd">    and returns output of the same size.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">init_method</span><span class="p">,</span>
+        <span class="n">output_layer_init_method</span><span class="p">,</span>
+        <span class="n">layer_number</span><span class="p">,</span>
+        <span class="n">attention_type</span><span class="o">=</span><span class="n">AttnType</span><span class="o">.</span><span class="n">self_attn</span><span class="p">,</span>
+        <span class="n">attn_mask_type</span><span class="o">=</span><span class="n">AttnMaskType</span><span class="o">.</span><span class="n">padding</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ParallelAttention</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp16</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">fp16</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bf16</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">bf16</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_query_key_layer_scaling</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">apply_query_key_layer_scaling</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attention_softmax_in_fp32</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">attention_softmax_in_fp32</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_query_key_layer_scaling</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attention_softmax_in_fp32</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_number</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">layer_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attention_type</span> <span class="o">=</span> <span class="n">attention_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attn_mask_type</span> <span class="o">=</span> <span class="n">attn_mask_type</span>
+
+        <span class="n">projection_size</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">kv_channels</span> <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">num_attention_heads</span>
+
+        <span class="c1"># Per attention head and per partition values.</span>
+        <span class="n">world_size</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">get_tensor_model_parallel_world_size</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size_per_partition</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">projection_size</span><span class="p">,</span> <span class="n">world_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size_per_attention_head</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
+            <span class="n">projection_size</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">num_attention_heads</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_attention_heads_per_partition</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">num_attention_heads</span><span class="p">,</span> <span class="n">world_size</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Strided linear layer.</span>
+        <span class="k">if</span> <span class="n">attention_type</span> <span class="o">==</span> <span class="n">AttnType</span><span class="o">.</span><span class="n">self_attn</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">query_key_value</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">ColumnParallelLinear</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
+                <span class="mi">3</span> <span class="o">*</span> <span class="n">projection_size</span><span class="p">,</span>
+                <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">skip_bias_add</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">gather_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">init_method</span><span class="o">=</span><span class="n">init_method</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">attention_type</span> <span class="o">==</span> <span class="n">AttnType</span><span class="o">.</span><span class="n">cross_attn</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">ColumnParallelLinear</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
+                <span class="n">projection_size</span><span class="p">,</span>
+                <span class="n">gather_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">init_method</span><span class="o">=</span><span class="n">init_method</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">key_value</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">ColumnParallelLinear</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
+                <span class="mi">2</span> <span class="o">*</span> <span class="n">projection_size</span><span class="p">,</span>
+                <span class="n">gather_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">init_method</span><span class="o">=</span><span class="n">init_method</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">attention_type</span> <span class="o">==</span> <span class="n">AttnType</span><span class="o">.</span><span class="n">value_conv</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">query_key</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">ColumnParallelLinear</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
+                <span class="mi">2</span> <span class="o">*</span> <span class="n">projection_size</span><span class="p">,</span>
+                <span class="n">gather_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">init_method</span><span class="o">=</span><span class="n">init_method</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">Conv4Value</span><span class="p">(</span><span class="n">gather_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">init_method</span><span class="o">=</span><span class="n">init_method</span><span class="p">)</span>
+
+        <span class="n">coeff</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm_factor</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_size_per_attention_head</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_query_key_layer_scaling</span><span class="p">:</span>
+            <span class="n">coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_number</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">norm_factor</span> <span class="o">*=</span> <span class="n">coeff</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale_mask_softmax</span> <span class="o">=</span> <span class="n">FusedScaleMaskSoftmax</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp16</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bf16</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attn_mask_type</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">masked_softmax_fusion</span><span class="p">,</span>
+            <span class="n">attention_mask_func</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attention_softmax_in_fp32</span><span class="p">,</span>
+            <span class="n">coeff</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Dropout. Note that for a single iteration, this layer will generate</span>
+        <span class="c1"># different outputs on different number of parallel partitions but</span>
+        <span class="c1"># on average it should not be partition dependent.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attention_dropout</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">attention_dropout</span><span class="p">)</span>
+
+        <span class="c1"># Output.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dense</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">RowParallelLinear</span><span class="p">(</span>
+            <span class="n">projection_size</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
+            <span class="n">input_is_parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">init_method</span><span class="o">=</span><span class="n">output_layer_init_method</span><span class="p">,</span>
+            <span class="n">skip_bias_add</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="ParallelAttention.forward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.transformer.ParallelAttention.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">hidden_states</span><span class="p">,</span>
+        <span class="n">attention_mask</span><span class="p">,</span>
+        <span class="n">layer_past</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">get_key_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">encoder_output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">get_atten_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># hidden_states: [sq, b, h]</span>
+
+        <span class="c1"># =====================</span>
+        <span class="c1"># Query, Key, and Value</span>
+        <span class="c1"># =====================</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_type</span> <span class="o">==</span> <span class="n">AttnType</span><span class="o">.</span><span class="n">self_attn</span><span class="p">:</span>
+            <span class="c1"># Attention heads [sq, b, h] --&gt; [sq, b, (np * 3 * hn)]</span>
+            <span class="n">mixed_x_layer</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_key_value</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+
+            <span class="c1"># [sq, b, (np * 3 * hn)] --&gt; [sq, b, np, 3 * hn]</span>
+            <span class="n">new_tensor_shape</span> <span class="o">=</span> <span class="n">mixed_x_layer</span><span class="o">.</span><span class="n">size</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_attention_heads_per_partition</span><span class="p">,</span>
+                <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size_per_attention_head</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">mixed_x_layer</span> <span class="o">=</span> <span class="n">mixed_x_layer</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">*</span><span class="n">new_tensor_shape</span><span class="p">)</span>
+
+            <span class="c1"># [sq, b, np, 3 * hn] --&gt; 3 [sq, b, np, hn]</span>
+            <span class="p">(</span><span class="n">query_layer</span><span class="p">,</span> <span class="n">key_layer</span><span class="p">,</span> <span class="n">value_layer</span><span class="p">)</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">split_tensor_along_last_dim</span><span class="p">(</span>
+                <span class="n">mixed_x_layer</span><span class="p">,</span> <span class="mi">3</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_type</span> <span class="o">==</span> <span class="n">AttnType</span><span class="o">.</span><span class="n">cross_attn</span><span class="p">:</span>
+            <span class="c1"># Attention heads [sk, b, h] --&gt; [sk, b, (np * 2 * hn)]</span>
+            <span class="n">mixed_kv_layer</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_value</span><span class="p">(</span><span class="n">encoder_output</span><span class="p">)</span>
+
+            <span class="c1"># [sk, b, (np * 2 * hn)] --&gt; [sk, b, np, 2 * hn]</span>
+            <span class="n">new_tensor_shape</span> <span class="o">=</span> <span class="n">mixed_kv_layer</span><span class="o">.</span><span class="n">size</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_attention_heads_per_partition</span><span class="p">,</span>
+                <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size_per_attention_head</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">mixed_kv_layer</span> <span class="o">=</span> <span class="n">mixed_kv_layer</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">*</span><span class="n">new_tensor_shape</span><span class="p">)</span>
+
+            <span class="c1"># [sk, b, np, 2 * hn] --&gt; 2 [sk, b, np, hn]</span>
+            <span class="p">(</span><span class="n">key_layer</span><span class="p">,</span> <span class="n">value_layer</span><span class="p">)</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">split_tensor_along_last_dim</span><span class="p">(</span>
+                <span class="n">mixed_kv_layer</span><span class="p">,</span> <span class="mi">2</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Attention head [sq, b, h] --&gt; [sq, b, hp]</span>
+            <span class="n">query_layer</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+            <span class="c1"># [sq, b, hp] --&gt; [sq, b, np, hn]</span>
+            <span class="n">new_tensor_shape</span> <span class="o">=</span> <span class="n">query_layer</span><span class="o">.</span><span class="n">size</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_attention_heads_per_partition</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size_per_attention_head</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">query_layer</span> <span class="o">=</span> <span class="n">query_layer</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">*</span><span class="n">new_tensor_shape</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Attention heads [sk, b, h] --&gt; [sk, b, (np * 2 * hn)]</span>
+            <span class="n">mixed_qk_layer</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_key</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+
+            <span class="c1"># [sk, b, (np * 2 * hn)] --&gt; [sk, b, np, 2 * hn]</span>
+            <span class="n">new_tensor_shape</span> <span class="o">=</span> <span class="n">mixed_qk_layer</span><span class="o">.</span><span class="n">size</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_attention_heads_per_partition</span><span class="p">,</span>
+                <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size_per_attention_head</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">mixed_qk_layer</span> <span class="o">=</span> <span class="n">mixed_qk_layer</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">*</span><span class="n">new_tensor_shape</span><span class="p">)</span>
+
+            <span class="c1"># [sk, b, np, 2 * hn] --&gt; 2 [sk, b, np, hn]</span>
+            <span class="p">(</span><span class="n">query_layer</span><span class="p">,</span> <span class="n">key_layer</span><span class="p">)</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">split_tensor_along_last_dim</span><span class="p">(</span>
+                <span class="n">mixed_qk_layer</span><span class="p">,</span> <span class="mi">2</span>
+            <span class="p">)</span>
+
+            <span class="c1"># TODO, model paralle, Attention head [sq, b, h] --&gt; [sq, b, hp]</span>
+            <span class="c1"># NOW Attention head [sq, b, h] --&gt; [sq, b, h] only works when p=1</span>
+            <span class="n">value_layer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+            <span class="c1"># [sq, b, hp] --&gt; [sq, b, np, hn]</span>
+            <span class="n">new_tensor_shape</span> <span class="o">=</span> <span class="n">value_layer</span><span class="o">.</span><span class="n">size</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_attention_heads_per_partition</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size_per_attention_head</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">value_layer</span> <span class="o">=</span> <span class="n">value_layer</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">*</span><span class="n">new_tensor_shape</span><span class="p">)</span>
+        <span class="c1"># ==================================</span>
+        <span class="c1"># Adjust key and value for inference</span>
+        <span class="c1"># ==================================</span>
+
+        <span class="k">if</span> <span class="n">layer_past</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">past_key</span><span class="p">,</span> <span class="n">past_value</span> <span class="o">=</span> <span class="n">layer_past</span>
+            <span class="n">key_layer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">past_key</span><span class="o">.</span><span class="n">type_as</span><span class="p">(</span><span class="n">key_layer</span><span class="p">),</span> <span class="n">key_layer</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">value_layer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">past_value</span><span class="o">.</span><span class="n">type_as</span><span class="p">(</span><span class="n">value_layer</span><span class="p">),</span> <span class="n">value_layer</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">get_key_value</span><span class="p">:</span>
+            <span class="n">present</span> <span class="o">=</span> <span class="p">(</span><span class="n">key_layer</span><span class="p">,</span> <span class="n">value_layer</span><span class="p">)</span>
+
+        <span class="c1"># ===================================</span>
+        <span class="c1"># Raw attention scores. [b, np, s, s]</span>
+        <span class="c1"># ===================================</span>
+
+        <span class="c1"># [b, np, sq, sk]</span>
+        <span class="n">output_size</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">query_layer</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">query_layer</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">query_layer</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+            <span class="n">key_layer</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># [sq, b, np, hn] -&gt; [sq, b * np, hn]</span>
+        <span class="n">query_layer</span> <span class="o">=</span> <span class="n">query_layer</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+            <span class="n">output_size</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">output_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">output_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="c1"># [sk, b, np, hn] -&gt; [sk, b * np, hn]</span>
+        <span class="n">key_layer</span> <span class="o">=</span> <span class="n">key_layer</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">output_size</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">output_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">output_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># preallocting result tensor: [b * np, sq, sk]</span>
+        <span class="n">matmul_result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+            <span class="n">output_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">output_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">output_size</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="n">output_size</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">query_layer</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">current_device</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Raw attention scores. [b * np, sq, sk]</span>
+        <span class="n">matmul_result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">baddbmm</span><span class="p">(</span>
+            <span class="n">matmul_result</span><span class="p">,</span>
+            <span class="n">query_layer</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">key_layer</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">beta</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_factor</span><span class="p">),</span>
+        <span class="p">)</span>  <span class="c1"># [b * np, sq, hn]  # [b * np, hn, sk]</span>
+
+        <span class="c1"># change view to [b, np, sq, sk]</span>
+        <span class="n">attention_scores</span> <span class="o">=</span> <span class="n">matmul_result</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">*</span><span class="n">output_size</span><span class="p">)</span>
+
+        <span class="c1"># ==================================================</span>
+        <span class="c1"># Update attention mask for inference. [b, np, sq, sk]</span>
+        <span class="c1"># ==================================================</span>
+
+        <span class="k">if</span> <span class="n">get_key_value</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">layer_past</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">attention_mask</span> <span class="o">=</span> <span class="n">attention_mask</span><span class="p">[</span>
+                        <span class="o">...</span><span class="p">,</span> <span class="n">attention_scores</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:</span> <span class="n">attention_scores</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+                    <span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">attention_mask</span> <span class="o">=</span> <span class="n">attention_mask</span><span class="p">[</span>
+                        <span class="o">...</span><span class="p">,</span> <span class="p">:</span> <span class="n">attention_scores</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="p">:</span> <span class="n">attention_scores</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+                    <span class="p">]</span>
+
+        <span class="c1"># ===========================</span>
+        <span class="c1"># Attention probs and dropout</span>
+        <span class="c1"># ===========================</span>
+
+        <span class="c1"># attention scores and attention mask [b, np, sq, sk]</span>
+        <span class="n">attention_probs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_mask_softmax</span><span class="p">(</span><span class="n">attention_scores</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">)</span>
+
+        <span class="c1"># This is actually dropping out entire tokens to attend to, which might</span>
+        <span class="c1"># seem a bit unusual, but is taken from the original Transformer paper.</span>
+        <span class="k">with</span> <span class="n">mpu</span><span class="o">.</span><span class="n">get_cuda_rng_tracker</span><span class="p">()</span><span class="o">.</span><span class="n">fork</span><span class="p">():</span>
+            <span class="n">attention_probs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_dropout</span><span class="p">(</span><span class="n">attention_probs</span><span class="p">)</span>
+
+        <span class="c1"># =========================</span>
+        <span class="c1"># Context layer. [sq, b, hp]</span>
+        <span class="c1"># =========================</span>
+
+        <span class="c1"># value_layer -&gt; context layer.</span>
+        <span class="c1"># [sk, b, np, hn] --&gt; [b, np, sq, hn]</span>
+
+        <span class="c1"># context layer shape: [b, np, sq, hn]</span>
+        <span class="n">output_size</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">value_layer</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">value_layer</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">query_layer</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+            <span class="n">value_layer</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># change view [sk, b * np, hn]</span>
+        <span class="n">value_layer</span> <span class="o">=</span> <span class="n">value_layer</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+            <span class="n">value_layer</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">output_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">output_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">)</span>
+
+        <span class="c1"># change view [b * np, sq, sk]</span>
+        <span class="n">attention_probs</span> <span class="o">=</span> <span class="n">attention_probs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+            <span class="n">output_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">output_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">output_size</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">get_atten_value</span><span class="p">:</span>
+            <span class="n">atten_probs</span> <span class="o">=</span> <span class="p">(</span><span class="n">attention_probs</span><span class="p">,)</span>
+
+        <span class="c1"># matmul: [b * np, sq, hn]</span>
+        <span class="n">context_layer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bmm</span><span class="p">(</span><span class="n">attention_probs</span><span class="p">,</span> <span class="n">value_layer</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># change view [b, np, sq, hn]</span>
+        <span class="n">context_layer</span> <span class="o">=</span> <span class="n">context_layer</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">*</span><span class="n">output_size</span><span class="p">)</span>
+
+        <span class="c1"># [b, np, sq, hn] --&gt; [sq, b, np, hn]</span>
+        <span class="n">context_layer</span> <span class="o">=</span> <span class="n">context_layer</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+
+        <span class="c1"># [sq, b, np, hn] --&gt; [sq, b, hp]</span>
+        <span class="n">new_context_layer_shape</span> <span class="o">=</span> <span class="n">context_layer</span><span class="o">.</span><span class="n">size</span><span class="p">()[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size_per_partition</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">context_layer</span> <span class="o">=</span> <span class="n">context_layer</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+            <span class="o">*</span><span class="n">new_context_layer_shape</span>
+        <span class="p">)</span>  <span class="c1"># because mlp needs to perform on hidden_size dim, to be compatible with row/column parallel</span>
+
+        <span class="c1"># =================</span>
+        <span class="c1"># Output. [sq, b, h]</span>
+        <span class="c1"># =================</span>
+
+        <span class="n">output</span><span class="p">,</span> <span class="n">bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span><span class="n">context_layer</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">get_key_value</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="n">output</span><span class="p">,</span> <span class="n">present</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">get_atten_value</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="n">output</span><span class="p">,</span> <span class="n">atten_probs</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">bias</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="bias_dropout_add">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.transformer.bias_dropout_add">[docs]</a>
+<span class="k">def</span> <span class="nf">bias_dropout_add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">residual</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">training</span><span class="p">):</span>
+    <span class="c1"># type: (Tensor, Tensor, Tensor, float, bool) -&gt; Tensor</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">bias</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">training</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">residual</span> <span class="o">+</span> <span class="n">out</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<div class="viewcode-block" id="get_bias_dropout_add">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.transformer.get_bias_dropout_add">[docs]</a>
+<span class="k">def</span> <span class="nf">get_bias_dropout_add</span><span class="p">(</span><span class="n">training</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_bias_dropout_add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">residual</span><span class="p">,</span> <span class="n">prob</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">bias_dropout_add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">residual</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">training</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_bias_dropout_add</span></div>
+
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">bias_dropout_add_fused_train</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">residual</span><span class="p">,</span> <span class="n">prob</span><span class="p">):</span>
+    <span class="c1"># type: (Tensor, Tensor, Tensor, float) -&gt; Tensor</span>
+    <span class="k">return</span> <span class="n">bias_dropout_add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">residual</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">bias_dropout_add_fused_inference</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">residual</span><span class="p">,</span> <span class="n">prob</span><span class="p">):</span>
+    <span class="c1"># type: (Tensor, Tensor, Tensor, float) -&gt; Tensor</span>
+    <span class="k">return</span> <span class="n">bias_dropout_add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">residual</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ParallelTransformerLayer">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.transformer.ParallelTransformerLayer">[docs]</a>
+<span class="k">class</span> <span class="nc">ParallelTransformerLayer</span><span class="p">(</span><span class="n">MegatronModule</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A single transformer layer.</span>
+
+<span class="sd">    Transformer layer takes input with size [b, s, h] and returns an</span>
+<span class="sd">    output of the same size.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">init_method</span><span class="p">,</span>
+        <span class="n">output_layer_init_method</span><span class="p">,</span>
+        <span class="n">layer_number</span><span class="p">,</span>
+        <span class="n">layer_type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">encoder</span><span class="p">,</span>
+        <span class="n">self_attn_mask_type</span><span class="o">=</span><span class="n">AttnMaskType</span><span class="o">.</span><span class="n">padding</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">ParallelTransformerLayer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_number</span> <span class="o">=</span> <span class="n">layer_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_type</span> <span class="o">=</span> <span class="n">layer_type</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_residual_connection_post_layernorm</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">apply_residual_connection_post_layernorm</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bf16</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">bf16</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp32_residual_connection</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">fp32_residual_connection</span>
+
+        <span class="c1"># Layernorm on the input data.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_layernorm</span> <span class="o">=</span> <span class="n">LayerNorm</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">layernorm_epsilon</span><span class="p">)</span>
+
+        <span class="c1"># Self attention.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">self_attention</span> <span class="o">=</span> <span class="n">ParallelAttention</span><span class="p">(</span>
+            <span class="n">init_method</span><span class="p">,</span>
+            <span class="n">output_layer_init_method</span><span class="p">,</span>
+            <span class="n">layer_number</span><span class="p">,</span>
+            <span class="n">attention_type</span><span class="o">=</span><span class="n">AttnType</span><span class="o">.</span><span class="n">self_attn</span><span class="p">,</span>
+            <span class="n">attn_mask_type</span><span class="o">=</span><span class="n">self_attn_mask_type</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dropout</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">hidden_dropout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bias_dropout_fusion</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">bias_dropout_fusion</span>
+
+        <span class="c1"># Layernorm on the attention output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">post_attention_layernorm</span> <span class="o">=</span> <span class="n">LayerNorm</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">layernorm_epsilon</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_type</span> <span class="o">==</span> <span class="n">LayerType</span><span class="o">.</span><span class="n">decoder</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inter_attention</span> <span class="o">=</span> <span class="n">ParallelAttention</span><span class="p">(</span>
+                <span class="n">init_method</span><span class="p">,</span>
+                <span class="n">output_layer_init_method</span><span class="p">,</span>
+                <span class="n">layer_number</span><span class="p">,</span>
+                <span class="n">attention_type</span><span class="o">=</span><span class="n">AttnType</span><span class="o">.</span><span class="n">cross_attn</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># Layernorm on the attention output.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">post_inter_attention_layernorm</span> <span class="o">=</span> <span class="n">LayerNorm</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">layernorm_epsilon</span>
+            <span class="p">)</span>
+
+        <span class="c1"># MLP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span> <span class="o">=</span> <span class="n">ParallelMLP</span><span class="p">(</span><span class="n">init_method</span><span class="p">,</span> <span class="n">output_layer_init_method</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ParallelTransformerLayer.forward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.transformer.ParallelTransformerLayer.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">hidden_states</span><span class="p">,</span>
+        <span class="n">attention_mask</span><span class="p">,</span>
+        <span class="n">encoder_output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">enc_dec_attn_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">layer_past</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">get_key_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">get_atten_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># hidden_states: [b, s, h]</span>
+
+        <span class="c1"># Layer norm at the beginning of the transformer layer.</span>
+        <span class="n">layernorm_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_layernorm</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+        <span class="c1"># Self attention.</span>
+        <span class="n">attention_output</span><span class="p">,</span> <span class="n">attention_bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">self_attention</span><span class="p">(</span>
+            <span class="n">layernorm_output</span><span class="p">,</span>
+            <span class="n">attention_mask</span><span class="p">,</span>
+            <span class="n">layer_past</span><span class="o">=</span><span class="n">layer_past</span><span class="p">,</span>
+            <span class="n">get_key_value</span><span class="o">=</span><span class="n">get_key_value</span><span class="p">,</span>
+            <span class="n">get_atten_value</span><span class="o">=</span><span class="n">get_atten_value</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">get_key_value</span><span class="p">:</span>
+            <span class="n">attention_output</span><span class="p">,</span> <span class="n">presents</span> <span class="o">=</span> <span class="n">attention_output</span>
+
+        <span class="k">if</span> <span class="n">get_atten_value</span><span class="p">:</span>
+            <span class="n">attention_output</span><span class="p">,</span> <span class="n">attention_probs</span> <span class="o">=</span> <span class="n">attention_output</span>
+        <span class="c1"># Residual connection.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_residual_connection_post_layernorm</span><span class="p">:</span>
+            <span class="n">residual</span> <span class="o">=</span> <span class="n">layernorm_output</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">residual</span> <span class="o">=</span> <span class="n">hidden_states</span>
+
+        <span class="c1"># jit scripting for a nn.module (with dropout) is not</span>
+        <span class="c1"># trigerring the fusion kernel. For now, we use two</span>
+        <span class="c1"># different nn.functional routines to account for varying</span>
+        <span class="c1"># dropout semantics during training and inference phases.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_dropout_fusion</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
+                <span class="n">bias_dropout_add_func</span> <span class="o">=</span> <span class="n">bias_dropout_add_fused_train</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">bias_dropout_add_func</span> <span class="o">=</span> <span class="n">bias_dropout_add_fused_inference</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bias_dropout_add_func</span> <span class="o">=</span> <span class="n">get_bias_dropout_add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">)</span>
+
+        <span class="c1"># re-enable torch grad to enable fused optimization.</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">():</span>
+            <span class="n">layernorm_input</span> <span class="o">=</span> <span class="n">bias_dropout_add_func</span><span class="p">(</span>
+                <span class="n">attention_output</span><span class="p">,</span>
+                <span class="n">attention_bias</span><span class="o">.</span><span class="n">expand_as</span><span class="p">(</span><span class="n">residual</span><span class="p">),</span>
+                <span class="n">residual</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dropout</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Layer norm post the self attention.</span>
+        <span class="n">layernorm_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_attention_layernorm</span><span class="p">(</span><span class="n">layernorm_input</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_type</span> <span class="o">==</span> <span class="n">LayerType</span><span class="o">.</span><span class="n">decoder</span><span class="p">:</span>
+            <span class="n">attention_output</span><span class="p">,</span> <span class="n">attention_bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inter_attention</span><span class="p">(</span>
+                <span class="n">layernorm_output</span><span class="p">,</span> <span class="n">enc_dec_attn_mask</span><span class="p">,</span> <span class="n">encoder_output</span><span class="o">=</span><span class="n">encoder_output</span>
+            <span class="p">)</span>
+            <span class="c1"># residual connection</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_residual_connection_post_layernorm</span><span class="p">:</span>
+                <span class="n">residual</span> <span class="o">=</span> <span class="n">layernorm_output</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">residual</span> <span class="o">=</span> <span class="n">layernorm_input</span>
+
+            <span class="c1"># re-enable torch grad to enable fused optimization.</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">():</span>
+                <span class="n">layernorm_input</span> <span class="o">=</span> <span class="n">bias_dropout_add_func</span><span class="p">(</span>
+                    <span class="n">attention_output</span><span class="p">,</span>
+                    <span class="n">attention_bias</span><span class="o">.</span><span class="n">expand_as</span><span class="p">(</span><span class="n">residual</span><span class="p">),</span>
+                    <span class="n">residual</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dropout</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Layer norm post the decoder attention</span>
+            <span class="n">layernorm_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_inter_attention_layernorm</span><span class="p">(</span><span class="n">layernorm_input</span><span class="p">)</span>
+
+        <span class="c1"># MLP.</span>
+        <span class="n">mlp_output</span><span class="p">,</span> <span class="n">mlp_bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span><span class="p">(</span><span class="n">layernorm_output</span><span class="p">)</span>
+
+        <span class="c1"># Second residual connection.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_residual_connection_post_layernorm</span><span class="p">:</span>
+            <span class="n">residual</span> <span class="o">=</span> <span class="n">layernorm_output</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">residual</span> <span class="o">=</span> <span class="n">layernorm_input</span>
+
+        <span class="c1"># re-enable torch grad to enable fused optimization.</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">():</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">bias_dropout_add_func</span><span class="p">(</span>
+                <span class="n">mlp_output</span><span class="p">,</span> <span class="n">mlp_bias</span><span class="o">.</span><span class="n">expand_as</span><span class="p">(</span><span class="n">residual</span><span class="p">),</span> <span class="n">residual</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dropout</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">get_key_value</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="n">output</span><span class="p">,</span> <span class="n">presents</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">get_atten_value</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="n">output</span><span class="p">,</span> <span class="n">attention_probs</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">output</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ParallelTransformer">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.transformer.ParallelTransformer">[docs]</a>
+<span class="k">class</span> <span class="nc">ParallelTransformer</span><span class="p">(</span><span class="n">MegatronModule</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transformer class.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">init_method</span><span class="p">,</span>
+        <span class="n">output_layer_init_method</span><span class="p">,</span>
+        <span class="n">layer_type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">encoder</span><span class="p">,</span>
+        <span class="n">self_attn_mask_type</span><span class="o">=</span><span class="n">AttnMaskType</span><span class="o">.</span><span class="n">padding</span><span class="p">,</span>
+        <span class="n">pre_process</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">post_process</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">get_atten_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ParallelTransformer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bf16</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">bf16</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp32_residual_connection</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">fp32_residual_connection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span> <span class="o">=</span> <span class="n">pre_process</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">post_process</span> <span class="o">=</span> <span class="n">post_process</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_tensor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_atten_value</span> <span class="o">=</span> <span class="n">get_atten_value</span>
+
+        <span class="c1"># Store activation checkpoiting flag.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_activations</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">checkpoint_activations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_num_layers</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">checkpoint_num_layers</span>
+
+        <span class="c1"># Number of layers.</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">%</span> <span class="n">mpu</span><span class="o">.</span><span class="n">get_pipeline_model_parallel_world_size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="p">),</span> <span class="s2">&quot;num_layers must be divisible by pipeline_model_parallel_size&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">//</span> <span class="n">mpu</span><span class="o">.</span><span class="n">get_pipeline_model_parallel_world_size</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Transformer layers.</span>
+        <span class="k">def</span> <span class="nf">build_layer</span><span class="p">(</span><span class="n">layer_number</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ParallelTransformerLayer</span><span class="p">(</span>
+                <span class="n">init_method</span><span class="p">,</span>
+                <span class="n">output_layer_init_method</span><span class="p">,</span>
+                <span class="n">layer_number</span><span class="p">,</span>
+                <span class="n">layer_type</span><span class="o">=</span><span class="n">layer_type</span><span class="p">,</span>
+                <span class="n">self_attn_mask_type</span><span class="o">=</span><span class="n">self_attn_mask_type</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">virtual_pipeline_model_parallel_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">args</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">virtual_pipeline_model_parallel_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;num_layers_per_stage must be divisible by &quot;</span>
+                <span class="s2">&quot;virtual_pipeline_model_parallel_size&quot;</span>
+            <span class="p">)</span>
+            <span class="c1"># Number of layers in each model chunk is the number of layers in the stage,</span>
+            <span class="c1"># divided by the number of model chunks in a stage.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">//</span> <span class="n">args</span><span class="o">.</span><span class="n">virtual_pipeline_model_parallel_size</span>
+            <span class="p">)</span>
+            <span class="c1"># With 8 layers, 2 stages, and 4 model chunks, we want an assignment of</span>
+            <span class="c1"># layers to stages like (each list is a model chunk):</span>
+            <span class="c1"># Stage 0: [0]  [2]  [4]  [6]</span>
+            <span class="c1"># Stage 1: [1]  [3]  [5]  [7]</span>
+            <span class="c1"># With 8 layers, 2 stages, and 2 virtual stages, we want an assignment of</span>
+            <span class="c1"># layers to stages like (each list is a model chunk):</span>
+            <span class="c1"># Stage 0: [0, 1]  [4, 5]</span>
+            <span class="c1"># Stage 1: [2, 3]  [6, 7]</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">get_virtual_pipeline_model_parallel_rank</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">//</span> <span class="n">args</span><span class="o">.</span><span class="n">virtual_pipeline_model_parallel_size</span>
+            <span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">mpu</span><span class="o">.</span><span class="n">get_pipeline_model_parallel_rank</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Each stage gets a contiguous set of layers.</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">get_pipeline_model_parallel_rank</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">build_layer</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">offset</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span><span class="p">)]</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_process</span><span class="p">:</span>
+            <span class="c1"># Final layer norm before output.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">final_layernorm</span> <span class="o">=</span> <span class="n">LayerNorm</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">layernorm_epsilon</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_number</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer_number</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_checkpointed_forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">hidden_states</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">,</span> <span class="n">encoder_output</span><span class="p">,</span> <span class="n">enc_dec_attn_mask</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward method with activation checkpointing.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">custom</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">custom_forward</span><span class="p">(</span><span class="o">*</span><span class="n">inputs</span><span class="p">):</span>
+                <span class="n">x_</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">attention_mask</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">encoder_output</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">enc_dec_attn_mask</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+                    <span class="n">layer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_layer</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                    <span class="n">x_</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x_</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">,</span> <span class="n">encoder_output</span><span class="p">,</span> <span class="n">enc_dec_attn_mask</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">x_</span>
+
+            <span class="k">return</span> <span class="n">custom_forward</span>
+
+        <span class="c1"># Make sure memory is freed.</span>
+        <span class="n">mpu</span><span class="o">.</span><span class="n">reset_checkpointed_activations_memory_buffer</span><span class="p">()</span>
+        <span class="n">lt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">lt</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span><span class="p">:</span>
+            <span class="n">hidden_states</span> <span class="o">=</span> <span class="n">mpu</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">(</span>
+                <span class="n">custom</span><span class="p">(</span><span class="n">lt</span><span class="p">,</span> <span class="n">lt</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_num_layers</span><span class="p">),</span>
+                <span class="n">hidden_states</span><span class="p">,</span>
+                <span class="n">attention_mask</span><span class="p">,</span>
+                <span class="n">encoder_output</span><span class="p">,</span>
+                <span class="n">enc_dec_attn_mask</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">lt</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_num_layers</span>
+
+        <span class="k">return</span> <span class="n">hidden_states</span>
+
+<div class="viewcode-block" id="ParallelTransformer.set_input_tensor">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.transformer.ParallelTransformer.set_input_tensor">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_input_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_tensor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set input tensor to be used instead of forward()&#39;s input.</span>
+
+<span class="sd">        When doing pipeline parallelism the input from the previous</span>
+<span class="sd">        stage comes from communication, not from the input, so the</span>
+<span class="sd">        model&#39;s forward_step_func won&#39;t have it. This function is thus</span>
+<span class="sd">        used by internal code to bypass the input provided by the</span>
+<span class="sd">        forward_step_func&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_tensor</span> <span class="o">=</span> <span class="n">input_tensor</span></div>
+
+
+<div class="viewcode-block" id="ParallelTransformer.forward">
+<a class="viewcode-back" href="../../../../model.denoising.model.html#model.denoising.model.transformer.ParallelTransformer.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">hidden_states</span><span class="p">,</span>
+        <span class="n">attention_mask</span><span class="p">,</span>
+        <span class="n">layer_past</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">get_key_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">encoder_output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">enc_dec_attn_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># Checks.</span>
+        <span class="k">if</span> <span class="n">layer_past</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">get_key_value</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;for not None values in layer_past, &quot;</span> <span class="s2">&quot;expected get_key_value to be set&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">get_key_value</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_activations</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;get_key_value does not work with &quot;</span> <span class="s2">&quot;activation checkpointing&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">:</span>
+            <span class="c1"># Data format change to avoid explicit tranposes : [b s h] --&gt; [s b h].</span>
+            <span class="c1"># If the input flag for fp32 residual connection is set, convert for float.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp32_residual_connection</span><span class="p">:</span>
+                <span class="n">hidden_states</span> <span class="o">=</span> <span class="n">hidden_states</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+            <span class="c1"># Otherwise, leave it as is.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">hidden_states</span> <span class="o">=</span> <span class="n">hidden_states</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># See set_input_tensor()</span>
+            <span class="n">hidden_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_tensor</span>
+
+        <span class="k">if</span> <span class="n">encoder_output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">encoder_output</span> <span class="o">=</span> <span class="n">encoder_output</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_activations</span><span class="p">:</span>
+            <span class="n">hidden_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkpointed_forward</span><span class="p">(</span>
+                <span class="n">hidden_states</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">,</span> <span class="n">encoder_output</span><span class="p">,</span> <span class="n">enc_dec_attn_mask</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">get_key_value</span><span class="p">:</span>
+                <span class="n">presents</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_atten_value</span><span class="p">:</span>
+                <span class="n">attention_probs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span><span class="p">):</span>
+                <span class="n">layer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_layer</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                <span class="n">past</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">layer_past</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">past</span> <span class="o">=</span> <span class="n">layer_past</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+                <span class="n">hidden_states</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span>
+                    <span class="n">hidden_states</span><span class="p">,</span>
+                    <span class="n">attention_mask</span><span class="p">,</span>
+                    <span class="n">encoder_output</span><span class="o">=</span><span class="n">encoder_output</span><span class="p">,</span>
+                    <span class="n">enc_dec_attn_mask</span><span class="o">=</span><span class="n">enc_dec_attn_mask</span><span class="p">,</span>
+                    <span class="n">layer_past</span><span class="o">=</span><span class="n">past</span><span class="p">,</span>
+                    <span class="n">get_key_value</span><span class="o">=</span><span class="n">get_key_value</span><span class="p">,</span>
+                    <span class="n">get_atten_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_atten_value</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">get_key_value</span><span class="p">:</span>
+                    <span class="n">hidden_states</span><span class="p">,</span> <span class="n">present</span> <span class="o">=</span> <span class="n">hidden_states</span>
+                    <span class="n">presents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">present</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_atten_value</span><span class="p">:</span>
+                    <span class="n">hidden_states</span><span class="p">,</span> <span class="n">attention_prob</span> <span class="o">=</span> <span class="n">hidden_states</span>
+                    <span class="n">attention_probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attention_prob</span><span class="p">)</span>
+        <span class="c1"># Final layer norm.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_process</span><span class="p">:</span>
+            <span class="c1"># Reverting data format change [s b h] --&gt; [b s h].</span>
+            <span class="n">hidden_states</span> <span class="o">=</span> <span class="n">hidden_states</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_layernorm</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">hidden_states</span>
+        <span class="k">if</span> <span class="n">get_key_value</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="n">output</span><span class="p">,</span> <span class="n">presents</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_atten_value</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="n">output</span><span class="p">,</span> <span class="n">attention_probs</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yue Zhou, Tianyu Zhao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
